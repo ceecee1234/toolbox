@@ -6,12 +6,55 @@
     <title>页面未找到 - 工具箱</title>
     <style>
         *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:-apple-system,sans-serif;background:#f8fafc;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f8fafc;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}
         .container{max-width:400px}
-        h1{font-size:80px;margin-bottom:16px}
-        h2{font-size:24px;color:#1e293b;margin-bottom:8px}
-        p{color:#64748b;margin-bottom:24px}
-        a{display:inline-block;padding:12px 24px;background:#4285f4;color:white;border-radius:8px;text-decoration:none}
-        a:hover{background:#3367d6}
+        .emoji{font-size:80px;margin-bottom:16px}
+        h1{font-size:32px;color:#1e293b;margin-bottom:8px}
+        p{color:#64748b;margin-bottom:24px;line-height:1.6}
+        .btn{display:inline-block;padding:12px 24px;background:#4285f4;color:white;border-radius:8px;text-decoration:none;font-weight:500;transition:all 0.2s}
+        .btn:hover{background:#3367d6;transform:translateY(-2px)}
+        .links{margin-top:32px;padding-top:24px;border-top:1px solid #e2e8f0}
+        .links a{color:#4285f4;margin:0 12px;font-size:14px}
+        .search-box{margin:20px 0}
+        .search-box input{width:100%;padding:12px 16px;border:2px solid #e2e8f0;border-radius:24px;font-size:16px;outline:none}
+        .search-box input:focus{border-color:#4285f4}
     </style>
-</head
+</head>
+<body>
+    <div class="container">
+        <div class="emoji">🔍</div>
+        <h1>页面走丢了</h1>
+        <p>抱歉，您访问的页面不存在或已被移动。<br>试试搜索您需要的工具？</p>
+        
+        <div class="search-box">
+            <input type="text" id="search" placeholder="搜索工具：房贷、个税、JSON..." onkeypress="if(event.keyCode===13)window.location.href='./?q='+this.value">
+        </div>
+        
+        <a href="./" class="btn">返回首页</a>
+        
+        <div class="links">
+            <a href="./tools/finance/fangdai.html">房贷计算器</a>
+            <a href="./tools/finance/geshui.html">个税计算</a>
+            <a href="./tools/dev/json.html">JSON格式化</a>
+            <a href="./ai/">AI工具</a>
+        </div>
+    </div>
+    
+    <script>
+        // 尝试智能跳转
+        const path = location.pathname;
+        const redirectMap = {
+            '/fangdai': '/tools/finance/fangdai.html',
+            '/geshui': '/tools/finance/geshui.html',
+            '/json': '/tools/dev/json.html',
+            '/ai': '/ai/'
+        };
+        for (const [key, url] of Object.entries(redirectMap)) {
+            if (path.includes(key)) {
+                location.href = url;
+                break;
+            }
+        }
+    </script>
+</body>
+</html>
