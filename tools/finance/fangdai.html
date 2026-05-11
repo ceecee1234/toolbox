@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    
+    <title>房贷计算器 - 在线计算月供、利息、还款计划 | 全能工具箱</title>
+    <meta name="description" content="免费在线房贷计算器，支持等额本息、等额本金两种还款方式，一键计算月供、总利息、还款总额。2025年最新利率，买房必备工具。">
+    <meta name="keywords" content="房贷计算器,月供计算器,房贷利息计算,等额本息,等额本金,贷款计算器">
+    <link rel="canonical" href="https://你的用户名.github.io/toolbox/tools/finance/fangdai.html">
+    
+    <!-- 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "房贷计算器",
+        "description": "在线计算房贷月供、利息、还款计划",
+        "url": "https://你的用户名.github.io/toolbox/tools/finance/fangdai.html",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "All",
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "CNY"}
+    }
+    </script>
+    
+    <script>
+    !function(){var e=localStorage.getItem("toolbox_theme");"dark"===e&&document.documentElement.classList.add("dark")}();
+    </script>
+    
+    <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../../" class="logo">🛠️ 全能工具箱</a>
+            <div class="header-actions">
+                <button class="icon-btn" id="themeToggle" aria-label="切换主题">
+                    <span class="icon-light">🌙</span>
+                    <span class="icon-dark">☀️</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container tool-page">
+        <a href="../../" class="back-link">← 返回首页</a>
+        
+        <!-- 广告位 -->
+        <div class="ad-slot" id="adTop"><div class="ad-placeholder">广告位</div></div>
+        
+        <div class="tool-header">
+            <h1>🏠 房贷计算器</h1>
+            <button class="fav-btn" data-tool-id="fangdai">🤍 收藏</button>
+        </div>
+        
+        <!-- 使用说明 -->
+        <div class="tool-intro">
+            <strong>📖 使用说明：</strong>
+            <br>1. 输入贷款总额（单位：万元）
+            <br>2. 选择贷款年限（1-30年）
+            <br>3. 输入年利率（当前LPR参考：3.95%）
+            <br>4. 选择还款方式后点击计算
+            <br><br>
+            <strong>💡 小贴士：</strong>等额本息每月还款相同，适合收入稳定者；等额本金前期压力大但总利息少。
+        </div>
+        
+        <!-- 计算表单 -->
+        <div class="tool-form">
+            <div class="form-group">
+                <label class="form-label">贷款金额（万元）</label>
+                <input type="number" id="amount" class="form-input" value="100" min="1" max="10000" step="1">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">贷款年限（年）</label>
+                <select id="years" class="form-select">
+                    <option value="5">5年（60期）</option>
+                    <option value="10">10年（120期）</option>
+                    <option value="15">15年（180期）</option>
+                    <option value="20">20年（240期）</option>
+                    <option value="25">25年（300期）</option>
+                    <option value="30" selected>30年（360期）</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">年利率（%）</label>
+                <input type="number" id="rate" class="form-input" value="3.95" min="0.1" max="20" step="0.01">
+                <div style="font-size:12px;color:#64748b;margin-top:4px">
+                    参考利率：首套 3.95% | 二套 4.25% | 公积金 2.85%
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">还款方式</label>
+                <select id="method" class="form-select">
+                    <option value="1">等额本息（每月还款相同）</option>
+                    <option value="2">等额本金（每月递减）</option>
+                </select>
+            </div>
+            
+            <button class="calc-btn" onclick="calculate()">立即计算</button>
+        </div>
+        
+        <!-- 计算结果 -->
+        <div class="result-box" id="resultBox">
+            <h3>📊 计算结果</h3>
+            <div class="result-grid" id="resultGrid"></div>
+            
+            <!-- 还款明细表格 -->
+            <div id="scheduleSection" style="margin-top:20px;display:none">
+                <h4 style="margin-bottom:12px;font-size:14px">📋 还款计划表（前12期）</h4>
+                <div style="overflow-x:auto">
+                    <table id="scheduleTable" style="width:100%;border-collapse:collapse;font-size:13px">
+                        <thead>
+                            <tr style="background:var(--bg2)">
+                                <th style="padding:10px;text-align:center;border:1px solid var(--border)">期数</th>
+                                <th style="padding:10px;text-align:right;border:1px solid var(--border)">月供</th>
+                                <th style="padding:10px;text-align:right;border:1px solid var(--border)">本金</th>
+                                <th style="padding:10px;text-align:right;border:1px solid var(--border)">利息</th>
+                                <th style="padding:10px;text-align:right;border:1px solid var(--border)">剩余本金</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 相关工具 -->
+        <div class="related">
+            <h3>🔗 相关工具</h3>
+            <div class="related-list">
+                <a href="tihuan.html">提前还款计算器</a>
+                <a href="gongjijin.html">公积金贷款</a>
+                <a href="zuhe.html">组合贷计算</a>
+                <a href="geshui.html">个税计算器</a>
+                <a href="chedai.html">车贷计算器</a>
+            </div>
+        </div>
+        
+        <!-- 广告位 -->
+        <div class="ad-slot" id="adBottom"><div class="ad-placeholder">广告位</div></div>
+        
+        <!-- SEO内容 -->
+        <article style="margin-top:32px;padding:20px;background:var(--card);border-radius:12px;line-height:1.8">
+            <h2 style="font-size:18px;margin-bottom:12px">房贷计算器使用指南</h2>
+            
+            <h3 style="font-size:16px;margin:16px 0 8px">一、等额本息 vs 等额本金</h3>
+            <p style="color:var(--text2);font-size:14px">
+                <strong>等额本息</strong>：每月还款金额相同，前期利息占比高，适合收入稳定的上班族。
+                <br><strong>等额本金</strong>：每月还款递减，前期压力大但总利息少，适合前期还款能力强的人。
+            </p>
+            
+            <h3 style="font-size:16px;margin:16px 0 8px">二、2025年最新房贷利率</h3>
+            <p style="color:var(--text2);font-size:14px">
+                • 商业贷款首套：LPR 3.95%<br>
+                • 商业贷款二套：LPR + 0.3% = 4.25%<br>
+                • 公积金贷款：2.85%（首套5年以上）
+            </p>
+            
+            <h3 style="font-size:16px;margin:16px 0 8px">三、省钱技巧</h3>
+            <p style="color:var(--text2);font-size:14px">
+                1. 优先使用公积金贷款，利率更低<br>
+                2. 考虑组合贷（公积金+商贷）<br>
+                3. 有余力时可提前还款节省利息<br>
+                4. 关注LPR变动，适时转换贷款类型
+            </p>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 全能工具箱 | <a href="../../">返回首页</a></p>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="../../assets/js/app.js"></script>
+    <script>
+    function calculate() {
+        const amount = ToolUtils.getValue('amount') * 10000; // 转为元
+        const years = ToolUtils.getValue('years');
+        const rate = ToolUtils.getValue('rate') / 100 / 12; // 月利率
+        const method = document.getElementById('method').value;
+        const months = years * 12;
+        
+        if (amount <= 0 || years <= 0 || rate <= 0) {
+            ToolUtils.toast('请输入有效数值', 'error');
+            return;
+        }
+        
+        let monthlyPayment, totalPayment, totalInterest;
+        let schedule = [];
+        
+        if (method === '1') {
+            // 等额本息
+            monthlyPayment = amount * rate * Math.pow(1 + rate, months) / (Math.pow(1 + rate, months) - 1);
+            totalPayment = monthlyPayment * months;
+            totalInterest = totalPayment - amount;
+            
+            // 生成还款计划
+            let remaining = amount;
+            for (let i = 1; i <= Math.min(months, 12); i++) {
+                const interest = remaining * rate;
+                const principal = monthlyPayment - interest;
+                remaining -= principal;
+                schedule.push({
+                    period: i,
+                    payment: monthlyPayment,
+                    principal: principal,
+                    interest: interest,
+                    remaining: Math.max(0, remaining)
+                });
+            }
+            
+            document.getElementById('resultGrid').innerHTML = `
+                <div class="result-item">
+                    <div class="label">每月还款</div>
+                    <div class="value">${ToolUtils.formatMoney(monthlyPayment)}<span class="unit">元</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="label">还款总额</div>
+                    <div class="value">${ToolUtils.formatMoney(totalPayment)}<span class="unit">元</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="label">支付利息</div>
+                    <div class="value">${ToolUtils.formatMoney(totalInterest)}<span class="unit">元</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="label">贷款期限</div>
+                    <div class="value">${years}<span class="unit">年（${months}期）</span></div>
+                </div>
+            `;
+        } else {
+            // 等额本金
+            const monthlyPrincipal = amount / months;
+            const firstPayment = monthlyPrincipal + amount * rate;
+            const lastPayment = monthlyPrincipal + monthlyPrincipal * rate;
+            totalInterest = (months + 1) * amount * rate / 2;
+            totalPayment = amount + totalInterest;
+            
+            // 生成还款计划
+            let remaining = amount;
+            for (let i = 1; i <= Math.min(months, 12); i++) {
+                const interest = remaining * rate;
+                const payment = monthlyPrincipal + interest;
+                remaining -= monthlyPrincipal;
+                schedule.push({
+                    period: i,
+                    payment: payment,
+                    principal: monthlyPrincipal,
+                    interest: interest,
+                    remaining: Math.max(0, remaining)
+                });
+            }
+            
+            document.getElementById('resultGrid').innerHTML = `
+                <div class="result-item">
+                    <div class="label">首月还款</div>
+                    <div class="value">${ToolUtils.formatMoney(firstPayment)}<span class="unit">元</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="label">末月还款</div>
+                    <div class="value">${ToolUtils.formatMoney(lastPayment)}<span class="unit">元</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="label">还款总额</div>
+                    <div class="value">${ToolUtils.formatMoney(totalPayment)}<span class="unit">元</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="label">支付利息</div>
+                    <div class="value">${ToolUtils.formatMoney(totalInterest)}<span class="unit">元</span></div>
+                </div>
+            `;
+        }
+        
+        // 渲染还款计划表
+        document.getElementById('scheduleBody').innerHTML = schedule.map(s => `
+            <tr>
+                <td style="padding:8px;text-align:center;border:1px solid var(--border)">${s.period}</td>
+                <td style="padding:8px;text-align:right;border:1px solid var(--border)">${ToolUtils.formatMoney(s.payment)}</td>
+                <td style="padding:8px;text-align:right;border:1px solid var(--border)">${ToolUtils.formatMoney(s.principal)}</td>
+                <td style="padding:8px;text-align:right;border:1px solid var(--border)">${ToolUtils.formatMoney(s.interest)}</td>
+                <td style="padding:8px;text-align:right;border:1px solid var(--border)">${ToolUtils.formatMoney(s.remaining)}</td>
+            </tr>
+        `).join('');
+        
+        document.getElementById('scheduleSection').style.display = 'block';
+        ToolUtils.showResult('resultBox');
+    }
+    </script>
+</body>
+</html>
