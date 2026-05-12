@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI工具导航 - 全能工具箱</title>
+    <meta name="description" content="ChatGPT、Claude、Midjourney等热门AI工具导航，一站收录最新最全AI应用。">
+    <script>
+        if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');
+    </script>
+    <style>
+        :root{--bg:#f8fafc;--card:#fff;--text:#1e293b;--text2:#64748b;--primary:#4F46E5;--border:#e2e8f0;--accent:#F97316}
+        .dark{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--border:#334155}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+        .header{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px}
+        .header-inner{max-width:1000px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:20px;font-weight:700;text-decoration:none;color:var(--text)}
+        .main{max-width:1000px;margin:0 auto;padding:40px 20px}
+        h1{font-size:32px;text-align:center;margin-bottom:12px}
+        .subtitle{text-align:center;color:var(--text2);margin-bottom:40px}
+        .ai-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+        .ai-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;transition:all 0.2s}
+        .ai-card:hover{transform:translateY(-4px);box-shadow:0 10px 20px rgba(0,0,0,0.1);border-color:var(--primary)}
+        .ai-card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+        .ai-icon{font-size:40px}
+        .ai-name{font-size:20px;font-weight:700}
+        .ai-tag{font-size:12px;padding:4px 10px;background:var(--primary);color:white;border-radius:20px}
+        .ai-desc{color:var(--text2);margin-bottom:16px;font-size:14px;line-height:1.6}
+        .ai-features{margin-bottom:16px}
+        .ai-features li{font-size:14px;color:var(--text2);margin-bottom:6px;padding-left:20px;position:relative}
+        .ai-features li::before{content:"✓";position:absolute;left:0;color:var(--primary)}
+        .ai-btn{display:block;text-align:center;padding:14px;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;border-radius:10px;font-weight:600;text-decoration:none;transition:transform 0.2s}
+        .ai-btn:hover{transform:scale(1.02)}
+        .back{display:inline-block;margin-bottom:20px;color:var(--text2);text-decoration:none}
+        .back:hover{color:var(--primary)}
+        .ad-slot{margin:30px 0;padding:20px;background:var(--card);border:1px dashed var(--border);border-radius:12px;text-align:center;color:var(--text2)}
+        .footer{text-align        .footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);margin-top:60px;color:var(--text2);font-size:14px}
+        .footer a{color:var(--primary)}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="./" class="logo">🛠️ 全能工具箱</a>
+            <button onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light')" style="background:none;border:none;font-size:20px;cursor:pointer">
+                🌓
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <a href="./" class="back">← 返回首页</a>
+        
+        <h1>🤖 AI 智能工具导航</h1>
+        <p class="subtitle">收录最新最热门的AI工具，助力效率提升</p>
+
+        <!-- 广告位 -->
+        <div class="ad-slot">📢 广告位 - 接入AdSense后显示</div>
+
+        <div class="ai-grid">
+            <!-- ChatGPT -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">🤖</span>
+                    <div>
+                        <div class="ai-name">ChatGPT</div>
+                        <span class="ai-tag">最热门</span>
+                    </div>
+                </div>
+                <p class="ai-desc">OpenAI开发的强大对话AI，支持写作、编程、问答、翻译等多种任务，是目前最智能的AI助手。</p>
+                <ul class="ai-features">
+                    <li>自然语言对话</li>
+                    <li>代码生成与调试</li>
+                    <li>文章写作润色</li>
+                    <li>多语言翻译</li>
+                </ul>
+                <a href="https://chat.openai.com" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+
+            <!-- Claude -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">🧠</span>
+                    <div>
+                        <div class="ai-name">Claude</div>
+                        <span class="ai-tag">超长上下文</span>
+                    </div>
+                </div>
+                <p class="ai-desc">Anthropic开发的AI助手，支持超长文本分析，安全性高，是ChatGPT最强竞争者。</p>
+                <ul class="ai-features">
+                    <li>100K上下文窗口</li>
+                    <li>长文档分析</li>
+                    <li>安全可靠</li>
+                    <li>逻辑推理强</li>
+                </ul>
+                <a href="https://claude.ai" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+
+            <!-- Midjourney -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">🎨</span>
+                    <div>
+                        <div class="ai-name">Midjourney</div>
+                        <span class="ai-tag">AI绘画</span>
+                    </div>
+                </div>
+                <p class="ai-desc">目前最强大的AI绘画工具，只需文字描述即可生成高质量艺术作品，设计师必备神器。</p>
+                <ul class="ai-features">
+                    <li>文字生成图片</li>
+                    <li>艺术风格多样</li>
+                    <li>画质极高</li>
+                    <li>支持图片融合</li>
+                </ul>
+                <a href="https://midjourney.com" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+
+            <!-- 豆包 -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">🫘</span>
+                    <div>
+                        <div class="ai-name">豆包</div>
+                        <span class="ai-tag">国产免费</span>
+                    </div>
+                </div>
+                <p class="ai-desc">字节跳动推出的AI助手，中文理解能力强，免费使用，无需翻墙，国内用户首选。</p>
+                <ul class="ai-features">
+                    <li>完全免费</li>
+                    <li>中文理解强</li>
+                    <li>无需翻墙</li>
+                    <li>多端可用</li>
+                </ul>
+                <a href="https://www.doubao.com" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+
+            <!-- 文心一言 -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">📝</span>
+                    <div>
+                        <div class="ai-name">文心一言</div>
+                        <span class="ai-tag">百度AI</span>
+                    </div>
+                </div>
+                <p class="ai-desc">百度推出的大语言模型，中文能力出色，支持多模态，与百度生态深度整合。</p>
+                <ul class="ai-features">
+                    <li>中文理解强</li>
+                    <li>支持图片理解</li>
+                    <li>百度生态整合</li>
+                    <li>免费使用</li>
+                </ul>
+                <a href="https://yiyan.baidu.com" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+
+            <!-- 通义千问 -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">💬</span>
+                    <div>
+                        <div class="ai-name">通义千问</div>
+                        <span class="ai-tag">阿里AI</span>
+                    </div>
+                </div>
+                <p class="ai-desc">阿里巴巴推出的AI助手，支持文本、图像、音频多模态，企业级应用首选。</p>
+                <ul class="ai-features">
+                    <li>多模态能力</li>
+                    <li>企业级服务</li>
+                    <li>API开放</li>
+                    <li>免费额度</li>
+                </ul>
+                <a href="https://tongyi.aliyun.com" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+
+            <!-- Stable Diffusion -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">🖼️</span>
+                    <div>
+                        <div class="ai-name">Stable Diffusion</div>
+                        <span class="ai-tag">开源免费</span>
+                    </div>
+                </div>
+                <p class="ai-desc">开源免费的AI绘画模型，可本地部署，自由度极高，有丰富的模型和插件生态。</p>
+                <ul class="ai-features">
+                    <li>完全开源</li>
+                    <li>可本地部署</li>
+                    <li>模型丰富</li>
+                    <li>自由度高</li>
+                </ul>
+                <a href="https://stability.ai" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+
+            <!-- Notion AI -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">📓</span>
+                    <div>
+                        <div class="ai-name">Notion AI</div>
+                        <span class="ai-tag">笔记增强</span>
+                    </div>
+                </div>
+                <p class="ai-desc">Notion内置的AI助手，支持写作、总结、翻译、头脑风暴，与笔记工作流无缝结合。</p>
+                <ul class="ai-features">
+                    <li>笔记内嵌AI</li>
+                    <li>自动总结</li>
+                    <li>写作辅助</li>
+                    <li>翻译功能</li>
+                </ul>
+                <a href="https://notion.so" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+
+            <!-- Suno AI -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">🎵</span>
+                    <div>
+                        <div class="ai-name">Suno AI</div>
+                        <span class="ai-tag">AI音乐</span>
+                    </div>
+                </div>
+                <p class="ai-desc">革命性的AI音乐创作工具，输入文字即可生成完整歌曲，包括歌词、旋律、人声。</p>
+                <ul class="ai-features">
+                    <li>文字生成音乐</li>
+                    <li>自动生成歌词</li>
+                    <li>多种风格</li>
+                    <li>免费额度</li>
+                </ul>
+                <a href="https://suno.ai" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+
+            <!-- Pika -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">🎬</span>
+                    <div>
+                        <div class="ai-name">Pika Labs</div>
+                        <span class="ai-tag">AI视频</span>
+                    </div>
+                </div>
+                <p class="ai-desc">强大的AI视频生成工具，支持文字/图片生成视频，效果惊艳，视频创作新时代。</p>
+                <ul class="ai-features">
+                    <li>文字生成视频</li>
+                    <li>图片转视频</li>
+                    <li>视频编辑</li>
+                    <li>免费试用</li>
+                </ul>
+                <a href="https://pika.art" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+
+            <!-- Gamma -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">📊</span>
+                    <div>
+                        <div class="ai-name">Gamma</div>
+                        <span class="ai-tag">AI PPT</span>
+                    </div>
+                </div>
+                <p class="ai-desc">AI驱动的演示文稿工具，输入主题自动生成精美PPT，告别繁琐的排版工作。</p>
+                <ul class="ai-features">
+                    <li>一键生成PPT</li>
+                    <li>精美模板</li>
+                    <li>自动排版</li>
+                    <li>协作分享</li>
+                </ul>
+                <a href="https://gamma.app" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+
+            <!-- Perplexity -->
+            <div class="ai-card">
+                <div class="ai-card-header">
+                    <span class="ai-icon">🔍</span>
+                    <div>
+                        <div class="ai-name">Perplexity</div>
+                        <span class="ai-tag">AI搜索</span>
+                    </div>
+                </div>
+                <p class="ai-desc">新一代AI搜索引擎，实时联网获取信息，给出带来源的准确答案，替代传统搜索。</p>
+                <ul class="ai-features">
+                    <li>实时联网</li>
+                    <li>来源引用</li>
+                    <li>对话式搜索</li>
+                    <li>免费使用</li>
+                </ul>
+                <a href="https://perplexity.ai" target="_blank" rel="nofollow noopener" class="ai-btn">立即使用 →</a>
+            </div>
+        </div>
+
+        <!-- 广告位 -->
+        <div class="ad-slot">📢 广告位 - 接入AdSense后显示</div>
+
+        <!-- 提交AI工具 -->
+        <div style="text-align:center;padding:40px;background:var(--card);border:2px dashed var(--border);border-radius:16px;margin-top:40px">
+            <div style="font-size:48px;margin-bottom:16px">🤖</div>
+            <h3 style="margin-bottom:8px">发现新的AI工具？</h3>
+            <p style="color:var(--text2);margin-bottom:20px">提交你发现的AI工具，审核通过后收录</p>
+            <a href="https://github.com/ceecee1234/toolbox/issues" target="_blank" style="display:inline-block;padding:14px 32px;background:var(--primary);color:white;border-radius:50px;font-weight:600;text-decoration:none">提交AI工具</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 全能工具箱 | <a href="./">返回首页</a> | <a href="https://github.com/ceecee1234/toolbox" target="_blank">GitHub</a></p>
+    </footer>
+</body>
+</html>
