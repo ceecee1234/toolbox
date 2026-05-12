@@ -2,328 +2,1334 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-    
-    <!-- 预加载关键资源 -->
-    <link rel="preload" href="assets/css/style.css" as="style">
-    <link rel="preconnect" href="https://pagead2.googlesyndication.com">
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-    
-    <!-- SEO Meta -->
-    <title>工具箱 - 100+免费在线工具 | 房贷计算器、个税计算、AI工具</title>
-    <meta name="description" content="永久免费在线工具集合：房贷计算器、个税计算器、AI智能工具、JSON格式化、单位换算等100+实用工具。无需下载注册，打开即用！">
-    <meta name="keywords" content="在线工具,免费工具,房贷计算器,个税计算器,AI工具,JSON格式化,单位换算">
-    <meta name="author" content="全能工具箱">
-    <meta name="robots" content="index,follow">
-    <link rel="canonical" href="https://你的用户名.github.io/toolbox/">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="全能工具箱 - 100+免费在线工具">
-    <meta property="og:description" content="房贷计算、个税计算、AI工具、单位换算，一站搞定！">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://你的用户名.github.io/toolbox/">
-    <meta property="og:image" content="https://你的用户名.github.io/toolbox/assets/og-image.png">
-    <meta property="og:site_name" content="全能工具箱">
-    <meta property="og:locale" content="zh_CN">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="全能工具箱 - 100+免费在线工具">
-    <meta name="twitter:description" content="房贷计算、个税计算、AI工具，永久免费！">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全能工具箱 - 免费在线工具集合</title>
+    <meta name="description" content="100+免费在线工具：房贷计算器、个税计算、JSON格式化、AI工具导航等，无需下载，打开即用！">
+    <meta name="keywords" content="在线工具,免费工具,房贷计算器,个税计算器,JSON格式化,AI工具">
     
     <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4285f4">
+    <meta name="theme-color" content="#4F46E5">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="工具箱">
-    <link rel="apple-touch-icon" href="assets/icon-192.png">
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
-    
-    <!-- 结构化数据 -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "工具箱",
-        "description": "免费在线工具合集，包含100+实用工具",
-        "url": "https://你的用户名.github.io/toolbox/",
-        "applicationCategory": "UtilityApplication",
-        "operatingSystem": "All",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "CNY"
-        },
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "ratingCount": "2680"
-        }
-    }
-    </script>
-    
-    <!-- 主题预加载防闪烁 -->
+    <!-- 主题切换脚本 -->
     <script>
-    !function(){var e=localStorage.getItem("toolbox_theme");"dark"!==e&&"light"===e||!matchMedia("(prefers-color-scheme:dark)").matches||document.documentElement.classList.add("dark")}();
+        if(localStorage.getItem('theme')==='dark'||(!localStorage.getItem('theme')&&window.matchMedia('(prefers-color-scheme: dark)').matches)){
+            document.documentElement.classList.add('dark');
+        }
     </script>
     
-    <!-- 内联关键CSS -->
     <style>
-    :root{--bg:#f8fafc;--card:#fff;--text:#1e293b;--text2:#64748b;--primary:#4285f4;--border:#e2e8f0;--shadow:0 1px 3px rgba(0,0,0,.1)}
-    .dark{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--border:#334155}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
-    .container{max-width:960px;margin:0 auto;padding:0 16px}
-    .header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border);padding:12px 0}
-    .header-inner{max-width:960px;margin:0 auto;padding:0 16px;display:flex;justify-content:space-between;align-items:center}
-    .logo{font-size:18px;font-weight:700;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:6px}
-    .hero{text-align:center;padding:32px 16px}
-    .hero h1{font-size:clamp(22px,5vw,32px);margin-bottom:8px}
-    .search-box{max-width:480px;margin:0 auto;position:relative}
-    .search-box input{width:100%;height:48px;padding:0 16px 0 42px;border:2px solid var(--border);border-radius:24px;background:var(--card);color:var(--text);font-size:16px;outline:none}
-    .search-box input:focus{border-color:var(--primary)}
-    .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text2)}
-    .loading{text-align:center;padding:40px}
+        /* ===== CSS变量 ===== */
+        :root {
+            --bg: #f8fafc;
+            --bg-alt: #f1f5f9;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --primary: #4F46E5;
+            --primary-light: #EEF2FF;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --accent: #F97316;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-full: 9999px;
+        }
+        
+        .dark {
+            --bg: #0f172a;
+            --bg-alt: #1e293b;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --primary-light: rgba(79,70,229,0.2);
+        }
+        
+        /* ===== 基础样式 ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        /* ===== 头部 ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: none;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .icon-btn:hover {
+            background: var(--bg-alt);
+        }
+        
+        .dark-icon { display: none; }
+        .dark .light-icon { display: none; }
+        .dark .dark-icon { display: block; }
+        
+        /* ===== 主内容 ===== */
+        .main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* ===== Hero ===== */
+        .hero {
+            text-align: center;
+            padding: 50px 0 40px;
+        }
+        
+        .hero h1 {
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+        
+        .hero p strong {
+            color: var(--primary);
+        }
+        
+        /* ===== 搜索框 ===== */
+        .search-box {
+            max-width: 500px;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            height: 52px;
+            padding: 0 20px 0 48px;
+            font-size: 16px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-full);
+            color: var(--text);
+            outline: none;
+            transition: all 0.2s;
+        }
+        
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+        
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        /* ===== 热门标签 ===== */
+        .hot-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+        
+        .tag {
+            padding: 8px 16px;
+            font-size: 14px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-full);
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        
+        .tag:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+        
+        .tag-hot {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+        }
+        
+        /* ===== 分类 ===== */
+        .category {
+            margin-bottom: 40px;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .category-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .category-count {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        /* ===== 工具网格 ===== */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 14px;
+        }
+        
+        .tool-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 22px 14px 18px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .tool-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+        
+        .tool-card.featured {
+            border-color: var(--warning);
+            background: linear-gradient(135deg, rgba(245,158,11,0.05), transparent);
+        }
+        
+        .tool-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--warning);
+            color: white;
+            border-radius: var(--radius-full);
+        }
+        
+        .tool-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .tool-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .tool-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        /* ===== AI Banner ===== */
+        .ai-banner {
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 16px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .ai-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .ai-icon {
+            font-size: 48px;
+        }
+        
+        .ai-text h2 {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        
+        .ai-text p {
+            opacity: 0.9;
+        }
+        
+        .ai-btn {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            background: white;
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            transition: transform 0.2s;
+        }
+        
+        .ai-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* ===== 广告位 ===== */
+        .ad-slot {
+            margin: 30px 0;
+            padding: 20px;
+            min-height: 90px;
+            background: var(--card);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        /* ===== 页脚 ===== */
+        .footer {
+            margin-top: 60px;
+            padding: 30px 20px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        .footer p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .footer p a {
+            color: var(--primary);
+        }
+        
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 14px 28px;
+            background: var(--text);
+            color: white;
+            border-radius: var(--radius-full);
+            font-size: 15px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--error); }
+        
+        /* ===== 回到顶部 ===== */
+        .back-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 48px;
+            height: 48px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .back-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-top:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+        }
+        
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            
+            .tool-card {
+                padding: 16px 10px 14px;
+            }
+            
+            .tool-icon {
+                font-size: 26px;
+            }
+            
+            .tool-name {
+                font-size: 13px;
+            }
+            
+            .tool-desc {
+                font-size: 11px;
+            }
+            
+            .ai-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .ai-content {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tools-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .hero h1 {
+                font-size: 26px;
+            }
+        }
     </style>
-    
-    <!-- 异步加载完整CSS -->
-    <link rel="stylesheet" href="assets/css/style.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="assets/css/style.css"></noscript>
 </head>
 <body>
-    <!-- 跳过链接（可访问性） -->
-    <a href="#main" class="skip-link">跳到主要内容</a>
-    
     <!-- 头部 -->
     <header class="header">
         <div class="header-inner">
             <a href="./" class="logo">
                 <span>🛠️</span>
-                <span>工具箱</span>
+                <span>全能工具箱</span>
             </a>
-            <div class="header-actions">
-                <button class="icon-btn" id="themeToggle" aria-label="切换深色模式">
-                    <span class="icon-light">🌙</span>
-                    <span class="icon-dark">☀️</span>
+            <div class="header-right">
+                <button class="icon-btn" id="themeBtn" title="切换主题">
+                    <span class="light-icon">🌙</span>
+                    <span class="dark-icon">☀️</span>
                 </button>
-                <button class="icon-btn" id="favToggle" aria-label="我的收藏">
-                    ❤️<span class="badge" id="favCount"></span>
-                </button>
+                <button class="icon-btn" id="favBtn" title="我的收藏">❤️</button>
             </div>
         </div>
     </header>
 
     <!-- 主内容 -->
-    <main id="main" class="container">
-        <!-- Hero 区域 -->
+    <main class="main">
+        <!-- Hero -->
         <section class="hero">
-            <h1>🛠️ 工具箱</h1>
-            <p class="hero-desc">汇集 <strong>100+</strong> 免费实用在线工具，无需下载，打开即用</p>
+            <h1>🛠️ 全能工具箱</h1>
+            <p>汇集 <strong>100+</strong> 免费在线工具，无需下载，打开即用</p>
             
             <!-- 搜索框 -->
             <div class="search-box">
                 <span class="search-icon">🔍</span>
-                <input 
-                    type="search" 
-                    id="searchInput" 
-                    placeholder="搜索工具：房贷、个税、JSON、AI..." 
-                    autocomplete="off"
-                    aria-label="搜索工具"
-                >
-                <div id="searchResults" class="search-results"></div>
+                <input type="search" id="searchInput" placeholder="搜索工具：房贷、个税、JSON、AI...">
             </div>
             
             <!-- 热门标签 -->
             <div class="hot-tags">
-                <span class="hot-label">🔥 热门：</span>
-                <a href="tools/finance/fangdai.html" class="tag">房贷计算器</a>
-                <a href="tools/finance/geshui.html" class="tag">个税计算</a>
-                <a href="tools/dev/json.html" class="tag">JSON格式化</a>
-                <a href="ai/" class="tag tag-hot">AI工具</a>
-            </div>
-        </section>
-
-        <!-- 快捷入口 -->
-        <section class="quick-section">
-            <div class="tabs" role="tablist">
-                <button class="tab active" data-tab="hot" role="tab" aria-selected="true">🔥 热门</button>
-                <button class="tab" data-tab="fav" role="tab" aria-selected="false">⭐ 收藏</button>
-                <button class="tab" data-tab="recent" role="tab" aria-selected="false">🕒 最近</button>
-            </div>
-            <div id="quickTools" class="quick-grid" role="tabpanel">
-                <div class="loading">加载中...</div>
+                <span style="color: var(--text-muted); font-size: 14px;">🔥 热门：</span>
+                <a href="#fangdai" class="tag">房贷计算器</a>
+                <a href="#geshui" class="tag">个税计算</a>
+                <a href="#json" class="tag">JSON格式化</a>
+                <a href="#ai" class="tag tag-hot">🤖 AI工具</a>
             </div>
         </section>
 
         <!-- 广告位1 -->
-        <div class="ad-slot" id="adTop">
-            <div class="ad-placeholder">广告位</div>
+        <div class="ad-slot">
+            📢 广告位 - 接入 Google AdSense 后显示广告
         </div>
 
-        <!-- 工具分类 -->
-        <section id="toolsContainer" class="tools-section">
-            <div class="loading">加载中...</div>
-        </section>
-
-        <!-- AI 专区 Banner -->
-        <section class="ai-banner">
-            <div class="ai-content">
-                <div class="ai-text">
-                    <h2>🤖 AI 智能工具专区</h2>
-                    <p>ChatGPT、Claude、Midjourney 等热门AI工具导航</p>
+        <!-- 金融房产 -->
+        <section class="category" id="finance">
+            <div class="category-header">
+                <h2 class="category-title"><span>💰</span> 金融房产工具</h2>
+                <span class="category-count">8个工具</span>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card featured" id="fangdai" onclick="openTool('fangdai')">
+                    <span class="tool-badge">热门</span>
+                    <div class="tool-icon">🏠</div>
+                    <div class="tool-name">房贷计算器</div>
+                    <div class="tool-desc">月供/利息计算</div>
                 </div>
-                <a href="ai/" class="ai-btn">进入AI专区 →</a>
+                <div class="tool-card" onclick="openTool('tihuan')">
+                    <div class="tool-icon">💵</div>
+                    <div class="tool-name">提前还款</div>
+                    <div class="tool-desc">节省利息计算</div>
+                </div>
+                <div class="tool-card" onclick="openTool('gongjijin')">
+                    <div class="tool-icon">🏦</div>
+                    <div class="tool-name">公积金贷款</div>
+                    <div class="tool-desc">额度计算</div>
+                </div>
+                <div class="tool-card" onclick="openTool('chedai')">
+                    <div class="tool-icon">🚗</div>
+                    <div class="tool-name">车贷计算器</div>
+                    <div class="tool-desc">购车贷款</div>
+                </div>
+                <div class="tool-card featured" id="geshui" onclick="openTool('geshui')">
+                    <span class="tool-badge">热门</span>
+                    <div class="tool-icon">📊</div>
+                    <div class="tool-name">个税计算器</div>
+                    <div class="tool-desc">工资扣税</div>
+                </div>
+                <div class="tool-card" onclick="openTool('nianzhong')">
+                    <div class="tool-icon">🎁</div>
+                    <div class="tool-name">年终奖个税</div>
+                    <div class="tool-desc">奖金计税</div>
+                </div>
+                <div class="tool-card" onclick="openTool('cunkuan')">
+                    <div class="tool-icon">💎</div>
+                    <div class="tool-name">存款利息</div>
+                    <div class="tool-desc">定期/活期</div>
+                </div>
+                <div class="tool-card" onclick="openTool('fuli')">
+                    <div class="tool-icon">📈</div>
+                    <div class="tool-name">复利计算器</div>
+                    <div class="tool-desc">投资收益</div>
+                </div>
             </div>
         </section>
 
+        <!-- 时间日期 -->
+        <section class="category" id="datetime">
+            <div class="category-header">
+                <h2 class="category-title"><span>⏰</span> 时间日期工具</h2>
+                <span class="category-count">6个工具</span>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card" onclick="openTool('age')">
+                    <div class="tool-icon">🎂</div>
+                    <div class="tool-name">年龄计算</div>
+                    <div class="tool-desc">周岁/虚岁</div>
+                </div>
+                <div class="tool-card" onclick="openTool('datediff')">
+                    <div class="tool-icon">📅</div>
+                    <div class="tool-name">日期差计算</div>
+                    <div class="tool-desc">相差天数</div>
+                </div>
+                <div class="tool-card featured" onclick="openTool('timestamp')">
+                    <span class="tool-badge">热门</span>
+                    <div class="tool-icon">⏱️</div>
+                    <div class="tool-name">时间戳转换</div>
+                    <div class="tool-desc">Unix时间戳</div>
+                </div>
+                <div class="tool-card" onclick="openTool('countdown')">
+                    <div class="tool-icon">⏳</div>
+                    <div class="tool-name">倒计时</div>
+                    <div class="tool-desc">自定义计时</div>
+                </div>
+                <div class="tool-card" onclick="openTool('workday')">
+                    <div class="tool-icon">💼</div>
+                    <div class="tool-name">工作日计算</div>
+                    <div class="tool-desc">排除节假日</div>
+                </div>
+                <div class="tool-card" onclick="openTool('calendar')">
+                    <div class="tool-icon">📆</div>
+                    <div class="tool-name">万年历</div>
+                    <div class="tool-desc">农历/黄历</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 开发工具 -->
+        <section class="category" id="dev">
+            <div class="category-header">
+                <h2 class="category-title"><span>💻</span> 开发者工具</h2>
+                <span class="category-count">8个工具</span>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card featured" id="json" onclick="openTool('json')">
+                    <span class="tool-badge">热门</span>
+                    <div class="tool-icon">{ }</div>
+                    <div class="tool-name">JSON格式化</div>
+                    <div class="tool-desc">美化/压缩</div>
+                </div>
+                <div class="tool-card" onclick="openTool('base64')">
+                    <div class="tool-icon">🔐</div>
+                    <div class="tool-name">Base64编解码</div>
+                    <div class="tool-desc">文本转换</div>
+                </div>
+                <div class="tool-card" onclick="openTool('url')">
+                    <div class="tool-icon">🔗</div>
+                    <div class="tool-name">URL编解码</div>
+                    <div class="tool-desc">URL转换</div>
+                </div>
+                <div class="tool-card" onclick="openTool('md5')">
+                    <div class="tool-icon">🔒</div>
+                    <div class="tool-name">MD5加密</div>
+                    <div class="tool-desc">Hash计算</div>
+                </div>
+                <div class="tool-card" onclick="openTool('color')">
+                    <div class="tool-icon">🎨</div>
+                    <div class="tool-name">颜色转换</div>
+                    <div class="tool-desc">HEX/RGB</div>
+                </div>
+                <div class="tool-card" onclick="openTool('regex')">
+                    <div class="tool-icon">🔍</div>
+                    <div class="tool-name">正则测试</div>
+                    <div class="tool-desc">正则表达式</div>
+                </div>
+                <div class="tool-card" onclick="openTool('uuid')">
+                    <div class="tool-icon">🆔</div>
+                    <div class="tool-name">UUID生成</div>
+                    <div class="tool-desc">唯一ID</div>
+                </div>
+                <div class="tool-card" onclick="openTool('diff')">
+                    <div class="tool-icon">📝</div>
+                    <div class="tool-name">文本对比</div>
+                    <div class="tool-desc">Diff比较</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 文本工具 -->
+        <section class="category" id="text">
+            <div class="category-header">
+                <h2 class="category-title"><span>📝</span> 文本办公工具</h2>
+                <span class="category-count">6个工具</span>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card" onclick="openTool('wordcount')">
+                    <div class="tool-icon">📊</div>
+                    <div class="tool-name">字数统计</div>
+                    <div class="tool-desc">字符/词数</div>
+                </div>
+                <div class="tool-card featured" onclick="openTool('qrcode')">
+                    <span class="tool-badge">热门</span>
+                    <div class="tool-icon">📱</div>
+                    <div class="tool-name">二维码生成</div>
+                    <div class="tool-desc">文字转码</div>
+                </div>
+                <div class="tool-card" onclick="openTool('password')">
+                    <div class="tool-icon">🔐</div>
+                    <div class="tool-name">密码生成</div>
+                    <div class="tool-desc">随机密码</div>
+                </div>
+                <div class="tool-card" onclick="openTool('case')">
+                    <div class="tool-icon">🔠</div>
+                    <div class="tool-name">大小写转换</div>
+                    <div class="tool-desc">格式转换</div>
+                </div>
+                <div class="tool-card" onclick="openTool('dedup')">
+                    <div class="tool-icon">🧹</div>
+                    <div class="tool-name">文本去重</div>
+                    <div class="tool-desc">删除重复</div>
+                </div>
+                <div class="tool-card" onclick="openTool('replace')">
+                    <div class="tool-icon">🔄</div>
+                    <div class="tool-name">批量替换</div>
+                    <div class="tool-desc">查找替换</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 单位换算 -->
+        <section class="category" id="convert">
+            <div class="category-header">
+                <h2 class="category-title"><span>📏</span> 单位换算工具</h2>
+                <span class="category-count">6个工具</span>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card" onclick="openTool('length')">
+                    <div class="tool-icon">📐</div>
+                    <div class="tool-name">长度换算</div>
+                    <div class="tool-desc">米/英尺</div>
+                </div>
+                <div class="tool-card" onclick="openTool('weight')">
+                    <div class="tool-icon">⚖️</div>
+                    <div class="tool-name">重量换算</div>
+                    <div class="tool-desc">公斤/磅</div>
+                </div>
+                <div class="tool-card" onclick="openTool('area')">
+                    <div class="tool-icon">🏠</div>
+                    <div class="tool-name">面积换算</div>
+                    <div class="tool-desc">平米/亩</div>
+                </div>
+                <div class="tool-card" onclick="openTool('temperature')">
+                    <div class="tool-icon">🌡️</div>
+                    <div class="tool-name">温度换算</div>
+                    <div class="tool-desc">摄氏/华氏</div>
+                </div>
+                <div class="tool-card" onclick="openTool('data')">
+                    <div class="tool-icon">💾</div>
+                    <div class="tool-name">数据单位</div>
+                    <div class="tool-desc">KB/MB/GB</div>
+                </div>
+                <div class="tool-card" onclick="openTool('speed')">
+                    <div class="tool-icon">🚀</div>
+                    <div class="tool-name">速度换算</div>
+                    <div class="tool-desc">km/h/mph</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Banner -->
+        <section class="ai-banner" id="ai">
+            <div class="ai-content">
+                <div class="ai-icon">🤖</div>
+                <div class="ai-text">
+                    <h2>AI 智能工具专区</h2>
+                    <p>ChatGPT、Claude、Midjourney 等热门AI工具导航</p>
+                </div>
+            </div>
+            <a href="ai.html" class="ai-btn">进入AI专区 →</a>
+        </section>
+
         <!-- 广告位2 -->
-        <div class="ad-slot" id="adBottom"></div>
+        <div class="ad-slot">
+            📢 广告位 - 接入 Google AdSense 后显示广告
+        </div>
 
         <!-- 提交工具 -->
-        <section class="submit-section">
-            <h3>📮 发现好工具？推荐给我们！</h3>
-            <p>通过 GitHub Issues 提交工具，审核通过后收录</p>
-            <a href="https://github.com/你的用户名/toolbox/issues/new?template=submit-tool.yml" 
-               target="_blank" 
-               rel="noopener noreferrer" 
-               class="submit-btn">
-                提交工具
-            </a>
+        <section style="text-align: center; padding: 40px; background: var(--card); border: 2px dashed var(--border); border-radius: 16px; margin: 40px 0;">
+            <div style="font-size: 48px; margin-bottom: 16px;">📮</div>
+            <h3 style="margin-bottom: 8px;">发现好工具？推荐给我们！</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">通过 GitHub Issues 提交，审核通过后收录</p>
+            <a href="https://github.com/ceecee1234/toolbox/issues" target="_blank" style="display: inline-block; padding: 14px 32px; background: var(--success); color: white; border-radius: var(--radius-full); font-weight: 600; transition: transform 0.2s;">提交工具</a>
         </section>
     </main>
 
     <!-- 页脚 -->
     <footer class="footer">
         <div class="footer-links">
-            <a href="pages/about.html">关于本站</a>
-            <a href="pages/privacy.html">隐私政策</a>
+            <a href="about.html">关于本站</a>
+            <a href="privacy.html">隐私政策</a>
             <a href="sitemap.xml">站点地图</a>
-            <a href="https://github.com/你的用户名/toolbox" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/ceecee1234/toolbox" target="_blank">GitHub</a>
         </div>
-        <p>© 2025 工具箱 | 永久免费 | <a href="https://pages.github.com" target="_blank" rel="noopener">Powered by GitHub Pages</a></p>
+        <p>© 2025 全能工具箱 | 永久免费 | Powered by <a href="https://pages.github.com" target="_blank">GitHub Pages</a></p>
     </footer>
 
-    <!-- Toast 提示 -->
-    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
-    
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
     <!-- 回到顶部 -->
-    <button id="backTop" class="back-top" aria-label="回到顶部">↑</button>
+    <button id="backTop" class="back-top">↑</button>
 
-    <!-- 工具数据（内联减少请求） -->
-    <script id="toolsData" type="application/json">
-    {
-        "categories": [
-            {
-                "id": "finance",
-                "name": "金融房产",
-                "icon": "💰",
-                "tools": [
-                    {"id":"fangdai","name":"房贷计算器","icon":"🏠","desc":"月供利息计算","hot":true,"keywords":["房贷","月供","贷款","买房"]},
-                    {"id":"tihuan","name":"提前还款","icon":"💵","desc":"节省利息计算","keywords":["提前还款","房贷"]},
-                    {"id":"chedai","name":"车贷计算器","icon":"🚗","desc":"购车贷款计算","keywords":["车贷","汽车贷款"]},
-                    {"id":"gongjijin","name":"公积金贷款","icon":"🏦","desc":"额度利率计算","keywords":["公积金","住房公积金"]},
-                    {"id":"geshui","name":"个税计算器","icon":"📊","desc":"工资扣税计算","hot":true,"keywords":["个税","工资","扣税","个人所得税"]},
-                    {"id":"nianzhong","name":"年终奖个税","icon":"🎁","desc":"奖金扣税计算","keywords":["年终奖","个税"]},
-                    {"id":"cunkuan","name":"存款利息","icon":"💎","desc":"定期活期计算","keywords":["存款","利息","定期","活期"]}
-                ]
-            },
-            {
-                "id": "datetime",
-                "name": "时间日期",
-                "icon": "⏰",
-                "tools": [
-                    {"id":"age","name":"年龄计算","icon":"🎂","desc":"周岁虚岁计算","keywords":["年龄","周岁","虚岁","生日"]},
-                    {"id":"datediff","name":"日期差计算","icon":"📅","desc":"相差天数计算","keywords":["日期差","天数","相差多少天"]},
-                    {"id":"timestamp","name":"时间戳转换","icon":"⏱️","desc":"Unix时间戳","hot":true,"keywords":["时间戳","unix","timestamp"]},
-                    {"id":"countdown","name":"倒计时","icon":"⏳","desc":"自定义倒计时","keywords":["倒计时","计时器"]}
-                ]
-            },
-            {
-                "id": "convert",
-                "name": "单位换算",
-                "icon": "📏",
-                "tools": [
-                    {"id":"length","name":"长度换算","icon":"📐","desc":"米/英尺/英寸","keywords":["长度","换算","米","英尺"]},
-                    {"id":"weight","name":"重量换算","icon":"⚖️","desc":"公斤/磅/盎司","keywords":["重量","换算","公斤","磅"]},
-                    {"id":"area","name":"面积换算","icon":"🏠","desc":"平米/亩/公顷","keywords":["面积","换算","平米","亩"]},
-                    {"id":"temperature","name":"温度换算","icon":"🌡️","desc":"摄氏/华氏","keywords":["温度","摄氏","华氏"]},
-                    {"id":"data","name":"数据单位","icon":"💾","desc":"KB/MB/GB/TB","keywords":["数据","存储","KB","MB","GB"]}
-                ]
-            },
-            {
-                "id": "text",
-                "name": "文本办公",
-                "icon": "📝",
-                "tools": [
-                    {"id":"wordcount","name":"字数统计","icon":"📊","desc":"字符词数统计","keywords":["字数","统计","字符数"]},
-                    {"id":"qrcode","name":"二维码生成","icon":"📱","desc":"文字转二维码","hot":true,"keywords":["二维码","qrcode"]},
-                    {"id":"password","name":"密码生成","icon":"🔐","desc":"随机安全密码","keywords":["密码","随机密码","密码生成"]},
-                    {"id":"textdiff","name":"文本对比","icon":"🔄","desc":"差异对比","keywords":["文本对比","diff","差异"]}
-                ]
-            },
-            {
-                "id": "dev",
-                "name": "开发者工具",
-                "icon": "💻",
-                "tools": [
-                    {"id":"json","name":"JSON格式化","icon":"{ }","desc":"JSON美化压缩","hot":true,"keywords":["json","格式化","美化"]},
-                    {"id":"base64","name":"Base64编解码","icon":"🔐","desc":"Base64转换","keywords":["base64","编码","解码"]},
-                    {"id":"url","name":"URL编解码","icon":"🔗","desc":"URL编码转换","keywords":["url","编码","urlencode"]},
-                    {"id":"color","name":"颜色转换","icon":"🎨","desc":"HEX/RGB/HSL","keywords":["颜色","hex","rgb","颜色转换"]},
-                    {"id":"regex","name":"正则测试","icon":"🔍","desc":"正则表达式","keywords":["正则","regex","正则表达式"]}
-                ]
-            }
-        ],
-        "aiTools": [
-            {"id":"chatgpt","name":"ChatGPT","icon":"🤖","desc":"最强对话AI","url":"https://chat.openai.com","affiliate":true},
-            {"id":"claude","name":"Claude","icon":"🧠","desc":"超长上下文","url":"https://claude.ai","affiliate":true},
-            {"id":"midjourney","name":"Midjourney","icon":"🎨","desc":"AI绘画神器","url":"https://midjourney.com","affiliate":true},
-            {"id":"doubao","name":"豆包","icon":"🫘","desc":"字节跳动AI","url":"https://www.doubao.com","affiliate":true}
-        ]
-    }
-    </script>
+    <!-- 工具弹窗 -->
+    <div id="toolModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; padding: 20px; overflow-y: auto;">
+        <div style="max-width: 600px; margin: 40px auto; background: var(--card); border-radius: 16px; overflow: hidden;">
+            <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="modalTitle" style="font-size: 20px;">工具名称</h3>
+                <button onclick="closeModal()" style="width: 36px; height: 36px; border: none; background: var(--bg-alt); border-radius: 50%; cursor: pointer; font-size: 18px;">✕</button>
+            </div>
+            <div id="modalContent" style="padding: 24px;">
+                <!-- 工具内容 -->
+            </div>
+        </div>
+    </div>
 
-    <!-- 主脚本 -->
-    <script src="assets/js/app.js" defer></script>
-    
-    <!-- Google Analytics（异步加载） -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
-    window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
-    gtag('js',new Date());gtag('config','G-XXXXXXXXXX');
-    </script>
-
-    <!-- AdSense（延迟加载优化首屏） -->
-    <script>
-    // 3秒后加载广告，避免阻塞首屏
-    // 检测是否启用数据节省模式
-    if(!navigator.connection||navigator.connection.saveData!==true){
-        setTimeout(function(){
-            var s=document.createElement('script');
-            s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXX';
-            s.async=true;
-            s.crossOrigin='anonymous';
-            s.onerror=function(){console.log('AdSense加载失败')};
-            document.head.appendChild(s);
-        },3000);
-    }
-    </script>
-
-    <!-- PWA Service Worker -->
-    <script>
-    if('serviceWorker'in navigator){
-        window.addEventListener('load',function(){
-            navigator.serviceWorker.register('sw.js').then(function(reg){
-                console.log('SW registered');
-            }).catch(function(err){
-                console.log('SW failed',err);
-            });
+        // ===== 主题切换 =====
+        document.getElementById('themeBtn').addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
         });
-    }
+
+        // ===== Toast提示 =====
+        function showToast(msg, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => toast.className = 'toast', 3000);
+        }
+
+        // ===== 回到顶部 =====
+        const backTop = document.getElementById('backTop');
+        window.addEventListener('scroll', function() {
+            backTop.classList.toggle('show', window.scrollY > 300);
+        });
+        backTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ===== 搜索功能 =====
+        const tools = [
+            { id: 'fangdai', name: '房贷计算器', keywords: ['房贷', '月供', '贷款'] },
+            { id: 'geshui', name: '个税计算器', keywords: ['个税', '工资', '扣税'] },
+            { id: 'json', name: 'JSON格式化', keywords: ['json', '格式化'] },
+            { id: 'timestamp', name: '时间戳转换', keywords: ['时间戳', 'unix'] },
+            { id: 'qrcode', name: '二维码生成', keywords: ['二维码', 'qrcode'] },
+            { id: 'base64', name: 'Base64编解码', keywords: ['base64'] },
+            { id: 'color', name: '颜色转换', keywords: ['颜色', 'hex', 'rgb'] },
+            { id: 'password', name: '密码生成', keywords: ['密码'] },
+        ];
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const kw = e.target.value.toLowerCase().trim();
+            if (!kw) return;
+            
+            const results = tools.filter(t => 
+                t.name.toLowerCase().includes(kw) || 
+                t.keywords.some(k => k.includes(kw))
+            );
+            
+            if (results.length > 0) {
+                // 可以显示搜索结果下拉
+                console.log('搜索结果:', results);
+            }
+        });
+
+        // ===== 打开工具 =====
+        function openTool(toolId) {
+            const modal = document.getElementById('toolModal');
+            const title = document.getElementById('modalTitle');
+            const content = document.getElementById('modalContent');
+            
+            // 工具配置
+            const toolsConfig = {
+                fangdai: {
+                    title: '🏠 房贷计算器',
+                    html: `
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">贷款金额（万元）</label>
+                            <input type="number" id="loanAmount" value="100" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; background: var(--bg); color: var(--text);">
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">贷款年限（年）</label>
+                            <select id="loanYears" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; background: var(--bg); color: var(--text);">
+                                <option value="10">10年</option>
+                                <option value="20">20年</option>
+                                <option value="30" selected>30年</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">年利率（%）</label>
+                            <input type="number" id="loanRate" value="3.95" step="0.01" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; background: var(--bg); color: var(--text);">
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">还款方式</label>
+                            <select id="loanMethod" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; background: var(--bg); color: var(--text);">
+                                <option value="1">等额本息</option>
+                                <option value="2">等额本金</option>
+                            </select>
+                        </div>
+                        <button onclick="calcLoan()" style="width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">计算</button>
+                        <div id="loanResult" style="margin-top: 20px; padding: 20px; background: var(--bg-alt); border-radius: 12px; display: none;"></div>
+                    `
+                },
+                geshui: {
+                    title: '📊 个税计算器',
+                    html: `
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">税前月薪（元）</label>
+                            <input type="number" id="salary" value="10000" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; background: var(--bg); color: var(--text);">
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">五险一金（元）</label>
+                            <input type="number" id="insurance" value="2000" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; background: var(--bg); color: var(--text);">
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">专项附加扣除（元）</label>
+                            <input type="number" id="deduction" value="0" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; background: var(--bg); color: var(--text);">
+                        </div>
+                        <button onclick="calcTax()" style="width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">计算</button>
+                        <div id="taxResult" style="margin-top: 20px; padding: 20px; background: var(--bg-alt); border-radius: 12px; display: none;"></div>
+                    `
+                },
+                json: {
+                    title: '{ } JSON格式化',
+                    html: `
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">输入JSON</label>
+                            <textarea id="jsonInput" rows="6" placeholder='{"name":"张三","age":25}' style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: monospace; background: var(--bg); color: var(--text); resize: vertical;"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+                            <button onclick="formatJSON()" style="flex: 1; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">格式化</button>
+                            <button onclick="compressJSON()" style="flex: 1; padding: 12px; background: var(--text-secondary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">压缩</button>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">输出结果</label>
+                            <textarea id="jsonOutput" rows="6" readonly style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: monospace; background: var(--bg); color: var(--text); resize: vertical;"></textarea>
+                        </div>
+                        <button onclick="copyResult('jsonOutput')" style="width: 100%; padding: 12px; background: var(--success); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">复制结果</button>
+                    `
+                },
+                timestamp: {
+                    title: '⏱️ 时间戳转换',
+                    html: `
+                        <div style="padding: 16px; background: var(--bg-alt); border-radius: 12px; text-align: center; margin-bottom: 20px;">
+                            <div style="color: var(--text-muted); margin-bottom: 4px;">当前时间戳</div>
+                            <div id="currentTs" style="font-size: 28px; font-weight: 700; font-family: monospace;"></div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">时间戳转日期</label>
+                            <input type="text" id="tsInput" placeholder="输入时间戳" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; background: var(--bg); color: var(--text);">
+                            <button onclick="tsToDate()" style="width: 100%; margin-top: 8px; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">转换</button>
+                            <div id="tsResult" style="margin-top: 12px; padding: 12px; background: var(--bg-alt); border-radius: 8px; display: none;"></div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">日期转时间戳</label>
+                            <input type="datetime-local" id="dateInput" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; background: var(--bg); color: var(--text);">
+                            <button onclick="dateToTs()" style="width: 100%; margin-top: 8px; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">转换</button>
+                            <div id="dateResult" style="margin-top: 12px; padding: 12px; background: var(--bg-alt); border-radius: 8px; display: none;"></div>
+                        </div>
+                    `
+                },
+                qrcode: {
+                    title: '📱 二维码生成',
+                    html: `
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">输入内容</label>
+                            <textarea id="qrInput" rows="3" placeholder="输入网址或文字..." style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; background: var(--bg); color: var(--text); resize: vertical;">https://ceecee1234.github.io/toolbox/</textarea>
+                        </div>
+                        <button onclick="generateQR()" style="width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">生成二维码</button>
+                        <div id="qrResult" style="margin-top: 20px; text-align: center; display: none;">
+                            <div id="qrcode" style="display: inline-block; padding: 16px; background: white; border-radius: 12px;"></div>
+                            <p style="margin-top: 12px; color: var(--text-muted); font-size: 14px;">右键可保存图片</p>
+                        </div>
+                    `
+                },
+                base64: {
+                    title: '🔐 Base64编解码',
+                    html: `
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">输入文本</label>
+                            <textarea id="b64Input" rows="4" placeholder="输入要编码或解码的文本..." style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--bg); color: var(--text); resize: vertical;"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+                            <button onclick="encodeB64()" style="flex: 1; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">编码</button>
+                            <button onclick="decodeB64()" style="flex: 1; padding: 12px; background: var(--text-secondary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">解码</button>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">输出结果</label>
+                            <textarea id="b64Output" rows="4" readonly style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--bg); color: var(--text); resize: vertical;"></textarea>
+                        </div>
+                        <button onclick="copyResult('b64Output')" style="width: 100%; padding: 12px; background: var(--success); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">复制结果</button>
+                    `
+                },
+                password: {
+                    title: '🔐 密码生成器',
+                    html: `
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">密码长度</label>
+                            <input type="range" id="pwdLength" min="6" max="32" value="16" style="width: 100%;" oninput="document.getElementById('pwdLengthVal').textContent = this.value">
+                            <div style="text-align: center; margin-top: 4px;"><span id="pwdLengthVal">16</span> 位</div>
+                        </div>
+                        <div style="margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 12px;">
+                            <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" id="pwdUpper" checked> 大写字母</label>
+                            <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" id="pwdLower" checked> 小写字母</label>
+                            <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" id="pwdNumber" checked> 数字</label>
+                            <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" id="pwdSymbol" checked> 特殊符号</label>
+                        </div>
+                        <button onclick="generatePwd()" style="width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">生成密码</button>
+                        <div style="margin-top: 20px; padding: 20px; background: var(--bg-alt); border-radius: 12px; text-align: center;">
+                            <div id="pwdResult" style="font-size: 24px; font-weight: 700; font-family: monospace; word-break: break-all; margin-bottom: 12px;">点击上方按钮生成</div>
+                            <button onclick="copyText(document.getElementById('pwdResult').textContent)" style="padding: 10px 24px; background: var(--success); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">复制密码</button>
+                        </div>
+                    `
+                }
+            };
+            
+            // 默认工具
+            const defaultTool = {
+                title: '🔧 工具开发中',
+                html: `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 64px; margin-bottom: 20px;">🚧</div>
+                        <h3 style="margin-bottom: 12px;">该工具正在开发中</h3>
+                        <p style="color: var(--text-secondary);">敬请期待，我们会尽快上线！</p>
+                    </div>
+                `
+            };
+            
+            const tool = toolsConfig[toolId] || defaultTool;
+            title.textContent = tool.title;
+            content.innerHTML = tool.html;
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // 特殊处理
+            if (toolId === 'timestamp') {
+                updateTimestamp();
+                setInterval(updateTimestamp, 1000);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('toolModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // 点击背景关闭
+        document.getElementById('toolModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // ===== 房贷计算 =====
+        function calcLoan() {
+            const amount = parseFloat(document.getElementById('loanAmount').value) * 10000;
+            const years = parseInt(document.getElementById('loanYears').value);
+            const rate = parseFloat(document.getElementById('loanRate').value) / 100 / 12;
+            const method = document.getElementById('loanMethod').value;
+            const months = years * 12;
+            
+            let html = '';
+            
+            if (method === '1') {
+                // 等额本息
+                const monthly = amount * rate * Math.pow(1 + rate, months) / (Math.pow(1 + rate, months) - 1);
+                const total = monthly * months;
+                const interest = total - amount;
+                
+                html = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-muted); font-size: 14px;">每月还款</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary);">${monthly.toFixed(2)}</div>
+                            <div style="color: var(--text-muted); font-size: 12px;">元</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-muted); font-size: 14px;">还款总额</div>
+                            <div style="font-size: 24px; font-weight: 700;">${(total/10000).toFixed(2)}</div>
+                            <div style="color: var(--text-muted); font-size: 12px;">万元</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-muted); font-size: 14px;">支付利息</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--warning);">${(interest/10000).toFixed(2)}</div>
+                            <div style="color: var(--text-muted); font-size: 12px;">万元</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-muted); font-size: 14px;">还款期数</div>
+                            <div style="font-size: 24px; font-weight: 700;">${months}</div>
+                            <div style="color: var(--text-muted); font-size: 12px;">期</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // 等额本金
+                const monthlyPrincipal = amount / months;
+                const firstMonth = monthlyPrincipal + amount * rate;
+                const lastMonth = monthlyPrincipal + monthlyPrincipal * rate;
+                const interest = (months + 1) * amount * rate / 2;
+                
+                html = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-muted); font-size: 14px;">首月还款</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary);">${firstMonth.toFixed(2)}</div>
+                            <div style="color: var(--text-muted); font-size: 12px;">元</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-muted); font-size: 14px;">末月还款</div>
+                            <div style="font-size: 24px; font-weight: 700;">${lastMonth.toFixed(2)}</div>
+                            <div style="color: var(--text-muted); font-size: 12px;">元</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-muted); font-size: 14px;">支付利息</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--warning);">${(interest/10000).toFixed(2)}</div>
+                            <div style="color: var(--text-muted); font-size: 12px;">万元</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-muted); font-size: 14px;">每月递减</div>
+                            <div style="font-size: 24px; font-weight: 700;">${(monthlyPrincipal * rate).toFixed(2)}</div>
+                            <div style="color: var(--text-muted); font-size: 12px;">元</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            const result = document.getElementById('loanResult');
+            result.innerHTML = html;
+            result.style.display = 'block';
+        }
+
+        // ===== 个税计算 =====
+        function calcTax() {
+            const salary = parseFloat(document.getElementById('salary').value);
+            const insurance = parseFloat(document.getElementById('insurance').value);
+            const deduction = parseFloat(document.getElementById('deduction').value);
+            
+            const taxable = Math.max(0, salary - 5000 - insurance - deduction);
+            
+            let tax = 0, rate = 0;
+            if (taxable <= 3000) { tax = taxable * 0.03; rate = 3; }
+            else if (taxable <= 12000) { tax = taxable * 0.1 - 210; rate = 10; }
+            else if (taxable <= 25000) { tax = taxable * 0.2 - 1410; rate = 20; }
+            else if (taxable <= 35000) { tax = taxable * 0.25 - 2660; rate = 25; }
+            else if (taxable <= 55000) { tax = taxable * 0.3 - 4410; rate = 30; }
+            else if (taxable <= 80000) { tax = taxable * 0.35 - 7160; rate = 35; }
+            else { tax = taxable * 0.45 - 15160; rate = 45; }
+            
+            tax = Math.max(0, tax);
+            const afterTax = salary - insurance - tax;
+            
+            const result = document.getElementById('taxResult');
+            result.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div style="text-align: center;">
+                        <div style="color: var(--text-muted); font-size: 14px;">应缴个税</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--warning);">${tax.toFixed(2)}</div>
+                        <div style="color: var(--text-muted); font-size: 12px;">元</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="color: var(--text-muted); font-size: 14px;">税后收入</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--success);">${afterTax.toFixed(2)}</div>
+                        <div style="color: var(--text-muted); font-size: 12px;">元</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="color: var(--text-muted); font-size: 14px;">适用税率</div>
+                        <div style="font-size: 24px; font-weight: 700;">${rate}%</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="color: var(--text-muted); font-size: 14px;">应税所得</div>
+                        <div style="font-size: 24px; font-weight: 700;">${taxable.toFixed(2)}</div>
+                        <div style="color: var(--text-muted); font-size: 12px;">元</div>
+                    </div>
+                </div>
+            `;
+            result.style.display = 'block';
+        }
+
+        // ===== JSON格式化 =====
+        function formatJSON() {
+            try {
+                const input = document.getElementById('jsonInput').value;
+                const parsed = JSON.parse(input);
+                document.getElementById('jsonOutput').value = JSON.stringify(parsed, null, 4);
+                showToast('格式化成功', 'success');
+            } catch (e) {
+                showToast('JSON格式错误: ' + e.message, 'error');
+            }
+        }
+
+        function compressJSON() {
+            try {
+                const input = document.getElementById('jsonInput').value;
+                const parsed = JSON.parse(input);
+                document.getElementById('jsonOutput').value = JSON.stringify(parsed);
+                showToast('压缩成功', 'success');
+            } catch (e) {
+                showToast('JSON格式错误: ' + e.message, 'error');
+            }
+        }
+
+        // ===== 时间戳 =====
+        function updateTimestamp() {
+            document.getElementById('currentTs').textContent = Math.floor(Date.now() / 1000);
+        }
+
+        function tsToDate() {
+            const ts = document.getElementById('tsInput').value;
+            if (!ts) return showToast('请输入时间戳', 'error');
+            
+            const num = parseInt(ts);
+            const date = new Date(ts.length === 10 ? num * 1000 : num);
+            
+            const result = document.getElementById('tsResult');
+            result.innerHTML = `<strong>转换结果：</strong>${date.toLocaleString('zh-CN')}`;
+            result.style.display = 'block';
+        }
+
+        function dateToTs() {
+            const dateStr = document.getElementById('dateInput').value;
+            if (!dateStr) return showToast('请选择日期', 'error');
+            
+            const ts = Math.floor(new Date(dateStr).getTime() / 1000);
+            
+            const result = document.getElementById('dateResult');
+            result.innerHTML = `<strong>秒级时间戳：</strong>${ts}<br><strong>毫秒级时间戳：</strong>${ts * 1000}`;
+            result.style.display = 'block';
+        }
+
+        // ===== 二维码 =====
+        function generateQR() {
+            const text = document.getElementById('qrInput').value.trim();
+            if (!text) return showToast('请输入内容', 'error');
+            
+            const qrDiv = document.getElementById('qrcode');
+            qrDiv.innerHTML = '';
+            
+            // 使用免费API生成二维码
+            const img = document.createElement('img');
+            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}`;
+            img.alt = 'QR Code';
+            img.style.borderRadius = '8px';
+            qrDiv.appendChild(img);
+            
+            document.getElementById('qrResult').style.display = 'block';
+            showToast('二维码生成成功', 'success');
+        }
+
+        // ===== Base64 =====
+        function encodeB64() {
+            const input = document.getElementById('b64Input').value;
+            if (!input) return showToast('请输入文本', 'error');
+            
+            try {
+                document.getElementById('b64Output').value = btoa(unescape(encodeURIComponent(input)));
+                showToast('编码成功', 'success');
+            } catch (e) {
+                showToast('编码失败', 'error');
+            }
+        }
+
+        function decodeB64() {
+            const input = document.getElementById('b64Input').value;
+            if (!input) return showToast('请输入Base64', 'error');
+            
+            try {
+                document.getElementById('b64Output').value = decodeURIComponent(escape(atob(input)));
+                showToast('解码成功', 'success');
+            } catch (e) {
+                showToast('解码失败，请检查输入', 'error');
+            }
+        }
+
+        // ===== 密码生成 =====
+        function generatePwd() {
+            const length = parseInt(document.getElementById('pwdLength').value);
+            const useUpper = document.getElementById('pwdUpper').checked;
+            const useLower = document.getElementById('pwdLower').checked;
+            const useNumber = document.getElementById('pwdNumber').checked;
+            const useSymbol = document.getElementById('pwdSymbol').checked;
+            
+            let chars = '';
+            if (useUpper) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (useLower) chars += 'abcdefghijklmnopqrstuvwxyz';
+            if (useNumber) chars += '0123456789';
+            if (useSymbol) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            if (!chars) {
+                return showToast('请至少选择一种字符类型', 'error');
+            }
+            
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            document.getElementById('pwdResult').textContent = password;
+            showToast('密码已生成', 'success');
+        }
+
+        // ===== 复制功能 =====
+        function copyResult(id) {
+            const text = document.getElementById(id).value;
+            copyText(text);
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('已复制到剪贴板', 'success');
+            }).catch(() => {
+                showToast('复制失败', 'error');
+            });
+        }
     </script>
 </body>
 </html>
