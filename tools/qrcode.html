@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二维码生成器 - 在线文字转二维码 | 全能工具箱</title>
+    <meta name="description" content="免费在线二维码生成器，支持文字、网址、名片等内容转二维码，可自定义大小和颜色，一键下载保存。">
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
+    <style>
+        :root{--bg:#f8fafc;--card:#fff;--text:#1e293b;--text2:#64748b;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--border:#e2e8f0;--radius:12px}
+        .dark{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--border:#334155;--primary-light:rgba(79,70,229,0.2)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+        .header{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px}
+        .header-inner{max-width:800px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:18px;font-weight:700;text-decoration:none;color:var(--text)}
+        .main{max-width:800px;margin:0 auto;padding:20px}
+        .breadcrumb{display:flex;gap:8px;font-size:14px;color:var(--text2);margin-bottom:20px}
+        .breadcrumb a{color:var(--primary);text-decoration:none}
+        .tool-header h1{font-size:26px;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+        .ad-slot{margin:20px 0;padding:15px;background:var(--card);border:1px dashed var(--border);border-radius:var(--radius);text-align:center;color:var(--text2)}
+        .tool-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+        .form-group{margin-bottom:16px}
+        .form-group label{display:block;font-size:14px;font-weight:600;margin-bottom:8px}
+        .form-group textarea{width:100%;height:120px;padding:12px;font-size:16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);outline:none;resize:vertical}
+        .form-group textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+        .form-group input[type="number"],.form-group input[type="color"]{height:44px;padding:0 12px;font-size:16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text)}
+        .form-group input[type="color"]{width:60px;padding:4px;cursor:pointer}
+        .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px}
+        .btn{padding:14px 28px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:all 0.2s}
+        .btn-primary{background:linear-gradient(135deg,var(--primary),#7C3AED);color:white}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(79,70,229,0.3)}
+        .btn-success{background:var(--success);color:white}
+        .btn-secondary{background:var(--border);color:var(--text)}
+        .qr-result{margin-top:24px;padding:30px;background:var(--bg);border-radius:var(--radius);text-align:center;display:none}
+        .qr-result.show{display:block}
+        .qr-result img{max-width:256px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+        .qr-actions{margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+        .templates{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+        .template-btn{padding:8px 16px;font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:20px;cursor:pointer;transition:all 0.2s;color:var(--text2)}
+        .template-btn:hover{border-color:var(--primary);color:var(--primary)}
+        .footer{margin-top:60px;padding:30px;text-align:center;border-top:1px solid var(--border);color:var(--text2);font-size:14px}
+        .footer a{color:var(--primary)}
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);padding:14px 28px;background:var(--success);color:white;border-radius:50px;opacity:0;transition:all 0.3s;z-index:1000}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../" class="logo">🛠️ 全能工具箱</a>
+            <button onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light')" style="background:none;border:none;font-size:20px;cursor:pointer">🌓</button>
+        </div>
+    </header>
+
+    <main class="main">
+        <nav class="breadcrumb">
+            <a href="../">首页</a><span>›</span>
+            <a href="../#text">文本工具</a><span>›</span>
+            <span>二维码生成</span>
+        </nav>
+
+        <div class="ad-slot">📢 广告位</div>
+
+        <div class="tool-header">
+            <h1><span>📱</span> 二维码生成器</h1>
+        </div>
+
+        <div class="tool-card">
+            <!-- 快捷模板 -->
+            <div class="templates">
+                <button class="template-btn" onclick="setTemplate('url')">🔗 网址</button>
+                <button class="template-btn" onclick="setTemplate('text')">📝 文本</button>
+                <button class="template-btn" onclick="setTemplate('email')">📧 邮箱</button>
+                <button class="template-btn" onclick="setTemplate('tel')">📞 电话</button>
+                <button class="template-btn" onclick="setTemplate('wifi')">📶 WiFi</button>
+            </div>
+
+            <div class="form-group">
+                <label>输入内容</label>
+                <textarea id="qrContent" placeholder="输入网址、文字、电话等内容...">https://ceecee1234.github.io/toolbox/</textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>尺寸（像素）</label>
+                    <input type="number" id="qrSize" value="256" min="100" max="500" step="50">
+                </div>
+                <div class="form-group">
+                    <label>前景色</label>
+                    <input type="color" id="qrFgColor" value="#000000">
+                </div>
+                <div class="form-group">
+                    <label>背景色</label>
+                    <input type="color" id="qrBgColor" value="#ffffff">
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="generateQR()" style="width:100%">🎨 生成二维码</button>
+
+            <div class="qr-result" id="qrResult">
+                <img id="qrImage" src="" alt="二维码">
+                <div class="qr-actions">
+                    <button class="btn btn-success" onclick="downloadQR()">💾 下载图片</button>
+                    <button class="btn btn-secondary" onclick="copyQR()">📋 复制图片</button>
+                </div>
+                <p style="margin-top:16px;font-size:13px;color:var(--text2)">💡 右键图片也可以保存</p>
+            </div>
+        </div>
+
+        <div class="ad-slot">📢 广告位</div>
+
+        <!-- 使用说明 -->
+        <div class="tool-card">
+            <h3 style="margin-bottom:16px">📖 使用说明</h3>
+            <ul style="padding-left:20px;color:var(--text2);font-size:14px;line-height:2">
+                <li><strong>网址：</strong>直接输入完整网址（包含 http:// 或 https://）</li>
+                <li><strong>文本：</strong>任意文字内容，扫码后直接显示</li>
+                <li><strong>电话：</strong>输入 tel:电话号码 格式，扫码可直接拨打</li>
+                <li><strong>邮箱：</strong>输入 mailto:邮箱地址 格式，扫码可发送邮件</li>
+                <li><strong>WiFi：</strong>输入 WIFI:T:WPA;S:WiFi名称;P:密码;; 格式</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 全能工具箱 | <a href="../">返回首页</a></p>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // 模板
+        function setTemplate(type) {
+            const templates = {
+                url: 'https://ceecee1234.github.io/toolbox/',
+                text: '这是一段测试文字',
+                email: 'mailto:example@email.com',
+                tel: 'tel:+8613800138000',
+                wifi: 'WIFI:T:WPA;S:MyWiFi;P:password123;;'
+            };
+            document.getElementById('qrContent').value = templates[type] || '';
+        }
+
+        // 生成二维码
+        function generateQR() {
+            const content = document.getElementById('qrContent').value.trim();
+            if (!content) {
+                showToast('请输入内容');
+                return;
+            }
+
+            const size = document.getElementById('qrSize').value;
+            const fgColor = document.getElementById('qrFgColor').value.replace('#', '');
+            const bgColor = document.getElementById('qrBgColor').value.replace('#', '');
+
+            // 使用免费API
+            const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(content)}&color=${fgColor}&bgcolor=${bgColor}`;
+            
+            const img = document.getElementById('qrImage');
+            img.src = apiUrl;
+            
+            img.onload = function() {
+                document.getElementById('qrResult').classList.add('show');
+                showToast('✅ 生成成功');
+            };
+            
+            img.onerror = function() {
+                showToast('❌ 生成失败，请重试');
+            };
+        }
+
+        // 下载二维码
+        function downloadQR() {
+            const img = document.getElementById('qrImage');
+            const link = document.createElement('a');
+            link.href = img.src;
+            link.download = 'qrcode.png';
+            link.click();
+            showToast('✅ 开始下载');
+        }
+
+        // 复制二维码
+        async function copyQR() {
+            try {
+                const img = document.getElementById('qrImage');
+                const response = await fetch(img.src);
+                const blob = await response.blob();
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                showToast('✅ 已复制到剪贴板');
+            } catch (err) {
+                showToast('❌ 复制失败，请右键保存');
+            }
+        }
+
+        // 记录最近使用
+        let recent = JSON.parse(localStorage.getItem('toolbox_recent') || '[]');
+        recent = recent.filter(r => r.id !== 'qrcode');
+        recent.unshift({ id: 'qrcode', name: '二维码生成', icon: '📱', url: 'tools/qrcode.html' });
+        if (recent.length > 10) recent.pop();
+        localStorage.setItem('toolbox_recent', JSON.stringify(recent));
+    </script>
+</body>
+</html>
