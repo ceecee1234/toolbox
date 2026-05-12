@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64编解码 - 在线文本/图片Base64转换 | 全能工具箱</title>
+    <meta name="description" content="免费在线Base64编解码工具，支持文本编码解码、图片转Base64、Base64转图片，一键转换。">
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
+    <style>
+        :root{--bg:#f8fafc;--card:#fff;--text:#1e293b;--text2:#64748b;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--error:#EF4444;--border:#e2e8f0;--radius:12px}
+        .dark{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--border:#334155;--primary-light:rgba(79,70,229,0.2)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+        .header{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px}
+        .header-inner{max-width:1000px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:18px;font-weight:700;text-decoration:none;color:var(--text)}
+        .main{max-width:1000px;margin:0 auto;padding:20px}
+        .breadcrumb{display:flex;gap:8px;font-size:14px;color:var(--text2);margin-bottom:20px}
+        .breadcrumb a{color:var(--primary);text-decoration:none}
+        .tool-header h1{font-size:26px;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+        .ad-slot{margin:20px 0;padding:15px;background:var(--card);border:1px dashed var(--border);border-radius:var(--radius);text-align:center;color:var(--text2)}
+        .tabs{display:flex;gap:0;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+        .tab{flex:1;padding:14px;text-align:center;font-weight:600;cursor:pointer;transition:all 0.2s;border:none;background:none;color:var(--text2)}
+        .tab.active{background:var(--primary);color:white}
+        .tab:hover:not(.active){background:var(--bg)}
+        .tab-content{display:none}
+        .tab-content.active{display:block}
+        .tool-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+        .tool-area{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+        @media(max-width:768px){.tool-area{grid-template-columns:1fr}}
+        .panel{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+        .panel-header{padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border);font-weight:600;font-size:14px}
+        .panel textarea{width:100%;height:250px;padding:16px;border:none;background:transparent;color:var(--text);font-family:monospace;font-size:14px;resize:vertical;outline:none}
+        .btn-group{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}
+        .btn{padding:12px 24px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s}
+        .btn-primary{background:var(--primary);color:white}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(79,70,229,0.3)}
+        .btn-secondary{background:var(--border);color:var(--text)}
+        .btn-success{background:var(--success);color:white}
+        .upload-area{border:2px dashed var(--border);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:all 0.2s}
+        .upload-area:hover{border-color:var(--primary);background:var(--primary-light)}
+        .upload-area input{display:none}
+        .preview-area{margin-top:20px;text-align:center;display:none}
+        .preview-area img{max-width:100%;max-height:300px;border-radius:var(--radius)}
+        .status{padding:10px 16px;border-radius:8px;font-size:14px;margin-bottom:16px;display:none}
+        .status.show{display:block}
+        .status.success{background:rgba(16,185,129,0.1);color:var(--success)}
+        .status.error{background:rgba(239,68,68,0.1);color:var(--error)}
+        .footer{margin-top:60px;padding:30px;text-align:center;border-top:1px solid var(--border);color:var(--text2);font-size:14px}
+        .footer a{color:var(--primary)}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../" class="logo">🛠️ 全能工具箱</a>
+            <button onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light')" style="background:none;border:none;font-size:20px;cursor:pointer">🌓</button>
+        </div>
+    </header>
+
+    <main class="main">
+        <nav class="breadcrumb">
+            <a href="../">首页</a><span>›</span>
+            <a href="../#dev">开发工具</a><span>›</span>
+            <span>Base64编解码</span>
+        </nav>
+
+        <div class="ad-slot">📢 广告位</div>
+
+        <div class="tool-header">
+            <h1><span>🔐</span> Base64编解码</h1>
+        </div>
+
+        <!-- 标签切换 -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('text')">📝 文本转换</button>
+            <button class="tab" onclick="switchTab('image')">🖼️ 图片转换</button>
+        </div>
+
+        <!-- 文本转换 -->
+        <div class="tab-content active" id="textTab">
+            <div class="tool-card">
+                <div id="textStatus" class="status"></div>
+                <div class="tool-area">
+                    <div class="panel">
+                        <div class="panel-header">📥 输入文本</div>
+                        <textarea id="textInput" placeholder="输入要编码或解码的文本..."></textarea>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">📤 输出结果</div>
+                        <textarea id="textOutput" readonly placeholder="转换结果将显示在这里..."></textarea>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="encodeText()">🔒 编码 (Text → Base64)</button>
+                    <button class="btn btn-primary" onclick="decodeText()">🔓 解码 (Base64 → Text)</button>
+                    <button class="btn btn-success" onclick="copyTextOutput()">📋 复制结果</button>
+                    <button class="btn btn-secondary" onclick="clearText()">🗑️ 清空</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图片转换 -->
+        <div class="tab-content" id="imageTab">
+            <div class="tool-card">
+                <div id="imageStatus" class="status"></div>
+                
+                <div class="upload-area" onclick="document.getElementById('imageInput').click()">
+                    <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
+                    <div style="font-size:48px;margin-bottom:16px">📷</div>
+                    <div style="font-size:16px;font-weight:600;margin-bottom:8px">点击或拖拽上传图片</div>
+                    <div style="font-size:14px;color:var(--text2)">支持 JPG、PNG、GIF、WebP 等格式</div>
+                </div>
+
+                <div class="preview-area" id="previewArea">
+                    <img id="previewImage" src="" alt="预览">
+                </div>
+
+                <div class="panel" style="margin-top:20px">
+                    <div class="panel-header">📤 Base64 结果</div>
+                    <textarea id="imageOutput" readonly placeholder="图片的Base64编码将显示在这里..." style="height:150px"></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="copyImageOutput()">📋 复制Base64</button>
+                    <button class="btn btn-primary" onclick="downloadDataUrl()">💾 下载图片</button>
+                    <button class="btn btn-secondary" onclick="clearImage()">🗑️ 清空</button>
+                </div>
+
+                <div style="margin-top:24px">
+                    <div style="font-weight:600;margin-bottom:12px">🔄 Base64转图片</div>
+                    <div class="panel">
+                        <textarea id="base64Input" placeholder="粘贴Base64编码（支持带data:image前缀）..." style="height:100px"></textarea>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top:12px" onclick="base64ToImage()">转换为图片</button>
+                    <div class="preview-area" id="convertPreview" style="margin-top:16px">
+                        <img id="convertImage" src="" alt="转换结果">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-slot">📢 广告位</div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 全能工具箱 | <a href="../">返回首页</a></p>
+    </footer>
+
+    <script>
+        // 标签切换
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'text') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('textTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('imageTab').classList.add('active');
+            }
+        }
+
+        // 显示状态
+        function showStatus(id, msg, type) {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.className = 'status show ' + type;
+            setTimeout(() => el.className = 'status', 3000);
+        }
+
+        // 文本编码
+        function encodeText() {
+            const input = document.getElementById('textInput').value;
+            if (!input) {
+                showStatus('textStatus', '❌ 请输入文本', 'error');
+                return;
+            }
+            try {
+                const encoded = btoa(unescape(encodeURIComponent(input)));
+                document.getElementById('textOutput').value = encoded;
+                showStatus('textStatus', '✅ 编码成功', 'success');
+            } catch (e) {
+                showStatus('textStatus', '❌ 编码失败: ' + e.message, 'error');
+            }
+        }
+
+        // 文本解码
+        function decodeText() {
+            const input = document.getElementById('textInput').value;
+            if (!input) {
+                showStatus('textStatus', '❌ 请输入Base64', 'error');
+                return;
+            }
+            try {
+                const decoded = decodeURIComponent(escape(atob(input)));
+                document.getElementById('textOutput').value = decoded;
+                showStatus('textStatus', '✅ 解码成功', 'success');
+            } catch (e) {
+                showStatus('textStatus', '❌ 解码失败，请检查输入', 'error');
+            }
+        }
+
+        // 复制文本结果
+        function copyTextOutput() {
+            const output = document.getElementById('textOutput').value;
+            if (!output) {
+                showStatus('textStatus', '❌ 没有可复制的内容', 'error');
+                return;
+            }
+            navigator.clipboard.writeText(output).then(() => {
+                showStatus('textStatus', '✅ 已复制到剪贴板', 'success');
+            });
+        }
+
+        // 清空文本
+        function clearText() {
+            document.getElementById('textInput').value = '';
+            document.getElementById('textOutput').value = '';
+            showStatus('textStatus', '✅ 已清空', 'success');
+        }
+
+        // 处理图片上传
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showStatus('imageStatus', '❌ 请上传图片文件', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                document.getElementById('previewImage').src = base64;
+                document.getElementById('previewArea').style.display = 'block';
+                document.getElementById('imageOutput').value = base64;
+                showStatus('imageStatus', '✅ 图片已转换为Base64', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 复制图片Base64
+        function copyImageOutput() {
+            const output = document.getElementById('imageOutput').value;
+            if (!output) {
+                showStatus('imageStatus', '❌ 没有可复制的内容', 'error');
+                return;
+            }
+            navigator.clipboard.writeText(output).then(() => {
+                showStatus('imageStatus', '✅ 已复制到剪贴板', 'success');
+            });
+        }
+
+        // 清空图片
+        function clearImage() {
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imageOutput').value = '';
+            document.getElementById('previewArea').style.display = 'none';
+            showStatus('imageStatus', '✅ 已清空', 'success');
+        }
+
+        // Base64转图片
+        function base64ToImage() {
+            let base64 = document.getElementById('base64Input').value.trim();
+            if (!base64) {
+                showStatus('imageStatus', '❌ 请输入Base64编码', 'error');
+                return;
+            }
+
+            // 如果没有data:image前缀，添加默认的
+            if (!base64.startsWith('data:image')) {
+                base64 = 'data:image/png;base64,' + base64;
+            }
+
+            const img = document.getElementById('convertImage');
+            img.src = base64;
+            img.onload = function() {
+                document.getElementById('convertPreview').style.display = 'block';
+                showStatus('imageStatus', '✅ 转换成功', 'success');
+            };
+            img.onerror = function() {
+                showStatus('imageStatus', '❌ Base64格式错误', 'error');
+            };
+        }
+
+        // 下载图片
+        function downloadDataUrl() {
+            const base64 = document.getElementById('imageOutput').value;
+            if (!base64) {
+                showStatus('imageStatus', '❌ 没有可下载的图片', 'error');
+                return;
+            }
+            const link = document.createElement('a');
+            link.href = base64;
+            link.download = 'image.png';
+            link.click();
+        }
+
+        // 记录最近使用
+        let recent = JSON.parse(localStorage.getItem('toolbox_recent') || '[]');
+        recent = recent.filter(r => r.id !== 'base64');
+        recent.unshift({ id: 'base64', name: 'Base64编解码', icon: '🔐', url: 'tools/base64.html' });
+        if (recent.length > 10) recent.pop();
+        localStorage.setItem('toolbox_recent', JSON.stringify(recent));
+    </script>
+</body>
+</html>
