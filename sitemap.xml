@@ -1,33 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <!-- 首页 -->
     <url>
         <loc>https://ceecee1234.github.io/toolbox/</loc>
-        <lastmod>2025-01-01</lastmod>
+        <lastmod>2025-01-15</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
+    
+    <!-- AI工具 -->
     <url>
-        <loc>https://ceecee1234.github.io/toolbox/tools/finance/fangdai.html</loc>
-        <lastmod>2025-01-01</lastmod>
+        <loc>https://ceecee1234.github.io/toolbox/ai.html</loc>
+        <lastmod>2025-01-15</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <!-- 金融工具 -->
+    <url>
+        <loc>https://ceecee1234.github.io/toolbox/tools/fangdai.html</loc>
+        <lastmod>2025-01-15</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://ceecee1234.github.io/toolbox/tools/finance/geshui.html</loc>
-        <lastmod>2025-01-01</lastmod>
+        <loc>https://ceecee1234.github.io/toolbox/tools/geshui.html</loc>
+        <lastmod>2025-01-15</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
+    
+    <!-- 开发工具 -->
     <url>
-        <loc>https://ceecee1234.github.io/toolbox/tools/dev/json.html</loc>
-        <lastmod>2025-01-01</lastmod>
+        <loc>https://ceecee1234.github.io/toolbox/tools/json.html</loc>
+        <lastmod>2025-01-15</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://ceecee1234.github.io/toolbox/ai/</loc>
-        <lastmod>2025-01-01</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.9</priority>
+        <loc>https://ceecee1234.github.io/toolbox/tools/timestamp.html</loc>
+        <lastmod>2025-01-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://ceecee1234.github.io/toolbox/tools/base64.html</loc>
+        <lastmod>2025-01-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- 文本工具 -->
+    <url>
+        <loc>https://ceecee1234.github.io/toolbox/tools/qrcode.html</loc>
+        <lastmod>2025-01-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://ceecee1234.github.io/toolbox/tools/password.html</loc>
+        <lastmod>2025-01-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- 其他页面 -->
+    <url>
+        <loc>https://ceecee1234.github.io/toolbox/about.html</loc>
+        <lastmod>2025-01-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>https://ceecee1234.github.io/toolbox/privacy.html</loc>
+        <lastmod>2025-01-15</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
     </url>
 </urlset>
