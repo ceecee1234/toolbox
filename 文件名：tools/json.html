@@ -154,4 +154,18 @@
             showStatus('✅ 已复制到剪贴板', 'success');
         }
 
-        function
+                function clearAll() {
+            document.getElementById('input').value = '';
+            document.getElementById('output').value = '';
+            showStatus('✅ 已清空', 'success');
+        }
+
+        // 记录最近使用
+        let recent = JSON.parse(localStorage.getItem('toolbox_recent') || '[]');
+        recent = recent.filter(r => r.id !== 'json');
+        recent.unshift({ id: 'json', name: 'JSON格式化', icon: '{ }', url: 'tools/json.html' });
+        if (recent.length > 10) recent.pop();
+        localStorage.setItem('toolbox_recent', JSON.stringify(recent));
+    </script>
+</body>
+</html>
