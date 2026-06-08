@@ -1,0 +1,17 @@
+{
+  "name": "toolbox",
+  "version": "2.0.0",
+  "description": "全能工具箱 - 100+ 免费在线工具集合 (纯静态，无需编译)",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve . -l 3000",
+    "preview": "npx serve . -l 3000",
+    "sitemap": "node generate-sitemap.js",
+    "build": "node generate-sitemap.js && echo '静态项目无需编译，sitemap.xml 已更新'"
+  },
+  "devDependencies": {
+    "serve": "^14.2.3"
+  },
+  "keywords": ["toolbox", "online-tools", "github-pages", "static-site"],
+  "license": "MIT"
+}

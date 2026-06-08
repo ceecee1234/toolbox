@@ -181,11 +181,11 @@
         {
             id: 'word-count',
             name: '字数统计与排版',
-            description: '统计字数、字符数、段落数、阅读时长，支持中英文混合',
+            description: '实时统计中英文字数、段落、阅读时长，一键清理空行空格',
             category: 'text',
             categoryName: '文本工具',
-            tags: ['字数', '统计', '排版'],
-            url: 'tools/word-count.html',
+            tags: ['字数', '统计', '排版', '字符'],
+            url: 'tools/text-word-count.html',
             icon: '📊',
             hot: false
         },
@@ -1203,6 +1203,17 @@
             url: 'tools/password.html',
             icon: '🔐',
             hot: false
+        },
+        {
+            id: 'security-password',
+            name: '高强度密码生成器',
+            description: '自由勾选字符类型，滑块调节6-64位，批量生成，强度可视化评级',
+            category: 'text',
+            categoryName: '文本工具',
+            tags: ['密码', '安全', '随机', '加密', '高强度'],
+            url: 'tools/security-password.html',
+            icon: '🛡️',
+            hot: true
         }
     ];
 

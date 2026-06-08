@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字数统计与排版工具 - 实时中英文字数统计 | 全能工具箱</title>
+    <meta name="description" content="免费在线字数统计工具，实时统计中文汉字、英文单词、数字、标点及段落数，支持一键清理行首行尾空格、合并连续空行。">
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
+    <style>
+        :root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--warning:#F59E0B;--error:#EF4444;--border:#e2e8f0;--radius:12px}
+        .dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#334155;--primary-light:rgba(79,70,229,.2)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+        a{color:inherit;text-decoration:none}
+        .header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border)}
+        .header-inner{max-width:900px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
+        .icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;background:none;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:.2s}
+        .icon-btn:hover{background:var(--bg2)}
+        .dark .icon-btn{color:var(--text)}
+        .main{max-width:900px;margin:0 auto;padding:24px 20px 60px}
+        .breadcrumb{display:flex;gap:8px;font-size:13px;color:var(--text3);margin-bottom:20px;flex-wrap:wrap}
+        .breadcrumb a{color:var(--primary)}
+        .tool-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px}
+        .tool-title{font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px}
+        .tool-desc{color:var(--text2);margin-bottom:24px;font-size:15px}
+        .tool-fav-btn{padding:8px 18px;font-size:14px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
+        .tool-fav-btn:hover,.tool-fav-btn.active{color:var(--warning);border-color:var(--warning)}
+
+        /* 统计卡片行 */
+        .stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px}
+        @media(max-width:700px){.stats-row{grid-template-columns:repeat(3,1fr)}}
+        @media(max-width:400px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+        .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 10px;text-align:center;transition:.2s}
+        .stat-card.highlight{border-color:var(--primary);background:var(--primary-light)}
+        .stat-num{font-size:26px;font-weight:800;color:var(--primary);line-height:1.1;margin-bottom:4px}
+        .stat-label{font-size:12px;color:var(--text3)}
+
+        /* 编辑区 */
+        .editor-wrap{position:relative}
+        .textarea-main{width:100%;min-height:340px;padding:16px;font-size:15px;line-height:1.8;background:var(--card);border:2px solid var(--border);border-radius:var(--radius);color:var(--text);outline:none;resize:vertical;transition:.2s;font-family:inherit}
+        .textarea-main:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-light)}
+        .textarea-main::placeholder{color:var(--text3)}
+        .char-counter{position:absolute;bottom:12px;right:14px;font-size:12px;color:var(--text3);pointer-events:none;background:var(--card);padding:2px 6px;border-radius:6px}
+
+        /* 工具栏 */
+        .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+        .tbtn{padding:8px 16px;font-size:13px;font-weight:500;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2);white-space:nowrap}
+        .tbtn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+        .tbtn.danger:hover{border-color:var(--error);color:var(--error);background:#fff0f0}
+        .tbtn.success-btn{background:var(--success);color:#fff;border-color:var(--success)}
+        .tbtn.success-btn:hover{opacity:.9}
+
+        /* 字频分析 */
+        .section-title{font-size:16px;font-weight:700;margin:24px 0 12px;display:flex;align-items:center;gap:6px}
+        .freq-list{display:flex;flex-wrap:wrap;gap:8px}
+        .freq-item{padding:5px 12px;background:var(--bg2);border-radius:50px;font-size:13px;color:var(--text2)}
+        .freq-item span{color:var(--primary);font-weight:700;margin-left:4px}
+
+        /* 读时预估 */
+        .read-bar{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-top:20px;display:flex;flex-wrap:wrap;gap:20px;align-items:center}
+        .read-item{display:flex;align-items:center;gap:8px;font-size:14px}
+        .read-dot{width:10px;height:10px;border-radius:50%}
+
+        /* Toast */
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;background:var(--text);color:#fff;border-radius:50px;font-size:14px;opacity:0;transition:.3s;z-index:999;pointer-events:none}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+        .toast.success{background:var(--success)}
+        .footer{margin-top:60px;padding:24px 20px;border-top:1px solid var(--border);text-align:center;font-size:13px;color:var(--text3)}
+        .footer a{color:var(--primary)}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../" class="logo"><span>🛠️</span><span>全能工具箱</span></a>
+            <div style="display:flex;gap:8px">
+                <button class="icon-btn" id="themeBtn" title="切换主题"><span id="themeIcon">🌙</span></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="breadcrumb">
+            <a href="../">首页</a>
+            <span>›</span>
+            <span>文本工具</span>
+            <span>›</span>
+            <span>字数统计</span>
+        </div>
+
+        <div class="tool-header">
+            <h1 class="tool-title">📊 字数统计与排版工具</h1>
+            <button class="tool-fav-btn" id="favBtn" data-tool-id="text-word-count">☆ 收藏</button>
+        </div>
+        <p class="tool-desc">实时统计中英文字数、数字、标点及段落，并提供一键排版清理功能。</p>
+
+        <!-- 统计数据 -->
+        <div class="stats-row">
+            <div class="stat-card highlight">
+                <div class="stat-num" id="statTotal">0</div>
+                <div class="stat-label">总字符数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="statChinese">0</div>
+                <div class="stat-label">中文汉字</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="statEnWords">0</div>
+                <div class="stat-label">英文单词</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="statDigits">0</div>
+                <div class="stat-label">数字</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="statPunct">0</div>
+                <div class="stat-label">标点符号</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="statParas">0</div>
+                <div class="stat-label">段落数</div>
+            </div>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <button class="tbtn" onclick="trimLines()">✂️ 清除行首尾空格</button>
+            <button class="tbtn" onclick="mergeBlankLines()">🗜️ 合并连续空行</button>
+            <button class="tbtn" onclick="removeAllBlankLines()">🧹 删除所有空行</button>
+            <button class="tbtn" onclick="fullToHalf()">Ａ→A 全角转半角</button>
+            <button class="tbtn" onclick="deduplicateLines()">🔁 删除重复行</button>
+            <button class="tbtn success-btn" onclick="copyText()">📋 复制文本</button>
+            <button class="tbtn danger" onclick="clearText()">🗑️ 清空</button>
+        </div>
+
+        <!-- 编辑区 -->
+        <div class="editor-wrap">
+            <textarea class="textarea-main" id="editor" placeholder="在此粘贴或输入文本，统计数据将实时更新...&#10;&#10;支持中文、英文、混合文本，段落、字数、汉字均可统计。"></textarea>
+            <span class="char-counter" id="charCounter">0 字符</span>
+        </div>
+
+        <!-- 阅读时间预估 -->
+        <div class="read-bar" id="readBar">
+            <span style="font-weight:600;font-size:14px;color:var(--text2)">⏱ 预计阅读时间</span>
+            <div class="read-item">
+                <div class="read-dot" style="background:#4F46E5"></div>
+                <span>默读（500字/分钟）：<strong id="readSilent">0秒</strong></span>
+            </div>
+            <div class="read-item">
+                <div class="read-dot" style="background:#10B981"></div>
+                <span>朗读（200字/分钟）：<strong id="readAloud">0秒</strong></span>
+            </div>
+            <div class="read-item">
+                <div class="read-dot" style="background:#F59E0B"></div>
+                <span>速读（800字/分钟）：<strong id="readFast">0秒</strong></span>
+            </div>
+        </div>
+
+        <!-- 高频词汇 -->
+        <div id="freqSection" style="display:none">
+            <div class="section-title">🔤 高频词汇 TOP 20</div>
+            <div class="freq-list" id="freqList"></div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 <a href="../">全能工具箱</a> | 所有统计在浏览器本地完成，不上传数据</p>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="../js/tools-data.js"></script>
+    <script src="../js/toolbox-core.js"></script>
+    <script>
+        const editor = document.getElementById('editor');
+
+        function count() {
+            const text = editor.value;
+            const noNewline = text.replace(/\n/g, '');
+
+            const chinese = (noNewline.match(/[\u4e00-\u9fa5\u3400-\u4dbf]/g) || []).length;
+            const digits = (noNewline.match(/[0-9０-９]/g) || []).length;
+            const punct = (noNewline.match(/[，。！？、；：""''【】（）《》—…·\.,!?;:"'()\[\]{}\-]/g) || []).length;
+            const enWords = (text.match(/\b[a-zA-Z]+(?:'[a-zA-Z]+)?\b/g) || []).length;
+            const paras = text.split(/\n+/).filter(p => p.trim().length > 0).length;
+            const total = text.replace(/\s/g, '').length;
+
+            document.getElementById('statTotal').textContent = total.toLocaleString();
+            document.getElementById('statChinese').textContent = chinese.toLocaleString();
+            document.getElementById('statEnWords').textContent = enWords.toLocaleString();
+            document.getElementById('statDigits').textContent = digits.toLocaleString();
+            document.getElementById('statPunct').textContent = punct.toLocaleString();
+            document.getElementById('statParas').textContent = paras.toLocaleString();
+            document.getElementById('charCounter').textContent = text.length.toLocaleString() + ' 字符';
+
+            const wordCount = chinese + enWords;
+            document.getElementById('readSilent').textContent = formatTime(wordCount / 500);
+            document.getElementById('readAloud').textContent = formatTime(wordCount / 200);
+            document.getElementById('readFast').textContent = formatTime(wordCount / 800);
+
+            updateFreq(text);
+        }
+
+        function formatTime(minutes) {
+            if (minutes < 1/60) return '0秒';
+            const totalSec = Math.round(minutes * 60);
+            if (totalSec < 60) return totalSec + '秒';
+            const m = Math.floor(totalSec / 60);
+            const s = totalSec % 60;
+            return m + '分' + (s ? s + '秒' : '');
+        }
+
+        function updateFreq(text) {
+            const words = text.match(/[\u4e00-\u9fa5]{2,}|\b[a-zA-Z]{3,}\b/g) || [];
+            if (words.length < 10) { document.getElementById('freqSection').style.display = 'none'; return; }
+
+            const freq = {};
+            words.forEach(w => { const k = w.toLowerCase(); freq[k] = (freq[k] || 0) + 1; });
+            const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 20);
+
+            document.getElementById('freqSection').style.display = '';
+            document.getElementById('freqList').innerHTML = sorted.map(([w, n]) =>
+                `<div class="freq-item">${w}<span>${n}</span></div>`
+            ).join('');
+        }
+
+        function trimLines() {
+            editor.value = editor.value.split('\n').map(l => l.replace(/^[\s\u3000]+|[\s\u3000]+$/g, '')).join('\n');
+            count();
+            toast('已清除行首尾空格', 'success');
+        }
+
+        function mergeBlankLines() {
+            editor.value = editor.value.replace(/\n{3,}/g, '\n\n');
+            count();
+            toast('已合并连续空行', 'success');
+        }
+
+        function removeAllBlankLines() {
+            editor.value = editor.value.split('\n').filter(l => l.trim() !== '').join('\n');
+            count();
+            toast('已删除所有空行', 'success');
+        }
+
+        function fullToHalf() {
+            editor.value = editor.value.replace(/[\uFF01-\uFF5E]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+            count();
+            toast('全角已转半角', 'success');
+        }
+
+        function deduplicateLines() {
+            const lines = editor.value.split('\n');
+            const seen = new Set();
+            const result = lines.filter(l => { const k = l.trim(); if (seen.has(k)) return false; seen.add(k); return true; });
+            const removed = lines.length - result.length;
+            editor.value = result.join('\n');
+            count();
+            toast(`已删除 ${removed} 条重复行`, 'success');
+        }
+
+        function copyText() {
+            const text = editor.value;
+            if (!text) { toast('内容为空', ''); return; }
+            navigator.clipboard.writeText(text).then(() => toast('已复制到剪贴板', 'success')).catch(() => toast('复制失败', ''));
+        }
+
+        function clearText() {
+            if (!editor.value) return;
+            editor.value = '';
+            count();
+            toast('已清空', '');
+        }
+
+        function toast(msg, type) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast show' + (type ? ' ' + type : '');
+            clearTimeout(el._t);
+            el._t = setTimeout(() => el.className = 'toast', 2500);
+        }
+
+        editor.addEventListener('input', count);
+        count();
+
+        // 主题切换
+        const themeBtn = document.getElementById('themeBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        function updateThemeIcon() {
+            themeIcon.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+        }
+        updateThemeIcon();
+        themeBtn.addEventListener('click', () => {
+            const dark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', dark ? 'dark' : 'light');
+            updateThemeIcon();
+        });
+    </script>
+</body>
+</html>
