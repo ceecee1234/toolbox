@@ -299,9 +299,20 @@
             category: 'seo',
             categoryName: '站长工具',
             tags: ['URL', 'Slug', 'SEO', '站长'],
-            url: 'tools/url-slug-gen.html',
+            url: 'tools/seo-slug.html',
             icon: '🔗',
-            hot: false
+            hot: true
+        },
+        {
+            id: 'seo-tdk',
+            name: 'TDK标签提取器',
+            description: '粘贴HTML源码，自动提取Title/Description/Keywords和OG标签，检测SEO字数',
+            category: 'seo',
+            categoryName: '站长工具',
+            tags: ['TDK', 'SEO', 'Meta', 'OpenGraph', '站长'],
+            url: 'tools/seo-tdk.html',
+            icon: '📋',
+            hot: true
         },
         {
             id: 'sitemap-gen',
@@ -435,9 +446,20 @@
             category: 'dev',
             categoryName: '开发工具',
             tags: ['JWT', 'Token', '解码', '认证'],
-            url: 'tools/jwt-decoder.html',
+            url: 'tools/dev-jwt.html',
             icon: '🔑',
-            hot: false
+            hot: true
+        },
+        {
+            id: 'dev-diff',
+            name: '代码文本对比',
+            description: '纯前端Diff对比，删除行红色高亮，新增行绿色高亮，支持逐字内联差异标注',
+            category: 'dev',
+            categoryName: '开发工具',
+            tags: ['Diff', '对比', '代码', '文本', '差异'],
+            url: 'tools/dev-diff.html',
+            icon: '🔀',
+            hot: true
         },
         {
             id: 'flex-grid-gen',
@@ -553,6 +575,17 @@
         // ==============================
         // 效率工具 (51-60)
         // ==============================
+        {
+            id: 'efficiency-todo',
+            name: '每日高价值清单',
+            description: '按高/中/低价值分级管理任务，默认显示高价值任务，极简高效，数据本地保存',
+            category: 'efficiency',
+            categoryName: '效率工具',
+            tags: ['Todo', '待办', '任务', '效率', '清单'],
+            url: 'tools/efficiency-todo.html',
+            icon: '✅',
+            hot: true
+        },
         {
             id: 'dev-cron',
             name: 'Cron表达式生成器',

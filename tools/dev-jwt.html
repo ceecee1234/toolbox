@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT解码与验证器 - 在线JWT解析工具 | 全能工具箱</title>
+    <meta name="description" content="免费在线JWT解码工具，纯前端实时解析Header和Payload，自动检测过期时间并以人类语言提示，无需后端。">
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
+    <style>
+        :root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--success-light:#ECFDF5;--warning:#F59E0B;--warning-light:#FFFBEB;--error:#EF4444;--error-light:#FEF2F2;--border:#e2e8f0;--radius:12px;--shadow:0 4px 6px -1px rgba(0,0,0,.07)}
+        .dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#334155;--primary-light:rgba(79,70,229,.2);--success-light:rgba(16,185,129,.15);--warning-light:rgba(245,158,11,.15);--error-light:rgba(239,68,68,.15)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+        a{color:inherit;text-decoration:none}
+        .header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border)}
+        .header-inner{max-width:1000px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
+        .icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;background:none;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:.2s}
+        .icon-btn:hover{background:var(--bg2)}
+        .dark .icon-btn{color:var(--text)}
+        .main{max-width:1000px;margin:0 auto;padding:24px 20px 60px}
+        .breadcrumb{display:flex;gap:8px;font-size:13px;color:var(--text3);margin-bottom:20px;flex-wrap:wrap}
+        .breadcrumb a{color:var(--primary)}
+        .tool-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px}
+        .tool-title{font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px}
+        .tool-desc{color:var(--text2);margin-bottom:24px;font-size:15px}
+        .tool-fav-btn{padding:8px 18px;font-size:14px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
+        .tool-fav-btn:hover,.tool-fav-btn.active{color:var(--warning);border-color:var(--warning)}
+
+        /* 输入区 */
+        .input-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+        .input-label{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+        .jwt-input{width:100%;min-height:100px;padding:14px;font-size:13px;font-family:'SF Mono','Fira Code',monospace;background:var(--bg2);border:2px solid var(--border);border-radius:10px;color:var(--text);outline:none;resize:vertical;transition:.2s;line-height:1.6}
+        .jwt-input:focus{border-color:var(--primary);background:var(--card);box-shadow:0 0 0 4px var(--primary-light)}
+        .jwt-input::placeholder{color:var(--text3)}
+        .input-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+        .btn{padding:9px 18px;font-size:13px;font-weight:600;border:none;border-radius:50px;cursor:pointer;transition:.2s}
+        .btn-primary{background:var(--primary);color:#fff}
+        .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+        .btn-ghost{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+        .btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
+
+        /* JWT视觉化 */
+        .jwt-visual{display:flex;gap:0;margin-bottom:20px;border-radius:10px;overflow:hidden;font-family:'SF Mono','Fira Code',monospace;font-size:13px;flex-wrap:wrap}
+        .jwt-part{padding:10px 16px;flex:1;min-width:0;word-break:break-all;line-height:1.6}
+        .jwt-part-header{background:#EEF2FF;color:#4F46E5}
+        .jwt-part-payload{background:#F0FDF4;color:#16a34a}
+        .jwt-part-sig{background:#FFF7ED;color:#c2410c}
+        .dark .jwt-part-header{background:rgba(79,70,229,.25);color:#a5b4fc}
+        .dark .jwt-part-payload{background:rgba(22,163,74,.2);color:#86efac}
+        .dark .jwt-part-sig{background:rgba(194,65,12,.2);color:#fdba74}
+        .jwt-dot{padding:10px 4px;background:var(--bg2);color:var(--text3);align-self:stretch;display:flex;align-items:center}
+
+        /* 结果布局 */
+        .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+        @media(max-width:660px){.result-grid{grid-template-columns:1fr}}
+        .result-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+        .result-card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+        .result-card-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+        .tag{padding:3px 10px;border-radius:50px;font-size:11px;font-weight:600}
+        .tag-header{background:#EEF2FF;color:#4F46E5}
+        .tag-payload{background:#F0FDF4;color:#16a34a}
+        .dark .tag-header{background:rgba(79,70,229,.25);color:#a5b4fc}
+        .dark .tag-payload{background:rgba(22,163,74,.2);color:#86efac}
+        .json-block{padding:14px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:12.5px;line-height:1.8;overflow-x:auto;background:var(--bg2);min-height:120px;white-space:pre}
+        .json-key{color:#0891b2}
+        .json-str{color:#16a34a}
+        .json-num{color:#9333ea}
+        .json-bool{color:#dc2626}
+        .dark .json-key{color:#67e8f9}
+        .dark .json-str{color:#86efac}
+        .dark .json-num{color:#d8b4fe}
+        .dark .json-bool{color:#fca5a5}
+
+        /* 状态横幅 */
+        .status-banner{padding:14px 20px;border-radius:var(--radius);margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;font-size:14px}
+        .status-banner.success{background:var(--success-light);border:1px solid rgba(16,185,129,.3);color:#065f46}
+        .status-banner.warning{background:var(--warning-light);border:1px solid rgba(245,158,11,.3);color:#92400e}
+        .status-banner.error{background:var(--error-light);border:1px solid rgba(239,68,68,.3);color:#991b1b}
+        .status-banner.info{background:var(--primary-light);border:1px solid rgba(79,70,229,.3);color:#3730a3}
+        .dark .status-banner.success{color:#a7f3d0}
+        .dark .status-banner.warning{color:#fde68a}
+        .dark .status-banner.error{color:#fecaca}
+        .dark .status-banner.info{color:#c7d2fe}
+        .status-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+        .status-content strong{display:block;margin-bottom:2px}
+
+        /* 字段表 */
+        .claims-table{width:100%;border-collapse:collapse;font-size:13px}
+        .claims-table th{padding:10px 14px;text-align:left;font-weight:600;color:var(--text2);border-bottom:2px solid var(--border);background:var(--bg2)}
+        .claims-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+        .claims-table tr:last-child td{border-bottom:none}
+        .claim-val{font-family:'SF Mono','Fira Code',monospace;font-size:12px;word-break:break-all}
+        .claim-badge{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin-left:6px}
+
+        /* 空态 */
+        .empty-state{padding:48px 20px;text-align:center;color:var(--text3)}
+        .empty-icon{font-size:48px;margin-bottom:12px}
+
+        /* Copy snack */
+        .copy-btn{padding:4px 12px;font-size:12px;background:var(--card);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:.2s;color:var(--text2)}
+        .copy-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+        /* Toast */
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;background:var(--text);color:#fff;border-radius:50px;font-size:14px;opacity:0;transition:.3s;z-index:999;pointer-events:none}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+        .toast.success{background:var(--success)}
+        .toast.error{background:var(--error)}
+        .footer{margin-top:60px;padding:24px 20px;border-top:1px solid var(--border);text-align:center;font-size:13px;color:var(--text3)}
+        .footer a{color:var(--primary)}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../" class="logo"><span>🛠️</span><span>全能工具箱</span></a>
+            <div style="display:flex;gap:8px">
+                <button class="icon-btn" id="themeBtn" title="切换主题"><span id="themeIcon">🌙</span></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="breadcrumb">
+            <a href="../">首页</a>
+            <span>›</span>
+            <span>开发工具</span>
+            <span>›</span>
+            <span>JWT解码器</span>
+        </div>
+
+        <div class="tool-header">
+            <h1 class="tool-title">🔑 JWT 解码与验证器</h1>
+            <button class="tool-fav-btn" id="favBtn" data-tool-id="dev-jwt">☆ 收藏</button>
+        </div>
+        <p class="tool-desc">纯前端实时解析 JWT 的 Header 和 Payload，自动检测过期时间，无任何网络请求，密钥安全不离开浏览器。</p>
+
+        <!-- 输入区 -->
+        <div class="input-card">
+            <div class="input-label">🔐 粘贴 JWT Token（格式：xxxxx.yyyyy.zzzzz）</div>
+            <textarea class="jwt-input" id="jwtInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"></textarea>
+            <div class="input-actions">
+                <button class="btn btn-primary" onclick="decode()">⚡ 立即解析</button>
+                <button class="btn btn-ghost" onclick="loadDemo()">📋 加载示例</button>
+                <button class="btn btn-ghost" onclick="clearAll()">🗑️ 清空</button>
+            </div>
+        </div>
+
+        <!-- 结果区（初始隐藏） -->
+        <div id="resultArea" style="display:none">
+            <!-- JWT 视觉化 -->
+            <div id="jwtVisual" class="jwt-visual"></div>
+
+            <!-- 状态横幅 -->
+            <div id="statusBanner"></div>
+
+            <!-- Header + Payload -->
+            <div class="result-grid">
+                <div class="result-card">
+                    <div class="result-card-head">
+                        <div class="result-card-title">Header <span class="tag tag-header">头部</span></div>
+                        <button class="copy-btn" onclick="copyPart('headerJson')">复制</button>
+                    </div>
+                    <pre class="json-block" id="headerJson"></pre>
+                </div>
+                <div class="result-card">
+                    <div class="result-card-head">
+                        <div class="result-card-title">Payload <span class="tag tag-payload">载荷</span></div>
+                        <button class="copy-btn" onclick="copyPart('payloadJson')">复制</button>
+                    </div>
+                    <pre class="json-block" id="payloadJson"></pre>
+                </div>
+            </div>
+
+            <!-- 标准字段解读 -->
+            <div class="result-card" style="margin-bottom:20px">
+                <div class="result-card-head">
+                    <div class="result-card-title">📋 标准字段解读</div>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="claims-table" id="claimsTable"></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 空态 -->
+        <div id="emptyState" class="empty-state">
+            <div class="empty-icon">🔑</div>
+            <div style="font-size:16px;font-weight:600;margin-bottom:6px">粘贴 JWT Token 开始解析</div>
+            <div style="font-size:14px">支持 HS256 / RS256 / ES256 等所有算法的 Header/Payload 解码</div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 <a href="../">全能工具箱</a> | 所有解析在浏览器本地完成，Token 不会上传</p>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="../js/tools-data.js"></script>
+    <script src="../js/toolbox-core.js"></script>
+    <script>
+        const DEMO_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
+            'eyJzdWIiOiJ1c2VyXzEyMyIsIm5hbWUiOiLlvKDkuIDkuIkiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6OTk5OTk5OTk5OX0.' +
+            'signature_placeholder';
+
+        function base64UrlDecode(str) {
+            str = str.replace(/-/g, '+').replace(/_/g, '/');
+            while (str.length % 4) str += '=';
+            try {
+                return JSON.parse(decodeURIComponent(atob(str).split('').map(c =>
+                    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                ).join('')));
+            } catch { return null; }
+        }
+
+        function syntaxHighlight(obj) {
+            const json = JSON.stringify(obj, null, 2);
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, match => {
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) return `<span class="json-key">${match}</span>`;
+                    return `<span class="json-str">${match}</span>`;
+                }
+                if (/true|false/.test(match)) return `<span class="json-bool">${match}</span>`;
+                return `<span class="json-num">${match}</span>`;
+            });
+        }
+
+        function formatTs(ts) {
+            return new Date(ts * 1000).toLocaleString('zh-CN', { year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit' });
+        }
+
+        function timeFromNow(ts) {
+            const diff = ts * 1000 - Date.now();
+            const abs = Math.abs(diff);
+            const past = diff < 0;
+            if (abs < 60000) return past ? `${Math.round(abs/1000)} 秒前过期` : `${Math.round(abs/1000)} 秒后过期`;
+            if (abs < 3600000) return past ? `${Math.round(abs/60000)} 分钟前过期` : `${Math.round(abs/60000)} 分钟后过期`;
+            if (abs < 86400000) return past ? `${Math.round(abs/3600000)} 小时前过期` : `${Math.round(abs/3600000)} 小时后过期`;
+            return past ? `${Math.round(abs/86400000)} 天前过期` : `${Math.round(abs/86400000)} 天后过期`;
+        }
+
+        function decode() {
+            const raw = document.getElementById('jwtInput').value.trim();
+            if (!raw) { toast('请输入 JWT Token', ''); return; }
+
+            const parts = raw.split('.');
+            if (parts.length !== 3) {
+                document.getElementById('emptyState').style.display = '';
+                document.getElementById('resultArea').style.display = 'none';
+                toast('格式错误：JWT 应包含三个由 . 分隔的部分', 'error');
+                return;
+            }
+
+            const header = base64UrlDecode(parts[0]);
+            const payload = base64UrlDecode(parts[1]);
+
+            if (!header || !payload) {
+                toast('解码失败：Base64Url 格式不正确', 'error');
+                return;
+            }
+
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultArea').style.display = '';
+
+            // 视觉化
+            document.getElementById('jwtVisual').innerHTML =
+                `<div class="jwt-part jwt-part-header">${escHtml(parts[0])}</div>` +
+                `<div class="jwt-dot">.</div>` +
+                `<div class="jwt-part jwt-part-payload">${escHtml(parts[1])}</div>` +
+                `<div class="jwt-dot">.</div>` +
+                `<div class="jwt-part jwt-part-sig">${escHtml(parts[2])}</div>`;
+
+            // JSON高亮
+            document.getElementById('headerJson').innerHTML = syntaxHighlight(header);
+            document.getElementById('payloadJson').innerHTML = syntaxHighlight(payload);
+
+            // 过期状态
+            renderStatus(payload);
+
+            // 标准字段表
+            renderClaims(payload);
+        }
+
+        function renderStatus(payload) {
+            const banner = document.getElementById('statusBanner');
+            const now = Math.floor(Date.now() / 1000);
+
+            if (payload.exp) {
+                const diff = payload.exp - now;
+                if (diff < 0) {
+                    banner.className = 'status-banner error';
+                    banner.innerHTML = `<span class="status-icon">❌</span><div class="status-content"><strong>Token 已过期</strong>${timeFromNow(payload.exp)}（${formatTs(payload.exp)}）</div>`;
+                } else if (diff < 300) {
+                    banner.className = 'status-banner warning';
+                    banner.innerHTML = `<span class="status-icon">⚠️</span><div class="status-content"><strong>Token 即将过期</strong>该 Token 将于 ${timeFromNow(payload.exp)}（${formatTs(payload.exp)}）</div>`;
+                } else {
+                    banner.className = 'status-banner success';
+                    banner.innerHTML = `<span class="status-icon">✅</span><div class="status-content"><strong>Token 有效</strong>将于 ${timeFromNow(payload.exp)}（${formatTs(payload.exp)}）</div>`;
+                }
+            } else {
+                banner.className = 'status-banner info';
+                banner.innerHTML = `<span class="status-icon">ℹ️</span><div class="status-content"><strong>无过期时间</strong>该 Token 未设置 exp 字段，永不过期（或由签发方在服务端管理）</div>`;
+            }
+        }
+
+        const CLAIM_NAMES = {
+            iss: { name: '签发者', desc: 'Issuer' },
+            sub: { name: '主题/用户ID', desc: 'Subject' },
+            aud: { name: '受众', desc: 'Audience' },
+            exp: { name: '过期时间', desc: 'Expiration Time', ts: true },
+            nbf: { name: '生效时间', desc: 'Not Before', ts: true },
+            iat: { name: '签发时间', desc: 'Issued At', ts: true },
+            jti: { name: 'JWT ID', desc: 'JWT ID' },
+            name: { name: '姓名', desc: 'Full Name' },
+            email: { name: '邮箱', desc: 'Email' },
+            role: { name: '角色', desc: 'Role' },
+            roles: { name: '角色列表', desc: 'Roles' },
+            scope: { name: '权限范围', desc: 'Scope' },
+            azp: { name: '授权方', desc: 'Authorized Party' },
+        };
+
+        function renderClaims(payload) {
+            const rows = Object.entries(payload).map(([k, v]) => {
+                const info = CLAIM_NAMES[k];
+                const label = info ? `${info.name} <span style="color:var(--text3);font-weight:400;font-size:11px">${info.desc}</span>` : k;
+                let val = '';
+                if (info && info.ts && typeof v === 'number') {
+                    val = `<span class="claim-val">${formatTs(v)}</span><span class="claim-badge" style="background:var(--bg2);color:var(--text2)">${v}</span>`;
+                } else {
+                    const display = typeof v === 'object' ? JSON.stringify(v) : String(v);
+                    val = `<span class="claim-val">${escHtml(display)}</span>`;
+                }
+                return `<tr><td style="font-size:12px;color:var(--text2);white-space:nowrap">${label}</td><td>${val}</td></tr>`;
+            }).join('');
+
+            document.getElementById('claimsTable').innerHTML =
+                `<thead><tr><th>字段</th><th>值</th></tr></thead><tbody>${rows}</tbody>`;
+        }
+
+        function copyPart(id) {
+            const el = document.getElementById(id);
+            const text = el.textContent;
+            navigator.clipboard.writeText(text).then(() => toast('已复制', 'success')).catch(() => toast('复制失败', 'error'));
+        }
+
+        function loadDemo() {
+            document.getElementById('jwtInput').value = DEMO_JWT;
+            decode();
+        }
+
+        function clearAll() {
+            document.getElementById('jwtInput').value = '';
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('emptyState').style.display = '';
+        }
+
+        function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function toast(msg, type) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast show' + (type ? ' ' + type : '');
+            clearTimeout(el._t);
+            el._t = setTimeout(() => el.className = 'toast', 2500);
+        }
+
+        // 输入监听
+        document.getElementById('jwtInput').addEventListener('input', () => {
+            const v = document.getElementById('jwtInput').value.trim();
+            if (v.split('.').length === 3) decode();
+        });
+
+        // 主题
+        const themeBtn = document.getElementById('themeBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        function updateThemeIcon() { themeIcon.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙'; }
+        updateThemeIcon();
+        themeBtn.addEventListener('click', () => {
+            const dark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', dark ? 'dark' : 'light');
+            updateThemeIcon();
+        });
+    </script>
+</body>
+</html>

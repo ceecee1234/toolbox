@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线代码文本对比工具 - Diff差异高亮 | 全能工具箱</title>
+    <meta name="description" content="免费在线代码与文本对比工具，纯前端Diff算法，删除行红色高亮，新增行绿色高亮，行号精确对齐，支持逐字差异标注。">
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
+    <style>
+        :root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--error:#EF4444;--warning:#F59E0B;--border:#e2e8f0;--radius:12px;--add-bg:#f0fdf4;--add-text:#166534;--del-bg:#fef2f2;--del-text:#991b1b;--add-mark:#bbf7d0;--del-mark:#fecaca}
+        .dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#334155;--primary-light:rgba(79,70,229,.2);--add-bg:rgba(22,163,74,.15);--add-text:#86efac;--del-bg:rgba(239,68,68,.15);--del-text:#fca5a5;--add-mark:rgba(22,163,74,.4);--del-mark:rgba(239,68,68,.4)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+        a{color:inherit;text-decoration:none}
+        .header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border)}
+        .header-inner{max-width:1100px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
+        .icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;background:none;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:.2s}
+        .icon-btn:hover{background:var(--bg2)}
+        .dark .icon-btn{color:var(--text)}
+        .main{max-width:1100px;margin:0 auto;padding:24px 20px 60px}
+        .breadcrumb{display:flex;gap:8px;font-size:13px;color:var(--text3);margin-bottom:20px;flex-wrap:wrap}
+        .breadcrumb a{color:var(--primary)}
+        .tool-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px}
+        .tool-title{font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px}
+        .tool-desc{color:var(--text2);margin-bottom:24px;font-size:15px}
+        .tool-fav-btn{padding:8px 18px;font-size:14px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
+        .tool-fav-btn:hover,.tool-fav-btn.active{color:var(--warning);border-color:var(--warning)}
+
+        /* 输入双栏 */
+        .input-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+        @media(max-width:700px){.input-grid{grid-template-columns:1fr}}
+        .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+        .panel-head{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--text2);background:var(--bg2)}
+        .panel-label{display:flex;align-items:center;gap:8px}
+        .dot{width:10px;height:10px;border-radius:50%}
+        .dot-del{background:#ef4444}
+        .dot-add{background:#22c55e}
+        .code-input{width:100%;min-height:200px;padding:14px;font-size:13px;font-family:'SF Mono','Fira Code',monospace;background:var(--bg2);border:none;color:var(--text);outline:none;resize:vertical;line-height:1.7;transition:background .2s}
+        .code-input:focus{background:var(--card)}
+        .code-input::placeholder{color:var(--text3)}
+        .dark .code-input:focus{background:#141d2e}
+        .clear-btn{padding:4px 10px;font-size:12px;background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text3);transition:.2s}
+        .clear-btn:hover{border-color:var(--error);color:var(--error)}
+
+        /* 控制行 */
+        .ctrl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+        .btn{padding:9px 20px;font-size:13px;font-weight:600;border:none;border-radius:50px;cursor:pointer;transition:.2s}
+        .btn-primary{background:var(--primary);color:#fff}
+        .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+        .btn-ghost{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+        .btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
+        .seg-btns{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+        .seg-btn{padding:7px 14px;font-size:13px;font-weight:500;background:var(--card);border:none;cursor:pointer;transition:.15s;color:var(--text2)}
+        .seg-btn.active{background:var(--primary);color:#fff}
+        .seg-btn:not(.active):hover{background:var(--bg2)}
+
+        /* 统计条 */
+        .stats-bar{display:flex;gap:16px;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;font-size:13px;flex-wrap:wrap;align-items:center}
+        .stat-item{display:flex;align-items:center;gap:6px}
+        .badge{padding:2px 10px;border-radius:50px;font-size:12px;font-weight:700}
+        .badge-add{background:var(--add-bg);color:var(--add-text)}
+        .badge-del{background:var(--del-bg);color:var(--del-text)}
+        .badge-same{background:var(--bg2);color:var(--text2)}
+        .dark .badge-add{color:#86efac}
+        .dark .badge-del{color:#fca5a5}
+
+        /* Diff 输出 */
+        .diff-output{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:auto;font-family:'SF Mono','Fira Code',monospace;font-size:13px;line-height:1.7}
+        .diff-row{display:flex;align-items:stretch}
+        .diff-row:hover{filter:brightness(.97)}
+        .dark .diff-row:hover{filter:brightness(1.05)}
+        .line-num{min-width:40px;padding:0 10px;text-align:right;font-size:11px;color:var(--text3);user-select:none;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;border-right:1px solid var(--border)}
+        .line-num-empty{min-width:40px;background:transparent;border-right:1px solid var(--border);flex-shrink:0}
+        .line-content{flex:1;padding:0 14px;white-space:pre;overflow-x:auto;display:flex;align-items:center;min-height:26px}
+        .diff-row.add{background:var(--add-bg)}
+        .diff-row.add .line-num{background:var(--add-bg);color:var(--add-text)}
+        .diff-row.add .line-content{color:var(--add-text)}
+        .diff-row.del{background:var(--del-bg)}
+        .diff-row.del .line-num{background:var(--del-bg);color:var(--del-text)}
+        .diff-row.del .line-content{color:var(--del-text)}
+        .diff-row.same .line-num{color:var(--text3)}
+        .diff-sign{min-width:20px;text-align:center;font-weight:700;padding:0 4px;flex-shrink:0;display:flex;align-items:center}
+        .diff-sign.add{color:var(--success)}
+        .diff-sign.del{color:var(--error)}
+        .diff-sign.same{color:var(--text3)}
+        mark.inline-add{background:var(--add-mark);border-radius:2px}
+        mark.inline-del{background:var(--del-mark);border-radius:2px;text-decoration:line-through}
+
+        /* 分栏视图 */
+        .split-view{display:none;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+        .split-view.active{display:grid;grid-template-columns:1fr 1fr}
+        .split-panel{overflow:auto}
+        .split-panel:first-child{border-right:1px solid var(--border)}
+        .split-head{padding:8px 14px;font-size:12px;font-weight:600;color:var(--text2);background:var(--bg2);border-bottom:1px solid var(--border)}
+
+        /* 空态 */
+        .empty-state{padding:48px 20px;text-align:center;color:var(--text3)}
+        .empty-icon{font-size:48px;margin-bottom:12px}
+
+        /* Legend */
+        .legend{display:flex;gap:16px;font-size:12px;color:var(--text2);margin-left:auto}
+        .legend-item{display:flex;align-items:center;gap:5px}
+        .legend-dot{width:8px;height:8px;border-radius:2px}
+
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;background:var(--text);color:#fff;border-radius:50px;font-size:14px;opacity:0;transition:.3s;z-index:999;pointer-events:none}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+        .toast.success{background:var(--success)}
+        .footer{margin-top:60px;padding:24px 20px;border-top:1px solid var(--border);text-align:center;font-size:13px;color:var(--text3)}
+        .footer a{color:var(--primary)}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../" class="logo"><span>🛠️</span><span>全能工具箱</span></a>
+            <div style="display:flex;gap:8px">
+                <button class="icon-btn" id="themeBtn" title="切换主题"><span id="themeIcon">🌙</span></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="breadcrumb">
+            <a href="../">首页</a>
+            <span>›</span>
+            <span>开发工具</span>
+            <span>›</span>
+            <span>代码对比</span>
+        </div>
+
+        <div class="tool-header">
+            <h1 class="tool-title">🔀 在线代码 / 文本对比</h1>
+            <button class="tool-fav-btn" id="favBtn" data-tool-id="dev-diff">☆ 收藏</button>
+        </div>
+        <p class="tool-desc">纯前端差异对比，删除行红色高亮，新增行绿色高亮，行号精确对齐，支持逐字内联差异标注。</p>
+
+        <!-- 双栏输入 -->
+        <div class="input-grid">
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-label"><div class="dot dot-del"></div>原始内容（版本 A）</div>
+                    <button class="clear-btn" onclick="document.getElementById('textA').value=''">清空</button>
+                </div>
+                <textarea class="code-input" id="textA" placeholder="粘贴原始代码或文本…"></textarea>
+            </div>
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-label"><div class="dot dot-add"></div>修改后内容（版本 B）</div>
+                    <button class="clear-btn" onclick="document.getElementById('textB').value=''">清空</button>
+                </div>
+                <textarea class="code-input" id="textB" placeholder="粘贴修改后代码或文本…"></textarea>
+            </div>
+        </div>
+
+        <!-- 控制行 -->
+        <div class="ctrl-row">
+            <button class="btn btn-primary" onclick="runDiff()">⚡ 对比差异</button>
+            <button class="btn btn-ghost" onclick="loadDemo()">📋 加载示例</button>
+            <button class="btn btn-ghost" onclick="swapTexts()">⇄ 交换</button>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+                <span style="font-size:13px;color:var(--text2)">视图</span>
+                <div class="seg-btns">
+                    <button class="seg-btn active" id="view-unified" onclick="setView('unified')">合并</button>
+                    <button class="seg-btn" id="view-split" onclick="setView('split')">分栏</button>
+                </div>
+                <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer">
+                    <input type="checkbox" id="inlineCheck" checked style="accent-color:var(--primary)"> 逐字标注
+                </label>
+            </div>
+        </div>
+
+        <!-- 统计条 -->
+        <div class="stats-bar" id="statsBar" style="display:none">
+            <div class="stat-item"><span class="badge badge-add" id="statAdd">+0</span> 新增行</div>
+            <div class="stat-item"><span class="badge badge-del" id="statDel">-0</span> 删除行</div>
+            <div class="stat-item"><span class="badge badge-same" id="statSame">0</span> 未变行</div>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>新增</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>删除</div>
+            </div>
+        </div>
+
+        <!-- 合并视图 -->
+        <div class="diff-output" id="unifiedView" style="display:none"></div>
+
+        <!-- 分栏视图 -->
+        <div class="split-view" id="splitView">
+            <div class="split-panel">
+                <div class="split-head"><span class="dot dot-del" style="display:inline-block;margin-right:6px"></span>版本 A</div>
+                <div class="diff-output" id="splitLeft" style="border:none;border-radius:0"></div>
+            </div>
+            <div class="split-panel">
+                <div class="split-head"><span class="dot dot-add" style="display:inline-block;margin-right:6px"></span>版本 B</div>
+                <div class="diff-output" id="splitRight" style="border:none;border-radius:0"></div>
+            </div>
+        </div>
+
+        <!-- 空态 -->
+        <div id="emptyState" class="empty-state">
+            <div class="empty-icon">🔀</div>
+            <div style="font-size:16px;font-weight:600;margin-bottom:6px">在左右两侧各粘贴一段文本</div>
+            <div style="font-size:14px">支持代码、配置文件、普通文本，差异行将高亮显示</div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 <a href="../">全能工具箱</a> | 所有对比在浏览器本地完成</p>
+    </footer>
+    <div id="toast" class="toast"></div>
+
+    <script src="../js/tools-data.js"></script>
+    <script src="../js/toolbox-core.js"></script>
+    <script>
+        let currentView = 'unified';
+        let lastDiff = null;
+
+        // LCS-based diff
+        function computeDiff(a, b) {
+            const linesA = a.split('\n');
+            const linesB = b.split('\n');
+            const m = linesA.length, n = linesB.length;
+
+            // Myers diff via DP table
+            const dp = [];
+            for (let i = 0; i <= m; i++) {
+                dp[i] = new Array(n + 1).fill(0);
+            }
+            for (let i = 1; i <= m; i++) {
+                for (let j = 1; j <= n; j++) {
+                    if (linesA[i-1] === linesB[j-1]) dp[i][j] = dp[i-1][j-1] + 1;
+                    else dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+                }
+            }
+
+            // Backtrack
+            const result = [];
+            let i = m, j = n;
+            while (i > 0 || j > 0) {
+                if (i > 0 && j > 0 && linesA[i-1] === linesB[j-1]) {
+                    result.unshift({ type: 'same', lineA: i, lineB: j, text: linesA[i-1] });
+                    i--; j--;
+                } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
+                    result.unshift({ type: 'add', lineA: null, lineB: j, text: linesB[j-1] });
+                    j--;
+                } else {
+                    result.unshift({ type: 'del', lineA: i, lineB: null, text: linesA[i-1] });
+                    i--;
+                }
+            }
+            return result;
+        }
+
+        // Inline char diff between two strings
+        function inlineDiff(strA, strB) {
+            const ca = strA.split(''), cb = strB.split('');
+            const m = ca.length, n = cb.length;
+            const dp = [];
+            for (let i = 0; i <= m; i++) {
+                dp[i] = new Array(n + 1).fill(0);
+            }
+            for (let i = 1; i <= m; i++) {
+                for (let j = 1; j <= n; j++) {
+                    if (ca[i-1] === cb[j-1]) dp[i][j] = dp[i-1][j-1] + 1;
+                    else dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+                }
+            }
+            const resA = [], resB = [];
+            let i = m, j = n;
+            while (i > 0 || j > 0) {
+                if (i > 0 && j > 0 && ca[i-1] === cb[j-1]) {
+                    resA.unshift({ type: 'same', c: ca[i-1] });
+                    resB.unshift({ type: 'same', c: cb[j-1] });
+                    i--; j--;
+                } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
+                    resB.unshift({ type: 'add', c: cb[j-1] });
+                    j--;
+                } else {
+                    resA.unshift({ type: 'del', c: ca[i-1] });
+                    i--;
+                }
+            }
+            const renderChars = (arr, markClass) => arr.map(x => {
+                if (x.type === 'same') return escHtml(x.c);
+                return `<mark class="${markClass}">${escHtml(x.c)}</mark>`;
+            }).join('');
+            return {
+                a: renderChars(resA, 'inline-del'),
+                b: renderChars(resB, 'inline-add'),
+            };
+        }
+
+        function renderRow(type, lineNumA, lineNumB, content, sign) {
+            const lnA = lineNumA !== null ? `<div class="line-num">${lineNumA}</div>` : `<div class="line-num-empty"></div>`;
+            const lnB = lineNumB !== null ? `<div class="line-num">${lineNumB}</div>` : `<div class="line-num-empty"></div>`;
+            return `<div class="diff-row ${type}">${lnA}${lnB}<div class="diff-sign ${type}">${sign}</div><div class="line-content">${content}</div></div>`;
+        }
+
+        function runDiff() {
+            const a = document.getElementById('textA').value;
+            const b = document.getElementById('textB').value;
+            if (!a && !b) { toast('请在左右两侧各输入内容', ''); return; }
+
+            const diffs = computeDiff(a, b);
+            lastDiff = diffs;
+
+            const useInline = document.getElementById('inlineCheck').checked;
+
+            let added = 0, deleted = 0, same = 0;
+            let unifiedHtml = '';
+            let splitLeftHtml = '';
+            let splitRightHtml = '';
+
+            // For inline diff, pair adjacent del+add
+            const pairedDiffs = [];
+            for (let k = 0; k < diffs.length; k++) {
+                if (diffs[k].type === 'del' && k + 1 < diffs.length && diffs[k+1].type === 'add' && useInline) {
+                    pairedDiffs.push({ del: diffs[k], add: diffs[k+1], paired: true });
+                    k++;
+                } else {
+                    pairedDiffs.push({ item: diffs[k], paired: false });
+                }
+            }
+
+            pairedDiffs.forEach(p => {
+                if (p.paired) {
+                    const { del: d, add: ad } = p;
+                    const il = inlineDiff(d.text, ad.text);
+                    deleted++;
+                    added++;
+                    unifiedHtml += renderRow('del', d.lineA, null, il.a, '−');
+                    unifiedHtml += renderRow('add', null, ad.lineB, il.b, '+');
+                    splitLeftHtml += renderRow('del', d.lineA, null, il.a, '−');
+                    splitLeftHtml += `<div class="diff-row same"><div class="line-num-empty"></div><div class="line-num-empty"></div><div class="diff-sign same"> </div><div class="line-content"></div></div>`;
+                    splitRightHtml += `<div class="diff-row same"><div class="line-num-empty"></div><div class="line-num-empty"></div><div class="diff-sign same"> </div><div class="line-content"></div></div>`;
+                    splitRightHtml += renderRow('add', null, ad.lineB, il.b, '+');
+                } else {
+                    const item = p.item;
+                    const content = escHtml(item.text);
+                    if (item.type === 'add') {
+                        added++;
+                        unifiedHtml += renderRow('add', null, item.lineB, content, '+');
+                        splitLeftHtml += `<div class="diff-row same"><div class="line-num-empty"></div><div class="line-num-empty"></div><div class="diff-sign same"> </div><div class="line-content"></div></div>`;
+                        splitRightHtml += renderRow('add', null, item.lineB, content, '+');
+                    } else if (item.type === 'del') {
+                        deleted++;
+                        unifiedHtml += renderRow('del', item.lineA, null, content, '−');
+                        splitLeftHtml += renderRow('del', item.lineA, null, content, '−');
+                        splitRightHtml += `<div class="diff-row same"><div class="line-num-empty"></div><div class="line-num-empty"></div><div class="diff-sign same"> </div><div class="line-content"></div></div>`;
+                    } else {
+                        same++;
+                        unifiedHtml += renderRow('same', item.lineA, item.lineB, content, ' ');
+                        splitLeftHtml += renderRow('same', item.lineA, item.lineB, content, ' ');
+                        splitRightHtml += renderRow('same', item.lineA, item.lineB, content, ' ');
+                    }
+                }
+            });
+
+            document.getElementById('statAdd').textContent = '+' + added;
+            document.getElementById('statDel').textContent = '-' + deleted;
+            document.getElementById('statSame').textContent = same;
+            document.getElementById('statsBar').style.display = '';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('unifiedView').innerHTML = unifiedHtml;
+            document.getElementById('splitLeft').innerHTML = splitLeftHtml;
+            document.getElementById('splitRight').innerHTML = splitRightHtml;
+            setView(currentView);
+        }
+
+        function setView(v) {
+            currentView = v;
+            document.getElementById('view-unified').classList.toggle('active', v === 'unified');
+            document.getElementById('view-split').classList.toggle('active', v === 'split');
+            document.getElementById('unifiedView').style.display = v === 'unified' && lastDiff ? '' : 'none';
+            document.getElementById('splitView').classList.toggle('active', v === 'split' && !!lastDiff);
+        }
+
+        function swapTexts() {
+            const a = document.getElementById('textA').value;
+            const b = document.getElementById('textB').value;
+            document.getElementById('textA').value = b;
+            document.getElementById('textB').value = a;
+            if (lastDiff) runDiff();
+        }
+
+        function loadDemo() {
+            document.getElementById('textA').value =
+`function greet(name) {
+  console.log('Hello, ' + name);
+  return true;
+}
+
+const user = "Alice";
+greet(user);`;
+
+            document.getElementById('textB').value =
+`function greet(name, greeting = 'Hello') {
+  console.log(\`\${greeting}, \${name}!\`);
+  console.log('Greeted at:', new Date().toISOString());
+  return { success: true, name };
+}
+
+const user = "Bob";
+greet(user, 'Hi');`;
+
+            runDiff();
+        }
+
+        function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function toast(msg, type) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast show' + (type ? ' ' + type : '');
+            clearTimeout(el._t);
+            el._t = setTimeout(() => el.className = 'toast', 2500);
+        }
+
+        const themeBtn = document.getElementById('themeBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        function updateThemeIcon() { themeIcon.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙'; }
+        updateThemeIcon();
+        themeBtn.addEventListener('click', () => {
+            const dark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', dark ? 'dark' : 'light');
+            updateThemeIcon();
+        });
+    </script>
+</body>
+</html>
