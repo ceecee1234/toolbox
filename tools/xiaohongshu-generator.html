@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小红书爆款文案生成器 - 标题种草文案一键生成 | 全能工具箱</title>
+    <meta name="description" content="免费在线小红书爆款标题与种草文案生成器，内置多种爆款模板和颜文字，一键生成高互动率笔记文案。">
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
+    <style>
+        :root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#E8416A;--primary-light:#FFF0F4;--success:#10B981;--warning:#F59E0B;--error:#EF4444;--border:#e2e8f0;--radius:12px}
+        .dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#334155;--primary-light:rgba(232,65,106,.15)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+        a{color:inherit;text-decoration:none}
+        .header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border)}
+        .header-inner{max-width:860px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
+        .icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;background:none;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:.2s}
+        .icon-btn:hover{background:var(--bg2)}
+        .main{max-width:860px;margin:0 auto;padding:24px 20px}
+        .breadcrumb{display:flex;gap:8px;font-size:13px;color:var(--text3);margin-bottom:20px;flex-wrap:wrap}
+        .breadcrumb a{color:var(--primary)}
+        .tool-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px}
+        .tool-title{font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px}
+        .tool-desc{color:var(--text2);margin-bottom:24px;font-size:15px}
+        .tool-fav-btn{padding:8px 18px;font-size:14px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
+        .tool-fav-btn:hover,.tool-fav-btn.active{color:var(--warning);border-color:var(--warning)}
+
+        /* XHS 特有渐变装饰 */
+        .xhs-banner{background:linear-gradient(135deg,#FF2D55,#FF6B81,#FF9A9E);color:white;border-radius:var(--radius);padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+        .xhs-banner-icon{font-size:48px}
+        .xhs-banner-text h2{font-size:18px;margin-bottom:4px}
+        .xhs-banner-text p{font-size:13px;opacity:.9}
+
+        /* 输入区 */
+        .input-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+        .input-title{font-size:15px;font-weight:600;margin-bottom:16px}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+        .form-group{margin-bottom:16px}
+        .form-label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px}
+        .form-input{width:100%;height:44px;padding:0 14px;font-size:15px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);outline:none;transition:.2s}
+        .form-input:focus{border-color:var(--primary);background:var(--primary-light)}
+        .form-textarea{width:100%;min-height:80px;padding:12px 14px;font-size:15px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);outline:none;resize:vertical;transition:.2s;line-height:1.6}
+        .form-textarea:focus{border-color:var(--primary);background:var(--primary-light)}
+        select.form-input{cursor:pointer}
+
+        /* 模板选择 */
+        .template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+        .tmpl-btn{padding:10px 8px;text-align:center;font-size:13px;font-weight:500;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:.2s;color:var(--text2)}
+        .tmpl-btn:hover,.tmpl-btn.selected{background:var(--primary-light);border-color:var(--primary);color:var(--primary)}
+        .tmpl-btn .t-icon{display:block;font-size:24px;margin-bottom:4px}
+
+        /* 生成按钮 */
+        .gen-btn{width:100%;height:52px;background:linear-gradient(135deg,#FF2D55,#FF6B81);color:white;border:none;border-radius:12px;font-size:18px;font-weight:700;cursor:pointer;transition:.2s;margin-top:4px;letter-spacing:.5px}
+        .gen-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,65,106,.35)}
+        .gen-btn:active{transform:translateY(0)}
+
+        /* 结果区 */
+        .results-area{display:none}
+        .results-area.show{display:block}
+
+        /* 标题结果卡 */
+        .result-section-title{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .titles-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:20px}
+        .title-card{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;transition:.2s;cursor:pointer}
+        .title-card:hover{border-color:var(--primary);background:var(--primary-light)}
+        .title-card.selected-title{border-color:var(--primary);background:var(--primary-light)}
+        .title-text{font-size:15px;font-weight:500;flex:1;line-height:1.5}
+        .title-copy-btn{padding:6px 14px;font-size:12px;background:var(--primary);color:white;border:none;border-radius:6px;cursor:pointer;white-space:nowrap}
+
+        /* 正文卡 */
+        .body-result-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+        .body-result-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+        .body-result-label{font-size:13px;font-weight:600;color:var(--text2)}
+        .body-result-actions{display:flex;gap:8px}
+        .action-sm-btn{padding:6px 14px;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--bg2);border-radius:6px;cursor:pointer;color:var(--text2);transition:.2s}
+        .action-sm-btn:hover{border-color:var(--primary);color:var(--primary)}
+        .body-result-text{padding:16px;font-size:15px;line-height:2;white-space:pre-wrap;color:var(--text)}
+        .body-result-editable{width:100%;min-height:220px;padding:16px;font-size:15px;line-height:2;background:transparent;border:none;outline:none;color:var(--text);resize:vertical}
+
+        /* 话题标签 */
+        .tags-result{padding:12px 16px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;background:var(--bg2)}
+        .xhs-tag{display:inline-block;padding:4px 10px;font-size:13px;font-weight:600;color:var(--primary);background:var(--primary-light);border-radius:20px;cursor:pointer;transition:.2s}
+        .xhs-tag:hover{background:var(--primary);color:white}
+
+        /* 颜文字插入 */
+        .kaomoji-bar{margin-bottom:20px}
+        .kaomoji-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+        .km-btn{padding:4px 10px;font-size:14px;background:var(--card);border:1px solid var(--border);border-radius:20px;cursor:pointer;transition:.2s;color:var(--text2)}
+        .km-btn:hover{background:var(--primary-light);border-color:var(--primary)}
+
+        /* 预览手机 */
+        .phone-preview{background:var(--bg2);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:20px}
+        .phone-frame{display:inline-block;background:white;border-radius:24px;padding:20px 16px;box-shadow:0 8px 32px rgba(0,0,0,.15);max-width:320px;width:100%;text-align:left}
+        .phone-title{font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:12px;line-height:1.4}
+        .phone-body{font-size:13px;color:#333;line-height:2;white-space:pre-wrap;max-height:180px;overflow-y:auto;margin-bottom:12px}
+        .phone-tags{display:flex;flex-wrap:wrap;gap:4px}
+        .phone-tag{font-size:11px;color:#E8416A;font-weight:600}
+
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;background:var(--text);color:#fff;border-radius:50px;opacity:0;transition:.3s;z-index:1000;font-size:14px}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+        .toast.success{background:var(--success)}
+        .footer{margin-top:60px;padding:24px 20px;border-top:1px solid var(--border);text-align:center;color:var(--text3);font-size:13px}
+        .footer a{color:var(--primary)}
+
+        @media(max-width:600px){
+            .form-row{grid-template-columns:1fr}
+            .template-grid{grid-template-columns:repeat(3,1fr)}
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../" class="logo">🛠️ 全能工具箱</a>
+            <button class="icon-btn" onclick="toggleTheme()">🌓</button>
+        </div>
+    </header>
+
+    <main class="main">
+        <nav class="breadcrumb">
+            <a href="../">首页</a><span>›</span>
+            <span>AI工具</span><span>›</span>
+            <span>小红书爆款文案生成器</span>
+        </nav>
+
+        <div class="tool-header">
+            <h1 class="tool-title">📱 小红书爆款文案生成器</h1>
+            <button class="tool-fav-btn" data-tool-id="xiaohongshu-generator">☆ 收藏</button>
+        </div>
+        <p class="tool-desc">内置 10+ 种爆款模板，一键生成高互动标题 + 种草正文 + 话题标签，颜文字自动加持 (｡◕‿◕｡)</p>
+
+        <!-- Banner -->
+        <div class="xhs-banner">
+            <div class="xhs-banner-icon">📖</div>
+            <div class="xhs-banner-text">
+                <h2>纯前端生成，数据不离开你的浏览器 ✨</h2>
+                <p>内置真实爆款公式 · 丰富颜文字库 · 话题标签自动匹配</p>
+            </div>
+        </div>
+
+        <!-- 输入区 -->
+        <div class="input-card">
+            <div class="input-title">✏️ 填写内容信息</div>
+
+            <div class="form-row">
+                <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label">产品/主题关键词 *</label>
+                    <input type="text" class="form-input" id="topic" placeholder="例：防晒霜 / 咖啡馆 / 减肥食谱">
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label">目标人群</label>
+                    <select class="form-input" id="audience">
+                        <option value="女生">女生</option>
+                        <option value="男生">男生</option>
+                        <option value="学生党">学生党</option>
+                        <option value="上班族">上班族</option>
+                        <option value="宝妈">宝妈</option>
+                        <option value="健身达人">健身达人</option>
+                        <option value="美食爱好者">美食爱好者</option>
+                        <option value="旅行党">旅行党</option>
+                        <option value="all">不限人群</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-top:16px">
+                <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label">内容卖点/亮点</label>
+                    <input type="text" class="form-input" id="selling" placeholder="例：平价大牌、效果媲美xxx、懒人必备">
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label">笔记风格</label>
+                    <select class="form-input" id="style">
+                        <option value="种草">种草推荐</option>
+                        <option value="测评">真实测评</option>
+                        <option value="教程">干货教程</option>
+                        <option value="故事">情感故事</option>
+                        <option value="合集">好物合集</option>
+                        <option value="避坑">踩坑避坑</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top:16px">
+                <label class="form-label">补充信息（可选）</label>
+                <textarea class="form-textarea" id="extra" placeholder="例：用了三个月、价格39元、在xx旗舰店购买..."></textarea>
+            </div>
+
+            <!-- 模板选择 -->
+            <div style="margin-bottom:12px">
+                <label class="form-label">选择爆款模板类型</label>
+                <div class="template-grid" id="templateGrid">
+                    <div class="tmpl-btn selected" data-tmpl="before-after" onclick="selectTmpl(this)">
+                        <span class="t-icon">✨</span>用前用后
+                    </div>
+                    <div class="tmpl-btn" data-tmpl="number-list" onclick="selectTmpl(this)">
+                        <span class="t-icon">📋</span>数字清单
+                    </div>
+                    <div class="tmpl-btn" data-tmpl="secret" onclick="selectTmpl(this)">
+                        <span class="t-icon">🤫</span>藏私好物
+                    </div>
+                    <div class="tmpl-btn" data-tmpl="question" onclick="selectTmpl(this)">
+                        <span class="t-icon">❓</span>疑问句式
+                    </div>
+                    <div class="tmpl-btn" data-tmpl="story" onclick="selectTmpl(this)">
+                        <span class="t-icon">💬</span>故事开头
+                    </div>
+                    <div class="tmpl-btn" data-tmpl="comparison" onclick="selectTmpl(this)">
+                        <span class="t-icon">⚖️</span>对比测评
+                    </div>
+                    <div class="tmpl-btn" data-tmpl="warning" onclick="selectTmpl(this)">
+                        <span class="t-icon">⚠️</span>避坑指南
+                    </div>
+                    <div class="tmpl-btn" data-tmpl="experience" onclick="selectTmpl(this)">
+                        <span class="t-icon">💡</span>亲身经历
+                    </div>
+                </div>
+            </div>
+
+            <button class="gen-btn" onclick="generate()">🌸 一键生成爆款文案</button>
+        </div>
+
+        <!-- 结果区 -->
+        <div class="results-area" id="resultsArea">
+
+            <!-- 标题 -->
+            <div class="result-section-title">🔥 爆款标题推荐（点击选用，支持复制）</div>
+            <div class="titles-grid" id="titlesGrid"></div>
+
+            <!-- 正文 -->
+            <div class="result-section-title" style="margin-bottom:12px">📝 种草正文</div>
+            <div class="body-result-card">
+                <div class="body-result-header">
+                    <span class="body-result-label">正文内容（可直接编辑）</span>
+                    <div class="body-result-actions">
+                        <button class="action-sm-btn" onclick="regenerateBody()">🔄 重新生成</button>
+                        <button class="action-sm-btn" onclick="copyBody()">📋 复制全文</button>
+                    </div>
+                </div>
+                <textarea class="body-result-editable" id="bodyText"></textarea>
+                <div class="tags-result" id="tagsResult"></div>
+            </div>
+
+            <!-- 颜文字工具栏 -->
+            <div class="kaomoji-bar">
+                <div class="result-section-title">( ◕‿◕ ) 颜文字快速插入</div>
+                <div class="kaomoji-grid" id="kaomojiGrid"></div>
+            </div>
+
+            <!-- 手机预览 -->
+            <div class="result-section-title">📱 手机预览效果</div>
+            <div class="phone-preview">
+                <div class="phone-frame">
+                    <div class="phone-title" id="phone-title">标题将显示在这里</div>
+                    <div class="phone-body" id="phone-body">正文将显示在这里</div>
+                    <div class="phone-tags" id="phone-tags"></div>
+                </div>
+            </div>
+
+            <!-- 一键复制全部 -->
+            <button class="gen-btn" onclick="copyAll()" style="background:linear-gradient(135deg,var(--success),#059669)">
+                📋 一键复制完整文案（标题 + 正文 + 话题）
+            </button>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 全能工具箱 | <a href="../">返回首页</a></p>
+    </footer>
+    <div id="toast" class="toast"></div>
+
+    <script src="../js/tools-data.js"></script>
+    <script src="../js/toolbox-core.js"></script>
+    <script>
+        var selectedTemplate = 'before-after';
+        var selectedTitle = '';
+        var generatedTags = [];
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        function selectTmpl(btn) {
+            document.querySelectorAll('.tmpl-btn').forEach(function(b) { b.classList.remove('selected'); });
+            btn.classList.add('selected');
+            selectedTemplate = btn.dataset.tmpl;
+        }
+
+        // 颜文字库
+        var kaomojis = [
+            '(｡◕‿◕｡)', '(✿◠‿◠)', '(*^▽^*)', '(≧◡≦)', '٩(◕‿◕｡)۶',
+            '(ﾉ◕ヮ◕)ﾉ', '(づ｡◕‿‿◕｡)づ', '(*≧ω≦)', '(●´ω｀●)', 'ヽ(✿ﾟ▽ﾟ)ノ',
+            '(๑˃ᴗ˂)ﻭ', '⸜(ˆᗜˆ˵ )⸝', '(灬º‿º灬)♡', '( ´ ▽ ` )ﾉ', '(ﾉ∀`)ﾉ',
+            '✧₊⁺', '✨✨✨', '💕', '🌸', '🌟', '💖', '🎀', '🌈',
+            '❗重要', '‼️必看', '👆戳这里', '⬇️往下看', '💡小tips',
+            '❤️‍🔥', '🔥', '⭐⭐⭐', '👏', '🙌'
+        ];
+
+        function renderKaomojis() {
+            var grid = document.getElementById('kaomojiGrid');
+            grid.innerHTML = kaomojis.map(function(km) {
+                return '<button class="km-btn" onclick="insertKaomoji(\'' + km.replace(/'/g, "\\'") + '\')">' + km + '</button>';
+            }).join('');
+        }
+
+        function insertKaomoji(km) {
+            var ta = document.getElementById('bodyText');
+            var start = ta.selectionStart;
+            var end = ta.selectionEnd;
+            var val = ta.value;
+            ta.value = val.substring(0, start) + km + val.substring(end);
+            ta.selectionStart = ta.selectionEnd = start + km.length;
+            ta.focus();
+            syncPreview();
+        }
+
+        // 话题标签库
+        var tagLibrary = {
+            '防晒': ['防晒好物', '防晒测评', '夏日防晒', 'SPF测评', '护肤日记'],
+            '咖啡': ['咖啡探店', '打卡咖啡馆', '咖啡爱好者', '精品咖啡', '网红咖啡'],
+            '减肥': ['减脂餐', '低卡食谱', '健康饮食', '瘦身计划', '减脂日记'],
+            '护肤': ['护肤日记', '平价好物', '护肤分享', '成分党', '敏感肌护肤'],
+            '美食': ['美食探店', '家常菜', '烘焙', '吃货聚集地', '食谱分享'],
+            '穿搭': ['穿搭分享', '日常穿搭', '显瘦穿搭', '学院风', '仙气穿搭'],
+            '旅行': ['旅行攻略', '旅游避坑', '出行必备', '小众景点', '旅行日记'],
+            default: ['好物分享', '亲测有效', '干货分享', '种草', '生活记录', '好用到哭']
+        };
+
+        function getRelatedTags(topic, style) {
+            var tags = [];
+            Object.keys(tagLibrary).forEach(function(key) {
+                if (topic.includes(key)) {
+                    tags = tags.concat(tagLibrary[key]);
+                }
+            });
+            if (!tags.length) tags = tagLibrary.default.slice();
+            tags.push(topic + '推荐', style + '分享', topic + '测评');
+            return tags.slice(0, 10).map(function(t) { return '#' + t; });
+        }
+
+        // 标题模板
+        var titleTemplates = {
+            'before-after': [
+                function(t, s, a) { return '用了{t}一个月，{a}的{s}变了！(ﾉ◕ヮ◕)ﾉ'.replace('{t}', t).replace('{a}', a).replace('{s}', s || '状态'); },
+                function(t, s, a) { return '买之前VS买之后，{t}真的给我惊喜到了 ✨'.replace('{t}', t); },
+                function(t, s, a) { return '坚持用{t}30天！看看{a}效果有多明显💕'.replace('{t}', t).replace('{a}', a); }
+            ],
+            'number-list': [
+                function(t, s) { return '{t}必备的5个超实用小技巧，收藏备用‼️'.replace('{t}', t); },
+                function(t, s) { return '3款{t}横评！哪款性价比最高一目了然'.replace('{t}', t); },
+                function(t, s) { return '关于{t}，这7件事你一定不知道 👆'.replace('{t}', t); }
+            ],
+            'secret': [
+                function(t) { return '我的{t}私藏！朋友问了好几次终于说了 (｡◕‿◕｡)'.replace('{t}', t); },
+                function(t) { return '一直不想公开的{t}好物，今天破防说了！'.replace('{t}', t); },
+                function(t) { return '悄悄把{t}宝藏推给你，别让太多人知道⭐⭐⭐'.replace('{t}', t); }
+            ],
+            'question': [
+                function(t, a) { return '{a}都在用的{t}到底怎么样？我替你测了💡'.replace('{a}', a).replace('{t}', t); },
+                function(t) { return '为什么我还在坚持用{t}？看到最后你就懂了'.replace('{t}', t); },
+                function(t) { return '{t}真的有用吗？亲测3个月告诉你实话 🔥'.replace('{t}', t); }
+            ],
+            'story': [
+                function(t, a) { return '那天{a}朋友问我：你用什么{t}？我愣住了'.replace('{a}', a).replace('{t}', t); },
+                function(t) { return '我妈看到我的{t}时沉默了5秒，然后问我要链接'.replace('{t}', t); },
+                function(t) { return '一不小心爱上了{t}，现在回不去了 (灬º‿º灬)♡'.replace('{t}', t); }
+            ],
+            'comparison': [
+                function(t, s) { return '买过10款{t}的我，终于找到最值得买的那个💖'.replace('{t}', t); },
+                function(t) { return '大牌 VS 平替 VS {t}，谁才是真正的yyds？'.replace('{t}', t); },
+                function(t) { return '{t}深度横评！200块vs2000块差距到底在哪'.replace('{t}', t); }
+            ],
+            'warning': [
+                function(t) { return '买{t}前一定要看！我踩过的坑全给你列出来了'.replace('{t}', t); },
+                function(t) { return '拒绝被割韭菜！{t}这几个坑千万别踩⚠️'.replace('{t}', t); },
+                function(t) { return '后悔没早看到这篇！{t}选购避坑指南'.replace('{t}', t); }
+            ],
+            'experience': [
+                function(t, a) { return '作为一个{a}，用{t}半年后我想说真心话'.replace('{a}', a).replace('{t}', t); },
+                function(t) { return '普通人亲测{t}，没有滤镜的真实效果记录'.replace('{t}', t); },
+                function(t) { return '{t}第15天 | 从怀疑到真香，我的变化记录✨'.replace('{t}', t); }
+            ]
+        };
+
+        // 正文模板
+        var bodyTemplates = {
+            'before-after': function(t, s, a, selling, extra) {
+                return '姐妹们！！今天必须来给你们分享一个宝藏 ✨✨\n\n' +
+                    '说的就是 — 【' + t + '】💕\n\n' +
+                    '作为一个坚持用了一段时间的' + a + '，我可以负责任地说：\n' +
+                    '✅ ' + (selling || t + '真的好用') + '\n' +
+                    '✅ 效果肉眼可见，完全不夸张\n' +
+                    '✅ 性价比超级高，入手毫不后悔\n\n' +
+                    (extra ? '补充说明：' + extra + '\n\n' : '') +
+                    '用前：完全看不出效果 (｡◕‿◕｡)\n' +
+                    '用后：直接问我买的哪家！！\n\n' +
+                    '说真的，我已经给身边好几个朋友推荐了，大家反馈都超好 🌸\n\n' +
+                    '需要的姐妹赶快冲！有问题评论区见 👇\n' +
+                    '❤️ 点赞收藏 = 你也在路上了！';
+            },
+            'number-list': function(t, s, a, selling, extra) {
+                return '整理了N久，给' + a + '们的' + t + '超实用清单来了！\n\n' +
+                    '🔥 这篇干货不藏着了，全给你！\n\n' +
+                    '📌 第1点：了解' + t + '的核心选购标准\n' +
+                    '   → ' + (selling || '关注这几个关键指标') + '\n\n' +
+                    '📌 第2点：避开这些常见误区\n' +
+                    '   → 很多人都会踩坑，千万别忽视\n\n' +
+                    '📌 第3点：我亲测的最优方案\n' +
+                    '   → 综合性价比和实用性的最优解\n\n' +
+                    '📌 第4点：使用技巧让效果翻倍\n' +
+                    '   → 这个技巧99%的人不知道 (ﾉ◕ヮ◕)ﾉ\n\n' +
+                    (extra ? '额外分享：' + extra + '\n\n' : '') +
+                    '建议先收藏，用到时候再看！\n' +
+                    '有问题随时评论区问我 💬';
+            },
+            'secret': function(t, s, a, selling, extra) {
+                return '好了好了，藏不住了，今天把' + t + '宝藏分享给你们 (｡◕‿◕｡)\n\n' +
+                    '这是我用了好久都不想说的私藏...\n' +
+                    '但每次看到' + a + '们还在踩坑，我良心上过不去！\n\n' +
+                    '✨ 为什么我一直在用：\n' +
+                    (selling ? '→ ' + selling + '\n' : '') +
+                    '→ 实用程度完全超出我的预期\n' +
+                    '→ 用过的都说好，这不是玄学\n\n' +
+                    '我身边小姐妹知道这个之后，' +
+                    '一人买了好几个备着 (*^▽^*)\n\n' +
+                    (extra ? '温馨提示：' + extra + '\n\n' : '') +
+                    '真心建议：遇到好东西要赶快冲！\n' +
+                    '❤️ 喜欢记得收藏，下次找不到哭死';
+            },
+            'story': function(t, s, a, selling, extra) {
+                return '说个真实的经历...\n\n' +
+                    '前段时间一个' + a + '朋友看到我在用' + t + '，\n' +
+                    '问我：这个真的有用吗？\n\n' +
+                    '我当时愣了一下，\n' +
+                    '因为我完全没想到效果会这么好 (≧◡≦)\n\n' +
+                    '后来我认真回想了一下：\n' +
+                    '✅ ' + (selling || t + '确实让我惊喜') + '\n' +
+                    '✅ 坚持用了一段时间后，变化是真实的\n' +
+                    '✅ 性价比这种东西，用过才知道\n\n' +
+                    (extra ? '另外补充：' + extra + '\n\n' : '') +
+                    '朋友后来也入手了，现在天天问我要链接给其他人 🌸\n\n' +
+                    '如果你也在纠结要不要试试，\n' +
+                    '我的建议是：冲！别犹豫！\n\n' +
+                    '有问题评论区见，我都会回复的 (づ｡◕‿‿◕｡)づ';
+            },
+            'comparison': function(t, s, a, selling, extra) {
+                return '买过N款' + t + '的我，今天终于可以客观评价了！⚖️\n\n' +
+                    '先说结论：有些真的不值得买！\n\n' +
+                    '🔍 横评维度：\n' +
+                    '① 实际效果 ② 性价比 ③ 使用体验 ④ 持久度\n\n' +
+                    '💡 我的最终评定：\n' +
+                    (selling ? '→ ' + selling + ' ← 这点是真的无敌\n' : '') +
+                    '→ 在同价位产品中稳居第一梯队\n' +
+                    '→ 作为' + a + '日常使用，刚刚好\n\n' +
+                    (extra ? '补充：' + extra + '\n\n' : '') +
+                    '综合对比下来，这款就是我的答案 ✨\n\n' +
+                    '不用再踩坑了，直接冲这款就行！\n' +
+                    '有疑问评论区聊 (●´ω｀●)';
+            },
+            'warning': function(t, s, a, selling, extra) {
+                return '⚠️ 写在前面：这篇是真心话，希望对你有帮助！\n\n' +
+                    '踩了这么多' + t + '的坑，今天终于来写总结了...\n\n' +
+                    '❌ 坑1：看到便宜就冲，质量完全不保障\n' +
+                    '❌ 坑2：只看颜值不看实用，后悔来不及\n' +
+                    '❌ 坑3：跟风买热门款，不一定适合自己\n\n' +
+                    '✅ 正确姿势：\n' +
+                    (selling ? '→ 重点关注：' + selling + '\n' : '') +
+                    '→ 先了解自己的需求，再做决定\n' +
+                    '→ 参考多方评价，不只看广告\n\n' +
+                    (extra ? '额外提示：' + extra + '\n\n' : '') +
+                    '希望这篇能帮到你！少走弯路，才能省钱省心 🌸\n' +
+                    '有问题直接问我，评论区看到必回 (✿◠‿◠)';
+            },
+            'experience': function(t, s, a, selling, extra) {
+                return '作为一个用过很多' + t + '的' + a + '，\n今天来说说我的真实感受：\n\n' +
+                    '先说我自己的情况：\n' +
+                    '入手前：将信将疑，毕竟网上吹嘘的多了\n' +
+                    '用了一段时间后：真的真的是真香！！(*≧ω≦)\n\n' +
+                    '具体感受：\n' +
+                    '🌟 ' + (selling || '效果比想象中好很多') + '\n' +
+                    '🌟 使用体验很好，没有任何不适\n' +
+                    '🌟 性价比真的超高\n\n' +
+                    (extra ? '我的使用细节：' + extra + '\n\n' : '') +
+                    '总结：这就是我会反复回购的原因 💕\n\n' +
+                    '如果你也在找' + t + '，这个绝对值得一试！\n' +
+                    '点赞收藏，需要的时候来找我 (ﾉ∀｀)ﾉ';
+            }
+        };
+
+        // 默认body template
+        bodyTemplates['question'] = bodyTemplates['experience'];
+
+        function generate() {
+            var topic = document.getElementById('topic').value.trim();
+            if (!topic) { showToast('请先输入产品/主题关键词', 'error'); return; }
+
+            var audience = document.getElementById('audience').value;
+            var style = document.getElementById('style').value;
+            var selling = document.getElementById('selling').value.trim();
+            var extra = document.getElementById('extra').value.trim();
+
+            // 生成标题
+            var titleFuncs = titleTemplates[selectedTemplate] || titleTemplates['before-after'];
+            var titles = titleFuncs.map(function(fn) { return fn(topic, selling, audience); });
+
+            // 生成正文
+            var bodyFn = bodyTemplates[selectedTemplate] || bodyTemplates['before-after'];
+            var body = bodyFn(topic, style, audience, selling, extra);
+
+            // 生成话题标签
+            generatedTags = getRelatedTags(topic, style);
+
+            // 渲染标题
+            var titlesHtml = titles.map(function(title, i) {
+                return '<div class="title-card" id="tc-' + i + '" onclick="selectTitle(this, \'' + title.replace(/'/g, "\\'") + '\')">' +
+                    '<span class="title-text">' + title + '</span>' +
+                    '<button class="title-copy-btn" onclick="event.stopPropagation();copyText(\'' + title.replace(/'/g, "\\'") + '\')">复制</button>' +
+                    '</div>';
+            }).join('');
+            document.getElementById('titlesGrid').innerHTML = titlesHtml;
+
+            // 设置默认选中标题
+            selectedTitle = titles[0];
+            document.getElementById('tc-0').classList.add('selected-title');
+
+            // 渲染正文
+            document.getElementById('bodyText').value = body;
+
+            // 渲染话题标签
+            var tagsHtml = generatedTags.map(function(tag) {
+                return '<span class="xhs-tag" onclick="copyText(\'' + tag + '\')">' + tag + '</span>';
+            }).join('');
+            document.getElementById('tagsResult').innerHTML = tagsHtml;
+
+            // 渲染颜文字
+            renderKaomojis();
+
+            // 手机预览
+            syncPreview();
+            document.getElementById('phone-title').textContent = selectedTitle;
+
+            // 显示结果
+            document.getElementById('resultsArea').classList.add('show');
+            document.getElementById('resultsArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function selectTitle(el, title) {
+            document.querySelectorAll('.title-card').forEach(function(c) { c.classList.remove('selected-title'); });
+            el.classList.add('selected-title');
+            selectedTitle = title;
+            document.getElementById('phone-title').textContent = title;
+        }
+
+        function regenerateBody() {
+            var topic = document.getElementById('topic').value.trim();
+            if (!topic) return;
+            var audience = document.getElementById('audience').value;
+            var style = document.getElementById('style').value;
+            var selling = document.getElementById('selling').value.trim();
+            var extra = document.getElementById('extra').value.trim();
+
+            var bodyFn = bodyTemplates[selectedTemplate] || bodyTemplates['before-after'];
+            // Slightly vary the body
+            var body = bodyFn(topic, style, audience, selling, extra);
+            document.getElementById('bodyText').value = body;
+            syncPreview();
+        }
+
+        function syncPreview() {
+            var body = document.getElementById('bodyText').value;
+            document.getElementById('phone-body').textContent = body.substring(0, 300) + (body.length > 300 ? '...' : '');
+            document.getElementById('phone-tags').innerHTML = generatedTags.slice(0, 5).map(function(t) {
+                return '<span class="phone-tag">' + t + ' </span>';
+            }).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var ta = document.getElementById('bodyText');
+            if (ta) ta.addEventListener('input', syncPreview);
+        });
+
+        function copyBody() {
+            var title = selectedTitle;
+            var body = document.getElementById('bodyText').value;
+            var tags = generatedTags.join(' ');
+            copyText(title + '\n\n' + body + '\n\n' + tags);
+        }
+
+        function copyAll() {
+            var title = selectedTitle;
+            var body = document.getElementById('bodyText').value;
+            var tags = generatedTags.join(' ');
+            copyText(title + '\n\n' + body + '\n\n' + tags);
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                showToast('复制成功！', 'success');
+            }).catch(function() {
+                showToast('复制失败，请手动复制', '');
+            });
+        }
+
+        function showToast(msg, type) {
+            var t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (type ? ' ' + type : '');
+            clearTimeout(t._t);
+            t._t = setTimeout(function() { t.className = 'toast'; }, 2800);
+        }
+    </script>
+</body>
+</html>

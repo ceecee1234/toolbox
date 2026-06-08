@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cron表达式生成器 - 在线可视化Cron生成与解读 | 全能工具箱</title>
+    <meta name="description" content="可视化Cron表达式生成器，支持中文人性化解读，内置每分钟、每小时、每12小时、每天等快捷模板，程序员必备。">
+    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
+    <style>
+        :root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--warning:#F59E0B;--error:#EF4444;--border:#e2e8f0;--radius:12px;--shadow:0 4px 6px -1px rgba(0,0,0,.1)}
+        .dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#334155;--primary-light:rgba(79,70,229,.2)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+        a{color:inherit;text-decoration:none}
+        .header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border)}
+        .header-inner{max-width:860px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
+        .icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;background:none;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:.2s}
+        .icon-btn:hover{background:var(--bg2)}
+        .main{max-width:860px;margin:0 auto;padding:24px 20px}
+        .breadcrumb{display:flex;gap:8px;font-size:13px;color:var(--text3);margin-bottom:20px;flex-wrap:wrap}
+        .breadcrumb a{color:var(--primary)}
+        .tool-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px}
+        .tool-title{font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px}
+        .tool-desc{color:var(--text2);margin-bottom:24px;font-size:15px}
+        .tool-fav-btn{padding:8px 18px;font-size:14px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
+        .tool-fav-btn:hover,.tool-fav-btn.active{color:var(--warning);border-color:var(--warning)}
+
+        /* 快捷模板 */
+        .presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+        .preset-btn{padding:8px 16px;font-size:13px;font-weight:500;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
+        .preset-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+        .preset-label{font-size:13px;color:var(--text3);display:flex;align-items:center;margin-right:4px}
+
+        /* Cron表达式展示 */
+        .cron-display{background:linear-gradient(135deg,var(--primary),#7C3AED);color:white;border-radius:var(--radius);padding:24px;margin-bottom:24px;text-align:center}
+        .cron-value{font-size:36px;font-weight:700;font-family:'Courier New',monospace;letter-spacing:4px;margin-bottom:8px;word-break:break-all}
+        .cron-human{font-size:16px;opacity:.9;margin-bottom:16px;min-height:24px}
+        .cron-copy-btn{padding:10px 28px;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);color:white;border-radius:50px;cursor:pointer;font-size:14px;font-weight:600;transition:.2s}
+        .cron-copy-btn:hover{background:rgba(255,255,255,.35)}
+
+        /* 字段编辑器 */
+        .fields-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:24px}
+        .field-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+        .field-label{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+        .field-name{font-size:15px;font-weight:600;margin-bottom:12px}
+        .field-input{width:100%;height:44px;padding:0 12px;font-size:16px;font-family:'Courier New',monospace;font-weight:700;background:var(--bg2);border:2px solid var(--border);border-radius:8px;color:var(--text);outline:none;transition:.2s;text-align:center}
+        .field-input:focus{border-color:var(--primary);background:var(--primary-light)}
+        .field-hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
+        .field-quick{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+        .fq-btn{padding:3px 8px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;cursor:pointer;color:var(--text2);transition:.2s}
+        .fq-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+        /* 高级选项 */
+        .advanced-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px}
+        .advanced-title{font-size:15px;font-weight:600;margin-bottom:16px}
+        .radio-group{display:flex;flex-wrap:wrap;gap:10px}
+        .radio-item{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:.2s;font-size:14px}
+        .radio-item.selected{background:var(--primary-light);border-color:var(--primary);color:var(--primary)}
+        .radio-item input{display:none}
+
+        /* 示例解读 */
+        .examples-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px}
+        .examples-title{font-size:15px;font-weight:600;margin-bottom:16px}
+        .example-item{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
+        .example-item:last-child{border-bottom:none}
+        .example-expr{font-family:'Courier New',monospace;font-size:13px;font-weight:700;color:var(--primary);background:var(--primary-light);padding:4px 10px;border-radius:6px;min-width:160px;cursor:pointer;transition:.2s}
+        .example-expr:hover{background:var(--primary);color:white}
+        .example-desc{font-size:14px;color:var(--text2)}
+
+        /* 参考表 */
+        .ref-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px}
+        .ref-title{font-size:15px;font-weight:600;margin-bottom:16px}
+        .ref-table{width:100%;border-collapse:collapse;font-size:13px}
+        .ref-table th{padding:10px;text-align:left;border-bottom:2px solid var(--border);color:var(--text3);font-weight:600}
+        .ref-table td{padding:10px;border-bottom:1px solid var(--border)}
+        .ref-table tr:last-child td{border-bottom:none}
+        code{font-family:'Courier New',monospace;background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px;color:var(--primary)}
+
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;background:var(--text);color:#fff;border-radius:50px;opacity:0;transition:.3s;z-index:1000;font-size:14px}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+        .toast.success{background:var(--success)}
+        .footer{margin-top:60px;padding:24px 20px;border-top:1px solid var(--border);text-align:center;color:var(--text3);font-size:13px}
+        .footer a{color:var(--primary)}
+
+        @media(max-width:600px){
+            .cron-value{font-size:24px;letter-spacing:2px}
+            .fields-grid{grid-template-columns:repeat(3,1fr)}
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../" class="logo">🛠️ 全能工具箱</a>
+            <button class="icon-btn" onclick="toggleTheme()">🌓</button>
+        </div>
+    </header>
+
+    <main class="main">
+        <nav class="breadcrumb">
+            <a href="../">首页</a><span>›</span>
+            <span>效率工具</span><span>›</span>
+            <span>Cron表达式生成器</span>
+        </nav>
+
+        <div class="tool-header">
+            <h1 class="tool-title">⏰ Cron表达式生成器</h1>
+            <button class="tool-fav-btn" data-tool-id="dev-cron">☆ 收藏</button>
+        </div>
+        <p class="tool-desc">可视化生成Cron定时任务表达式，支持中文人性化解读，内置高频快捷配置模板</p>
+
+        <!-- 快捷模板 -->
+        <div class="presets">
+            <span class="preset-label">⚡ 快速配置：</span>
+            <button class="preset-btn" onclick="setPreset('* * * * *')">每分钟</button>
+            <button class="preset-btn" onclick="setPreset('0 * * * *')">每小时整点</button>
+            <button class="preset-btn" onclick="setPreset('0 */2 * * *')">每2小时</button>
+            <button class="preset-btn" onclick="setPreset('0 */6 * * *')">每6小时</button>
+            <button class="preset-btn" onclick="setPreset('0 */12 * * *')">每12小时</button>
+            <button class="preset-btn" onclick="setPreset('0 0 * * *')">每天0点</button>
+            <button class="preset-btn" onclick="setPreset('0 9 * * *')">每天9点</button>
+            <button class="preset-btn" onclick="setPreset('0 9 * * 1')">每周一9点</button>
+            <button class="preset-btn" onclick="setPreset('0 0 1 * *')">每月1号</button>
+            <button class="preset-btn" onclick="setPreset('0 0 1 1 *')">每年1月1日</button>
+            <button class="preset-btn" onclick="setPreset('*/5 * * * *')">每5分钟</button>
+            <button class="preset-btn" onclick="setPreset('*/15 * * * *')">每15分钟</button>
+            <button class="preset-btn" onclick="setPreset('0 9-18 * * 1-5')">工作日9-18点</button>
+            <button class="preset-btn" onclick="setPreset('0 0,12 * * *')">每天0点和12点</button>
+        </div>
+
+        <!-- Cron 展示 -->
+        <div class="cron-display">
+            <div class="cron-value" id="cronExpr">* * * * *</div>
+            <div class="cron-human" id="cronHuman">每分钟执行一次</div>
+            <button class="cron-copy-btn" onclick="copyCron()">📋 复制表达式</button>
+        </div>
+
+        <!-- 字段编辑器 -->
+        <div class="fields-grid">
+            <!-- 分钟 -->
+            <div class="field-card">
+                <div class="field-label">字段 1 / 5</div>
+                <div class="field-name">分钟</div>
+                <input type="text" class="field-input" id="f-minute" value="*" oninput="onFieldChange()" placeholder="*">
+                <div class="field-hint">0-59，* 每分钟</div>
+                <div class="field-quick">
+                    <button class="fq-btn" onclick="setField('f-minute','*')">每分</button>
+                    <button class="fq-btn" onclick="setField('f-minute','0')">第0分</button>
+                    <button class="fq-btn" onclick="setField('f-minute','*/5')">每5分</button>
+                    <button class="fq-btn" onclick="setField('f-minute','*/15')">每15分</button>
+                    <button class="fq-btn" onclick="setField('f-minute','*/30')">每30分</button>
+                </div>
+            </div>
+
+            <!-- 小时 -->
+            <div class="field-card">
+                <div class="field-label">字段 2 / 5</div>
+                <div class="field-name">小时</div>
+                <input type="text" class="field-input" id="f-hour" value="*" oninput="onFieldChange()" placeholder="*">
+                <div class="field-hint">0-23，* 每小时</div>
+                <div class="field-quick">
+                    <button class="fq-btn" onclick="setField('f-hour','*')">每时</button>
+                    <button class="fq-btn" onclick="setField('f-hour','0')">0点</button>
+                    <button class="fq-btn" onclick="setField('f-hour','9')">9点</button>
+                    <button class="fq-btn" onclick="setField('f-hour','*/2')">每2时</button>
+                    <button class="fq-btn" onclick="setField('f-hour','*/12')">每12时</button>
+                    <button class="fq-btn" onclick="setField('f-hour','9-18')">9-18时</button>
+                </div>
+            </div>
+
+            <!-- 日 -->
+            <div class="field-card">
+                <div class="field-label">字段 3 / 5</div>
+                <div class="field-name">日（月中）</div>
+                <input type="text" class="field-input" id="f-day" value="*" oninput="onFieldChange()" placeholder="*">
+                <div class="field-hint">1-31，* 每天</div>
+                <div class="field-quick">
+                    <button class="fq-btn" onclick="setField('f-day','*')">每天</button>
+                    <button class="fq-btn" onclick="setField('f-day','1')">1号</button>
+                    <button class="fq-btn" onclick="setField('f-day','L')">最后日</button>
+                    <button class="fq-btn" onclick="setField('f-day','1,15')">1/15号</button>
+                </div>
+            </div>
+
+            <!-- 月 -->
+            <div class="field-card">
+                <div class="field-label">字段 4 / 5</div>
+                <div class="field-name">月</div>
+                <input type="text" class="field-input" id="f-month" value="*" oninput="onFieldChange()" placeholder="*">
+                <div class="field-hint">1-12，* 每月</div>
+                <div class="field-quick">
+                    <button class="fq-btn" onclick="setField('f-month','*')">每月</button>
+                    <button class="fq-btn" onclick="setField('f-month','1')">1月</button>
+                    <button class="fq-btn" onclick="setField('f-month','1,7')">1/7月</button>
+                    <button class="fq-btn" onclick="setField('f-month','*/3')">每季</button>
+                </div>
+            </div>
+
+            <!-- 周 -->
+            <div class="field-card">
+                <div class="field-label">字段 5 / 5</div>
+                <div class="field-name">星期</div>
+                <input type="text" class="field-input" id="f-weekday" value="*" oninput="onFieldChange()" placeholder="*">
+                <div class="field-hint">0-7（0/7=周日），* 不限</div>
+                <div class="field-quick">
+                    <button class="fq-btn" onclick="setField('f-weekday','*')">不限</button>
+                    <button class="fq-btn" onclick="setField('f-weekday','1-5')">工作日</button>
+                    <button class="fq-btn" onclick="setField('f-weekday','6,0')">周末</button>
+                    <button class="fq-btn" onclick="setField('f-weekday','1')">周一</button>
+                    <button class="fq-btn" onclick="setField('f-weekday','5')">周五</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 高级：执行平台 -->
+        <div class="advanced-card">
+            <div class="advanced-title">🔧 执行平台 / 秒级支持</div>
+            <div class="radio-group">
+                <label class="radio-item selected" id="plat-std" onclick="setPlatform('std')">
+                    <input type="radio" name="platform" value="std" checked>
+                    标准Cron (5字段)
+                </label>
+                <label class="radio-item" id="plat-6" onclick="setPlatform('6')">
+                    <input type="radio" name="platform" value="6">
+                    Spring/Quartz (含秒，6字段)
+                </label>
+                <label class="radio-item" id="plat-7" onclick="setPlatform('7')">
+                    <input type="radio" name="platform" value="7">
+                    AWS (含年，7字段)
+                </label>
+            </div>
+            <div id="extra-field-container" style="margin-top:16px;display:none">
+                <div style="display:flex;gap:12px;flex-wrap:wrap">
+                    <div id="sec-field" style="display:none">
+                        <label style="font-size:13px;font-weight:600;color:var(--text3);display:block;margin-bottom:4px">秒 (0-59)</label>
+                        <input type="text" class="field-input" id="f-sec" value="0" oninput="onFieldChange()" style="width:100px">
+                    </div>
+                    <div id="year-field" style="display:none">
+                        <label style="font-size:13px;font-weight:600;color:var(--text3);display:block;margin-bottom:4px">年 (1970-2099)</label>
+                        <input type="text" class="field-input" id="f-year" value="*" oninput="onFieldChange()" style="width:120px">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 常见示例 -->
+        <div class="examples-card">
+            <div class="examples-title">📋 常见表达式示例（点击载入）</div>
+            <div class="example-item">
+                <span class="example-expr" onclick="setPreset(this.textContent.trim())">*/1 * * * *</span>
+                <span class="example-desc">每1分钟执行一次</span>
+            </div>
+            <div class="example-item">
+                <span class="example-expr" onclick="setPreset(this.textContent.trim())">0 */12 * * *</span>
+                <span class="example-desc">每12小时执行一次（0点和12点）</span>
+            </div>
+            <div class="example-item">
+                <span class="example-expr" onclick="setPreset(this.textContent.trim())">30 8 * * 1-5</span>
+                <span class="example-desc">工作日每天上午8:30执行</span>
+            </div>
+            <div class="example-item">
+                <span class="example-expr" onclick="setPreset(this.textContent.trim())">0 0 * * *</span>
+                <span class="example-desc">每天凌晨0点执行（日志清理/备份）</span>
+            </div>
+            <div class="example-item">
+                <span class="example-expr" onclick="setPreset(this.textContent.trim())">0 2 * * *</span>
+                <span class="example-desc">每天凌晨2点执行（数据库备份）</span>
+            </div>
+            <div class="example-item">
+                <span class="example-expr" onclick="setPreset(this.textContent.trim())">0 0 1 * *</span>
+                <span class="example-desc">每月1日凌晨0点执行（月度统计）</span>
+            </div>
+            <div class="example-item">
+                <span class="example-expr" onclick="setPreset(this.textContent.trim())">0 0 1 1 *</span>
+                <span class="example-desc">每年1月1日凌晨执行（年度报告）</span>
+            </div>
+            <div class="example-item">
+                <span class="example-expr" onclick="setPreset(this.textContent.trim())">*/5 9-18 * * 1-5</span>
+                <span class="example-desc">工作日上班时间每5分钟执行一次</span>
+            </div>
+            <div class="example-item">
+                <span class="example-expr" onclick="setPreset(this.textContent.trim())">0 9,12,18 * * *</span>
+                <span class="example-desc">每天9点、12点、18点各执行一次</span>
+            </div>
+            <div class="example-item">
+                <span class="example-expr" onclick="setPreset(this.textContent.trim())">0 0 15 * *</span>
+                <span class="example-desc">每月15日凌晨0点（月中任务）</span>
+            </div>
+        </div>
+
+        <!-- 语法参考 -->
+        <div class="ref-card">
+            <div class="ref-title">📖 Cron 语法参考</div>
+            <table class="ref-table">
+                <thead>
+                    <tr><th>符号</th><th>含义</th><th>示例</th><th>解释</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>*</code></td><td>任意值</td><td><code>* * * * *</code></td><td>每分钟</td></tr>
+                    <tr><td><code>,</code></td><td>枚举列表</td><td><code>0 9,18 * * *</code></td><td>9点和18点</td></tr>
+                    <tr><td><code>-</code></td><td>范围</td><td><code>0 9-18 * * *</code></td><td>9点到18点每小时</td></tr>
+                    <tr><td><code>/</code></td><td>步长</td><td><code>*/15 * * * *</code></td><td>每15分钟</td></tr>
+                    <tr><td><code>L</code></td><td>最后</td><td><code>0 0 L * *</code></td><td>每月最后一天</td></tr>
+                    <tr><td><code>?</code></td><td>不指定（Quartz）</td><td><code>0 0 ? * 1</code></td><td>每周一（忽略日）</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 全能工具箱 | <a href="../">返回首页</a></p>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="../js/tools-data.js"></script>
+    <script src="../js/toolbox-core.js"></script>
+    <script>
+        var platform = 'std';
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        function setField(id, val) {
+            document.getElementById(id).value = val;
+            onFieldChange();
+        }
+
+        function setPlatform(p) {
+            platform = p;
+            document.querySelectorAll('.radio-item').forEach(el => el.classList.remove('selected'));
+            document.getElementById('plat-' + p).classList.add('selected');
+
+            var container = document.getElementById('extra-field-container');
+            var secField = document.getElementById('sec-field');
+            var yearField = document.getElementById('year-field');
+
+            if (p === 'std') {
+                container.style.display = 'none';
+                secField.style.display = 'none';
+                yearField.style.display = 'none';
+            } else if (p === '6') {
+                container.style.display = 'block';
+                secField.style.display = 'block';
+                yearField.style.display = 'none';
+            } else if (p === '7') {
+                container.style.display = 'block';
+                secField.style.display = 'none';
+                yearField.style.display = 'block';
+            }
+            onFieldChange();
+        }
+
+        function setPreset(expr) {
+            var parts = expr.trim().split(/\s+/);
+            // Standard 5-field
+            if (parts.length >= 5) {
+                document.getElementById('f-minute').value = parts[0];
+                document.getElementById('f-hour').value = parts[1];
+                document.getElementById('f-day').value = parts[2];
+                document.getElementById('f-month').value = parts[3];
+                document.getElementById('f-weekday').value = parts[4];
+            }
+            onFieldChange();
+        }
+
+        function buildExpr() {
+            var min = document.getElementById('f-minute').value.trim() || '*';
+            var hr  = document.getElementById('f-hour').value.trim() || '*';
+            var day = document.getElementById('f-day').value.trim() || '*';
+            var mon = document.getElementById('f-month').value.trim() || '*';
+            var wk  = document.getElementById('f-weekday').value.trim() || '*';
+
+            if (platform === '6') {
+                var sec = (document.getElementById('f-sec').value || '0').trim();
+                return sec + ' ' + min + ' ' + hr + ' ' + day + ' ' + mon + ' ' + wk;
+            }
+            if (platform === '7') {
+                var yr = (document.getElementById('f-year').value || '*').trim();
+                return min + ' ' + hr + ' ' + day + ' ' + mon + ' ' + wk + ' ' + yr;
+            }
+            return min + ' ' + hr + ' ' + day + ' ' + mon + ' ' + wk;
+        }
+
+        function humanize(expr) {
+            var parts = expr.split(/\s+/);
+            var min, hr, day, mon, wk;
+
+            if (platform === '6' && parts.length === 6) {
+                min = parts[1]; hr = parts[2]; day = parts[3]; mon = parts[4]; wk = parts[5];
+            } else if (platform === '7' && parts.length === 7) {
+                min = parts[0]; hr = parts[1]; day = parts[2]; mon = parts[3]; wk = parts[4];
+            } else {
+                min = parts[0]; hr = parts[1]; day = parts[2]; mon = parts[3]; wk = parts[4];
+            }
+
+            var txt = [];
+
+            // 分钟
+            if (min === '*') txt.push('每分钟');
+            else if (min.startsWith('*/')) txt.push('每' + min.slice(2) + '分钟');
+            else if (min === '0') txt.push('整点');
+            else txt.push('第' + min + '分钟');
+
+            // 小时
+            if (hr !== '*') {
+                if (hr.startsWith('*/')) txt.push('每' + hr.slice(2) + '小时');
+                else if (hr.includes('-')) {
+                    var p = hr.split('-');
+                    txt.push(p[0] + '点到' + p[1] + '点');
+                } else if (hr.includes(',')) {
+                    txt.push(hr + '点');
+                } else {
+                    txt.push(hr + '点');
+                }
+            } else if (min === '0') {
+                txt.push('每小时');
+            }
+
+            // 日
+            if (day !== '*') {
+                if (day === 'L') txt.push('每月最后一天');
+                else txt.push('每月' + day + '日');
+            }
+
+            // 月
+            if (mon !== '*') {
+                if (mon.startsWith('*/')) txt.push('每' + mon.slice(2) + '个月');
+                else txt.push(mon + '月份');
+            }
+
+            // 星期
+            if (wk && wk !== '*') {
+                var dayMap = {'0':'周日','1':'周一','2':'周二','3':'周三','4':'周四','5':'周五','6':'周六','7':'周日'};
+                if (wk === '1-5') txt.push('工作日');
+                else if (wk === '6,0' || wk === '0,6') txt.push('周末');
+                else if (dayMap[wk]) txt.push(dayMap[wk]);
+                else txt.push('星期' + wk);
+            }
+
+            if (!txt.length) return '每分钟执行一次';
+
+            // 拼装
+            var result = txt.join('、') + '执行一次';
+
+            // 特殊整理
+            if (min === '*' && (hr === '*' || !hr)) return '每分钟执行一次';
+            if (min === '0' && hr === '*') return '每小时整点执行一次';
+            if (min === '0' && hr && hr.startsWith('*/')) return '每' + hr.slice(2) + '小时执行一次（整点）';
+            if (min === '0' && hr === '0' && day === '*' && mon === '*' && (!wk || wk === '*')) return '每天凌晨0点执行一次';
+            if (min === '0' && hr === '0' && day === '1' && mon === '*') return '每月1号凌晨0点执行一次';
+            if (min === '0' && hr === '0' && day === '1' && mon === '1') return '每年1月1日凌晨0点执行一次';
+
+            return result;
+        }
+
+        function onFieldChange() {
+            var expr = buildExpr();
+            document.getElementById('cronExpr').textContent = expr;
+            document.getElementById('cronHuman').textContent = humanize(expr);
+        }
+
+        function copyCron() {
+            var expr = document.getElementById('cronExpr').textContent;
+            navigator.clipboard.writeText(expr).then(function() {
+                showToast('已复制: ' + expr, 'success');
+            }).catch(function() {
+                showToast('复制失败', '');
+            });
+        }
+
+        function showToast(msg, type) {
+            var t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (type ? ' ' + type : '');
+            clearTimeout(t._t);
+            t._t = setTimeout(function() { t.className = 'toast'; }, 2800);
+        }
+
+        // Init
+        onFieldChange();
+    </script>
+</body>
+</html>
