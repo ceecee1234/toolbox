@@ -1,427 +1,814 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>每日高价值清单 - 极简Todo待办工具 | 全能工具箱</title>
-    <meta name="description" content="免费在线极简待办清单，按高/中/低价值分级管理任务，默认只显示高价值任务，数据自动保存至本地，简洁高效。">
-    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
-    <style>
-        :root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--success-light:#ECFDF5;--warning:#F59E0B;--warning-light:#FFFBEB;--error:#EF4444;--border:#e2e8f0;--radius:12px;--high-color:#dc2626;--high-bg:#fef2f2;--high-border:#fecaca;--mid-color:#d97706;--mid-bg:#fffbeb;--mid-border:#fde68a;--low-color:#64748b;--low-bg:#f8fafc;--low-border:#e2e8f0}
-        .dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#334155;--primary-light:rgba(79,70,229,.2);--success-light:rgba(16,185,129,.15);--high-bg:rgba(220,38,38,.12);--high-border:rgba(220,38,38,.3);--mid-bg:rgba(217,119,6,.12);--mid-border:rgba(217,119,6,.3);--low-bg:rgba(100,116,139,.1);--low-border:rgba(100,116,139,.2)}
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
-        a{color:inherit;text-decoration:none}
-        .header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border)}
-        .header-inner{max-width:680px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
-        .logo{font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
-        .icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;background:none;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:.2s}
-        .icon-btn:hover{background:var(--bg2)}
-        .dark .icon-btn{color:var(--text)}
-        .main{max-width:680px;margin:0 auto;padding:24px 20px 60px}
-        .breadcrumb{display:flex;gap:8px;font-size:13px;color:var(--text3);margin-bottom:20px;flex-wrap:wrap}
-        .breadcrumb a{color:var(--primary)}
-        .tool-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px}
-        .tool-title{font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px}
-        .tool-desc{color:var(--text2);margin-bottom:24px;font-size:15px}
-        .tool-fav-btn{padding:8px 18px;font-size:14px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
-        .tool-fav-btn:hover,.tool-fav-btn.active{color:var(--warning);border-color:var(--warning)}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>优先级待办 - Dev Toolbox</title>
+<meta name="description" content="智能优先级待办清单，高价值任务默认显示，中低价值任务折叠隐藏，数据本地持久化。">
+<link rel="icon" href="../favicon.ico">
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #1a1d27;
+    --bg3: #22263a;
+    --border: #2e3347;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    /* Priority colors */
+    --high-bg: #1e0a0a;
+    --high-border: #7f1d1d;
+    --high-dot: #ef4444;
+    --high-tag: rgba(239,68,68,0.15);
+    --high-tag-text: #f87171;
+    --mid-bg: #1c1500;
+    --mid-border: #78350f;
+    --mid-dot: #f59e0b;
+    --mid-tag: rgba(245,158,11,0.15);
+    --mid-tag-text: #fbbf24;
+    --low-bg: #0a1520;
+    --low-border: #1e3a5f;
+    --low-dot: #3b82f6;
+    --low-tag: rgba(59,130,246,0.15);
+    --low-tag-text: #60a5fa;
+    --done-text: #4a5568;
+    --done-line: var(--text3);
+    --progress-bg: #1e2435;
+    --progress-fill: #3b82f6;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  [data-theme="light"] {
+    --bg: #f8fafc;
+    --bg2: #ffffff;
+    --bg3: #f1f5f9;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text2: #475569;
+    --text3: #94a3b8;
+    --high-bg: #fff5f5;
+    --high-border: #fecaca;
+    --high-dot: #ef4444;
+    --high-tag: #fee2e2;
+    --high-tag-text: #dc2626;
+    --mid-bg: #fffbeb;
+    --mid-border: #fde68a;
+    --mid-dot: #f59e0b;
+    --mid-tag: #fef3c7;
+    --mid-tag-text: #d97706;
+    --low-bg: #eff6ff;
+    --low-border: #bfdbfe;
+    --low-dot: #3b82f6;
+    --low-tag: #dbeafe;
+    --low-tag-text: #2563eb;
+    --done-text: #94a3b8;
+    --progress-bg: #e2e8f0;
+    --progress-fill: #3b82f6;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
 
-        /* 日期条 */
-        .date-bar{background:linear-gradient(135deg,var(--primary),#6366f1);color:#fff;border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-        .date-text{font-size:16px;font-weight:700}
-        .date-sub{font-size:13px;opacity:.85;margin-top:2px}
-        .progress-wrap{display:flex;align-items:center;gap:10px}
-        .progress-bar{width:120px;height:8px;background:rgba(255,255,255,.3);border-radius:4px;overflow:hidden}
-        .progress-fill{height:100%;background:#fff;border-radius:4px;transition:width .4s}
-        .progress-label{font-size:13px;opacity:.9;white-space:nowrap}
+  /* Aurora header */
+  .page-header {
+    position: relative;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    padding: 28px 24px 20px;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 20% 50%, rgba(239,68,68,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 80% 30%, rgba(245,158,11,0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 30% 50% at 50% 80%, rgba(59,130,246,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+  }
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { color: var(--text); border-color: var(--accent); }
+  .header-title { flex: 1; }
+  .header-title h1 { font-size: 20px; font-weight: 700; line-height: 1.3; }
+  .header-title p { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .theme-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: all .2s;
+  }
+  .theme-btn:hover { border-color: var(--accent); }
 
-        /* 输入区 */
-        .add-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px}
-        .add-row{display:flex;gap:10px;align-items:stretch}
-        .task-input{flex:1;padding:12px 14px;font-size:15px;background:var(--bg2);border:2px solid var(--border);border-radius:10px;color:var(--text);outline:none;transition:.2s}
-        .task-input:focus{border-color:var(--primary);background:var(--card);box-shadow:0 0 0 4px var(--primary-light)}
-        .task-input::placeholder{color:var(--text3)}
-        .priority-sel{padding:12px 10px;font-size:14px;background:var(--bg2);border:2px solid var(--border);border-radius:10px;color:var(--text);outline:none;cursor:pointer;transition:.2s}
-        .priority-sel:focus{border-color:var(--primary)}
-        .add-btn{padding:12px 20px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s;white-space:nowrap}
-        .add-btn:hover{opacity:.9;transform:translateY(-1px)}
+  .main { max-width: 760px; margin: 0 auto; padding: 20px 16px; }
 
-        /* 统计行 */
-        .stats-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-        .stat-chip{padding:7px 14px;background:var(--card);border:1px solid var(--border);border-radius:50px;font-size:13px;color:var(--text2);display:flex;align-items:center;gap:6px}
-        .stat-num{font-weight:700;font-size:15px}
-        .stat-high{color:var(--high-color)}
-        .stat-mid{color:var(--mid-color)}
-        .stat-done{color:var(--success)}
+  /* Progress bar */
+  .progress-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .progress-label { font-size: 13px; font-weight: 600; color: var(--text2); }
+  .progress-pct { font-size: 24px; font-weight: 700; color: var(--text); }
+  .progress-track {
+    height: 6px;
+    background: var(--progress-bg);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 999px;
+    transition: width .4s ease;
+  }
+  .progress-meta { margin-top: 8px; font-size: 12px; color: var(--text3); display: flex; gap: 16px; }
 
-        /* 分组标签 */
-        .group-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:24px}
-        .group-header:first-of-type{margin-top:0}
-        .group-label{font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px}
-        .priority-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-        .pd-high{background:var(--high-color)}
-        .pd-mid{background:var(--mid-color)}
-        .pd-low{background:var(--low-color)}
-        .group-count{font-size:12px;background:var(--bg2);padding:2px 10px;border-radius:50px;color:var(--text3)}
+  /* Add task */
+  .add-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .add-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .add-input {
+    flex: 1;
+    min-width: 200px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .add-input:focus { border-color: var(--accent); }
+  .add-input::placeholder { color: var(--text3); }
+  .pri-select {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .pri-select:focus { border-color: var(--accent); }
+  .btn-add {
+    padding: 9px 20px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s;
+    white-space: nowrap;
+  }
+  .btn-add:hover { background: var(--accent-hover); }
 
-        /* 任务卡片 */
-        .task-list{display:flex;flex-direction:column;gap:8px}
-        .task-card{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;transition:all .2s;position:relative;animation:slideIn .2s ease}
-        @keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-        .task-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.07);transform:translateY(-1px)}
-        .task-card.priority-high{border-color:var(--high-border);background:var(--high-bg)}
-        .task-card.priority-mid{border-color:var(--mid-border);background:var(--mid-bg)}
-        .task-card.priority-low{border-color:var(--low-border)}
-        .task-card.done{opacity:.55}
-        .task-card.done .task-text{text-decoration:line-through;color:var(--text3)}
-        .task-check{width:22px;height:22px;border:2px solid var(--border);border-radius:6px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.2s;margin-top:1px;background:var(--card)}
-        .task-check:hover{border-color:var(--primary)}
-        .task-check.checked{background:var(--success);border-color:var(--success);color:#fff}
-        .task-body{flex:1;min-width:0}
-        .task-text{font-size:15px;word-break:break-word;line-height:1.5}
-        .task-meta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
-        .priority-badge{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
-        .pb-high{background:var(--high-bg);color:var(--high-color);border:1px solid var(--high-border)}
-        .pb-mid{background:var(--mid-bg);color:var(--mid-color);border:1px solid var(--mid-border)}
-        .pb-low{background:var(--low-bg);color:var(--low-color);border:1px solid var(--low-border)}
-        .task-time{font-size:11px;color:var(--text3)}
-        .task-actions{display:flex;gap:4px;opacity:0;transition:.2s;flex-shrink:0}
-        .task-card:hover .task-actions{opacity:1}
-        .action-btn{width:28px;height:28px;border:none;background:var(--bg2);border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.2s;color:var(--text2)}
-        .action-btn:hover{background:var(--error);color:#fff}
-        .action-btn.edit-btn:hover{background:var(--primary);color:#fff}
+  /* Section group */
+  .section {
+    margin-bottom: 16px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0 8px;
+  }
+  .section-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text2); }
+  .section-count {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--bg3);
+    color: var(--text3);
+    font-weight: 600;
+  }
+  .section-toggle {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text3);
+    font-size: 12px;
+    padding: 3px 10px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .section-toggle:hover { border-color: var(--accent); color: var(--accent); }
 
-        /* 展开低价值 */
-        .toggle-btn{width:100%;padding:10px;background:none;border:1.5px dashed var(--border);border-radius:10px;cursor:pointer;font-size:13px;color:var(--text3);transition:.2s;margin-top:8px}
-        .toggle-btn:hover{border-color:var(--primary);color:var(--primary)}
+  .task-list { display: flex; flex-direction: column; gap: 8px; }
 
-        /* 空态 */
-        .empty-group{padding:24px;text-align:center;color:var(--text3);font-size:14px;background:var(--bg2);border-radius:10px}
+  /* Task card */
+  .task-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: all .2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: relative;
+  }
+  .task-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .task-card.done { opacity: .55; }
+  .task-card.done .task-text { text-decoration: line-through; color: var(--done-text); }
+  .task-card.high { border-left: 3px solid var(--high-dot); }
+  .task-card.mid  { border-left: 3px solid var(--mid-dot); }
+  .task-card.low  { border-left: 3px solid var(--low-dot); }
 
-        /* 已完成清单 */
-        .done-section{margin-top:32px;border-top:1px dashed var(--border);padding-top:20px}
-        .done-toggle{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;margin-bottom:12px;user-select:none}
+  .task-check {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    transition: all .2s;
+  }
+  .task-check:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .task-check:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 5px;
+    width: 5px; height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+  }
+  .task-check.high:not(:checked) { border-color: var(--high-dot); }
+  .task-check.mid:not(:checked)  { border-color: var(--mid-dot); }
+  .task-check.low:not(:checked)  { border-color: var(--low-dot); }
 
-        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;background:var(--text);color:#fff;border-radius:50px;font-size:14px;opacity:0;transition:.3s;z-index:999;pointer-events:none}
-        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-        .toast.success{background:var(--success)}
-        .footer{margin-top:60px;padding:24px 20px;border-top:1px solid var(--border);text-align:center;font-size:13px;color:var(--text3)}
-        .footer a{color:var(--primary)}
-    </style>
+  .task-body { flex: 1; min-width: 0; }
+  .task-text-row { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+  .task-text {
+    font-size: 14px;
+    line-height: 1.5;
+    flex: 1;
+    word-break: break-word;
+    cursor: pointer;
+    padding: 1px 4px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .task-text[contenteditable="true"] {
+    border-color: var(--accent);
+    background: var(--bg3);
+  }
+  .task-meta { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  .pri-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .pri-badge.high { background: var(--high-tag); color: var(--high-tag-text); }
+  .pri-badge.mid  { background: var(--mid-tag);  color: var(--mid-tag-text); }
+  .pri-badge.low  { background: var(--low-tag);  color: var(--low-tag-text); }
+
+  .task-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .action-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+  .action-btn:hover { background: var(--bg3); border-color: var(--border); color: var(--text); }
+  .action-btn.del:hover { color: #ef4444; border-color: #ef4444; }
+
+  /* Empty placeholder */
+  .section-empty {
+    text-align: center;
+    padding: 20px;
+    color: var(--text3);
+    font-size: 13px;
+    font-style: italic;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+  }
+
+  /* Done section */
+  .done-section { margin-top: 24px; }
+  .done-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .done-divider::before, .done-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .done-divider-label {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  /* Collapse animation helper */
+  .collapsible { overflow: hidden; transition: max-height .3s ease; }
+
+  /* Clear all btn */
+  .toolbar { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 8px; }
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text3);
+    font-size: 12px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--text);
+    box-shadow: var(--shadow);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all .3s;
+    z-index: 9999;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 500px) {
+    .add-row { flex-direction: column; }
+    .add-input { min-width: 0; width: 100%; }
+  }
+</style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-inner">
-            <a href="../" class="logo"><span>🛠️</span><span>全能工具箱</span></a>
-            <div style="display:flex;gap:8px">
-                <button class="icon-btn" id="clearDoneBtn" title="清除已完成" onclick="clearDone()" style="font-size:14px;color:var(--text2)">🗑️</button>
-                <button class="icon-btn" id="themeBtn" title="切换主题"><span id="themeIcon">🌙</span></button>
-            </div>
+
+<header class="page-header">
+  <div class="header-inner">
+    <a href="../index.html" class="back-btn">← 返回首页</a>
+    <div class="header-title">
+      <h1>优先级待办</h1>
+      <p>高价值任务默认显示 · 中低优先级自动折叠 · 本地持久化</p>
+    </div>
+    <button class="theme-btn" id="themeBtn" title="切换主题">☀️</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- Progress card -->
+  <div class="progress-card">
+    <div class="progress-header">
+      <div>
+        <div class="progress-label">整体进度</div>
+        <div class="progress-meta" id="progressMeta">0 个待完成 · 0 个已完成</div>
+      </div>
+      <div class="progress-pct" id="progressPct">0%</div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Add task -->
+  <div class="add-card">
+    <div class="add-row">
+      <input type="text" class="add-input" id="addInput" placeholder="新建待办任务…" maxlength="200">
+      <select class="pri-select" id="priSelect">
+        <option value="high">高优先级</option>
+        <option value="mid">中优先级</option>
+        <option value="low">低优先级</option>
+      </select>
+      <button class="btn-add" id="addBtn">+ 添加</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn-ghost" id="clearDoneBtn">清除已完成</button>
+    <button class="btn-ghost" id="clearAllBtn">清空全部</button>
+  </div>
+
+  <!-- High priority section (always visible) -->
+  <div class="section" id="section-high">
+    <div class="section-header">
+      <div class="section-dot" style="background:var(--high-dot)"></div>
+      <div class="section-title">高优先级</div>
+      <div class="section-count" id="count-high">0</div>
+    </div>
+    <div class="task-list" id="list-high"></div>
+  </div>
+
+  <!-- Mid priority section (collapsible) -->
+  <div class="section" id="section-mid">
+    <div class="section-header">
+      <div class="section-dot" style="background:var(--mid-dot)"></div>
+      <div class="section-title">中优先级</div>
+      <div class="section-count" id="count-mid">0</div>
+      <button class="section-toggle" id="toggle-mid" data-open="false">展开 0 个任务</button>
+    </div>
+    <div class="collapsible" id="collapse-mid" style="max-height:0">
+      <div class="task-list" id="list-mid"></div>
+    </div>
+  </div>
+
+  <!-- Low priority section (collapsible) -->
+  <div class="section" id="section-low">
+    <div class="section-header">
+      <div class="section-dot" style="background:var(--low-dot)"></div>
+      <div class="section-title">低优先级</div>
+      <div class="section-count" id="count-low">0</div>
+      <button class="section-toggle" id="toggle-low" data-open="false">展开 0 个任务</button>
+    </div>
+    <div class="collapsible" id="collapse-low" style="max-height:0">
+      <div class="task-list" id="list-low"></div>
+    </div>
+  </div>
+
+  <!-- Done section -->
+  <div class="done-section" id="done-section" style="display:none">
+    <div class="done-divider">
+      <div class="done-divider-label">已完成 (<span id="done-count">0</span>)</div>
+    </div>
+    <div class="task-list" id="list-done"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  // --- Theme ---
+  const savedTheme = localStorage.getItem('toolbox_theme') || 'dark';
+  document.documentElement.dataset.theme = savedTheme;
+  const themeBtn = document.getElementById('themeBtn');
+  themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+  themeBtn.addEventListener('click', () => {
+    const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = t;
+    localStorage.setItem('toolbox_theme', t);
+    themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
+  });
+
+  // --- Data ---
+  const STORAGE_KEY = 'priority_todo_v1';
+  let tasks = [];
+
+  function loadTasks() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) tasks = JSON.parse(raw);
+    } catch { tasks = []; }
+  }
+
+  function saveTasks() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  }
+
+  function genId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function formatDate(ts) {
+    const d = new Date(ts);
+    const now = new Date();
+    const diff = now - d;
+    if (diff < 60000) return '刚刚';
+    if (diff < 3600000) return Math.floor(diff/60000) + ' 分钟前';
+    if (diff < 86400000) return Math.floor(diff/3600000) + ' 小时前';
+    return d.getMonth()+1 + '月' + d.getDate() + '日';
+  }
+
+  // --- Render ---
+  function renderAll() {
+    const high = tasks.filter(t => !t.done && t.priority === 'high');
+    const mid  = tasks.filter(t => !t.done && t.priority === 'mid');
+    const low  = tasks.filter(t => !t.done && t.priority === 'low');
+    const done = tasks.filter(t => t.done);
+
+    renderList('high', high);
+    renderList('mid', mid);
+    renderList('low', low);
+    renderDone(done);
+
+    // Counts
+    document.getElementById('count-high').textContent = high.length;
+    document.getElementById('count-mid').textContent  = mid.length;
+    document.getElementById('count-low').textContent  = low.length;
+    document.getElementById('done-count').textContent = done.length;
+
+    // Collapse toggles
+    updateToggle('mid', mid.length);
+    updateToggle('low', low.length);
+
+    // Done section visibility
+    document.getElementById('done-section').style.display = done.length ? '' : 'none';
+
+    // Progress
+    const total = tasks.length;
+    const doneCount = done.length;
+    const pct = total > 0 ? Math.round(doneCount / total * 100) : 0;
+    document.getElementById('progressPct').textContent = pct + '%';
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressMeta').textContent =
+      `${total - doneCount} 个待完成 · ${doneCount} 个已完成`;
+  }
+
+  function updateToggle(pri, count) {
+    const toggle = document.getElementById('toggle-' + pri);
+    const isOpen = toggle.dataset.open === 'true';
+    toggle.textContent = isOpen ? '收起' : `展开 ${count} 个任务`;
+  }
+
+  function renderList(pri, items) {
+    const el = document.getElementById('list-' + pri);
+    if (items.length === 0) {
+      el.innerHTML = `<div class="section-empty">暂无${priLabel(pri)}任务</div>`;
+      return;
+    }
+    el.innerHTML = items.map(t => taskHTML(t)).join('');
+    bindTaskEvents(el);
+  }
+
+  function renderDone(items) {
+    const el = document.getElementById('list-done');
+    if (items.length === 0) { el.innerHTML = ''; return; }
+    el.innerHTML = items.map(t => taskHTML(t)).join('');
+    bindTaskEvents(el);
+  }
+
+  function priLabel(pri) {
+    return { high: '高优先级', mid: '中优先级', low: '低优先级' }[pri] || '';
+  }
+
+  function priLabelShort(pri) {
+    return { high: '高', mid: '中', low: '低' }[pri] || '';
+  }
+
+  function taskHTML(t) {
+    const checkedAttr = t.done ? 'checked' : '';
+    const doneClass = t.done ? 'done' : '';
+    const pri = t.done ? '' : t.priority;
+    return `
+      <div class="task-card ${t.priority} ${doneClass}" data-id="${t.id}">
+        <input type="checkbox" class="task-check ${t.priority}" ${checkedAttr} data-action="toggle" data-id="${t.id}">
+        <div class="task-body">
+          <div class="task-text-row">
+            <div class="task-text" contenteditable="false" data-action="edit" data-id="${t.id}">${escHtml(t.text)}</div>
+            ${!t.done ? `<span class="pri-badge ${t.priority}">${priLabelShort(t.priority)}</span>` : ''}
+          </div>
+          <div class="task-meta">${formatDate(t.createdAt)}</div>
         </div>
-    </header>
-
-    <main class="main">
-        <div class="breadcrumb">
-            <a href="../">首页</a>
-            <span>›</span>
-            <span>效率工具</span>
-            <span>›</span>
-            <span>高价值清单</span>
+        <div class="task-actions">
+          ${!t.done ? `<button class="action-btn" data-action="promote" data-id="${t.id}" title="升级优先级">↑</button>` : ''}
+          <button class="action-btn del" data-action="delete" data-id="${t.id}" title="删除">✕</button>
         </div>
+      </div>
+    `;
+  }
 
-        <div class="tool-header">
-            <h1 class="tool-title">✅ 每日高价值清单</h1>
-            <button class="tool-fav-btn" id="favBtn" data-tool-id="efficiency-todo">☆ 收藏</button>
-        </div>
-        <p class="tool-desc">按价值等级管理任务，默认只显示高价值任务，让你专注最重要的事。数据自动保存在本地。</p>
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
 
-        <!-- 日期条 -->
-        <div class="date-bar">
-            <div>
-                <div class="date-text" id="dateText"></div>
-                <div class="date-sub" id="dateSubText"></div>
-            </div>
-            <div class="progress-wrap">
-                <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-                <span class="progress-label" id="progressLabel">0 / 0 完成</span>
-            </div>
-        </div>
+  function bindTaskEvents(container) {
+    container.addEventListener('click', handleTaskClick);
+    container.addEventListener('dblclick', handleDblClick);
+  }
 
-        <!-- 统计 -->
-        <div class="stats-row" id="statsRow"></div>
+  function handleTaskClick(e) {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const action = el.dataset.action;
+    const id = el.dataset.id;
 
-        <!-- 输入区 -->
-        <div class="add-card">
-            <div class="add-row">
-                <input class="task-input" id="taskInput" type="text" placeholder="添加任务…" maxlength="200" autocomplete="off">
-                <select class="priority-sel" id="prioritySel">
-                    <option value="high">🔴 高价值</option>
-                    <option value="mid">🟡 中价值</option>
-                    <option value="low">⚪ 低价值</option>
-                </select>
-                <button class="add-btn" onclick="addTask()">添加</button>
-            </div>
-        </div>
+    if (action === 'toggle') {
+      const t = tasks.find(x => x.id === id);
+      if (t) { t.done = !t.done; saveTasks(); renderAll(); }
+    } else if (action === 'delete') {
+      tasks = tasks.filter(x => x.id !== id);
+      saveTasks(); renderAll();
+      toast('已删除');
+    } else if (action === 'promote') {
+      const t = tasks.find(x => x.id === id);
+      if (t) {
+        if (t.priority === 'low') t.priority = 'mid';
+        else if (t.priority === 'mid') t.priority = 'high';
+        saveTasks(); renderAll();
+        toast('已升级为' + priLabel(t.priority));
+      }
+    }
+  }
 
-        <!-- 任务列表 -->
-        <div id="taskBoard"></div>
+  function handleDblClick(e) {
+    const el = e.target.closest('[data-action="edit"]');
+    if (!el) return;
+    const id = el.dataset.id;
+    const t = tasks.find(x => x.id === id);
+    if (!t || t.done) return;
 
-        <!-- 已完成 -->
-        <div class="done-section" id="doneSection" style="display:none">
-            <div class="done-toggle" onclick="toggleDone()">
-                <span id="doneArrow">▶</span>
-                <span>已完成任务</span>
-                <span class="group-count" id="doneCountBadge">0</span>
-            </div>
-            <div id="doneList" style="display:none"></div>
-        </div>
-    </main>
+    el.contentEditable = 'true';
+    el.focus();
+    // Move cursor to end
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
 
-    <footer class="footer">
-        <p>© 2025 <a href="../">全能工具箱</a> | 数据保存在本地 localStorage，不上传</p>
-    </footer>
-    <div id="toast" class="toast"></div>
+    function finish() {
+      el.contentEditable = 'false';
+      const newText = el.textContent.trim();
+      if (newText && newText !== t.text) {
+        t.text = newText;
+        saveTasks();
+        toast('已保存');
+      } else {
+        el.textContent = t.text;
+      }
+      el.removeEventListener('blur', finish);
+      el.removeEventListener('keydown', onKey);
+    }
+    function onKey(ev) {
+      if (ev.key === 'Enter') { ev.preventDefault(); finish(); }
+      if (ev.key === 'Escape') { el.textContent = t.text; el.contentEditable='false'; el.removeEventListener('blur', finish); el.removeEventListener('keydown', onKey); }
+    }
+    el.addEventListener('blur', finish);
+    el.addEventListener('keydown', onKey);
+  }
 
-    <script src="../js/tools-data.js"></script>
-    <script src="../js/toolbox-core.js"></script>
-    <script>
-        const STORE_KEY = 'toolbox_todo_v1';
-        let tasks = [];
-        let lowExpanded = false;
-        let midExpanded = false;
-        let doneExpanded = false;
-        let editingId = null;
+  // --- Collapse toggles ---
+  ['mid', 'low'].forEach(pri => {
+    document.getElementById('toggle-' + pri).addEventListener('click', function() {
+      const isOpen = this.dataset.open === 'true';
+      const collapse = document.getElementById('collapse-' + pri);
+      if (isOpen) {
+        collapse.style.maxHeight = '0';
+        this.dataset.open = 'false';
+        const count = tasks.filter(t => !t.done && t.priority === pri).length;
+        this.textContent = `展开 ${count} 个任务`;
+      } else {
+        collapse.style.maxHeight = collapse.scrollHeight + 5000 + 'px';
+        this.dataset.open = 'true';
+        this.textContent = '收起';
+      }
+    });
+  });
 
-        function load() {
-            try { tasks = JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch { tasks = []; }
-        }
+  // --- Add task ---
+  function addTask() {
+    const input = document.getElementById('addInput');
+    const text = input.value.trim();
+    if (!text) { input.focus(); return; }
+    const pri = document.getElementById('priSelect').value;
+    tasks.unshift({
+      id: genId(),
+      text,
+      priority: pri,
+      done: false,
+      createdAt: Date.now()
+    });
+    saveTasks();
+    renderAll();
+    input.value = '';
+    input.focus();
+    // Auto-open the section if mid/low
+    if (pri !== 'high') {
+      const toggle = document.getElementById('toggle-' + pri);
+      if (toggle.dataset.open !== 'true') toggle.click();
+    }
+    toast('已添加到' + priLabel(pri));
+  }
 
-        function save() {
-            localStorage.setItem(STORE_KEY, JSON.stringify(tasks));
-        }
+  document.getElementById('addBtn').addEventListener('click', addTask);
+  document.getElementById('addInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addTask();
+  });
 
-        function newId() {
-            return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-        }
+  // --- Clear buttons ---
+  document.getElementById('clearDoneBtn').addEventListener('click', () => {
+    const count = tasks.filter(t => t.done).length;
+    if (!count) { toast('没有已完成的任务'); return; }
+    tasks = tasks.filter(t => !t.done);
+    saveTasks(); renderAll();
+    toast(`已清除 ${count} 个已完成任务`);
+  });
 
-        function addTask() {
-            const input = document.getElementById('taskInput');
-            const text = input.value.trim();
-            if (!text) { input.focus(); return; }
-            const priority = document.getElementById('prioritySel').value;
-            tasks.unshift({ id: newId(), text, priority, done: false, created: Date.now() });
-            save();
-            input.value = '';
-            input.focus();
-            render();
-            toast('任务已添加', 'success');
-        }
+  document.getElementById('clearAllBtn').addEventListener('click', () => {
+    if (!tasks.length) { toast('列表已经是空的'); return; }
+    if (!confirm('确定清空所有任务吗？此操作不可撤销。')) return;
+    tasks = [];
+    saveTasks(); renderAll();
+    toast('已清空全部任务');
+  });
 
-        function toggleDone(id) {
-            const task = tasks.find(t => t.id === id);
-            if (!task) return;
-            task.done = !task.done;
-            if (task.done) task.doneAt = Date.now();
-            save();
-            render();
-        }
+  // --- Toast ---
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
 
-        function deleteTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            save();
-            render();
-            toast('已删除', '');
-        }
-
-        function clearDone() {
-            const cnt = tasks.filter(t => t.done).length;
-            if (!cnt) { toast('没有已完成的任务', ''); return; }
-            tasks = tasks.filter(t => !t.done);
-            save();
-            render();
-            toast(`已清除 ${cnt} 条完成任务`, '');
-        }
-
-        function startEdit(id) {
-            editingId = id;
-            render();
-            const inp = document.getElementById('edit-' + id);
-            if (inp) { inp.focus(); inp.select(); }
-        }
-
-        function saveEdit(id) {
-            const inp = document.getElementById('edit-' + id);
-            if (!inp) return;
-            const val = inp.value.trim();
-            if (val) {
-                const task = tasks.find(t => t.id === id);
-                if (task) task.text = val;
-                save();
-            }
-            editingId = null;
-            render();
-        }
-
-        function formatTime(ts) {
-            const now = Date.now();
-            const diff = now - ts;
-            if (diff < 60000) return '刚刚';
-            if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前';
-            if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
-            return new Date(ts).toLocaleDateString('zh-CN', { month:'numeric', day:'numeric' });
-        }
-
-        function renderCard(t) {
-            const badge = { high: '<span class="priority-badge pb-high">高价值</span>', mid: '<span class="priority-badge pb-mid">中价值</span>', low: '<span class="priority-badge pb-low">低价值</span>' };
-            const checkClass = t.done ? 'task-check checked' : 'task-check';
-            const checkContent = t.done ? '✓' : '';
-            const cardClass = `task-card priority-${t.priority}${t.done ? ' done' : ''}`;
-
-            const textPart = editingId === t.id
-                ? `<input id="edit-${t.id}" value="${escAttr(t.text)}" style="width:100%;padding:4px 6px;font-size:15px;border:1.5px solid var(--primary);border-radius:6px;background:var(--card);color:var(--text);outline:none"
-                    onkeydown="if(event.key==='Enter')saveEdit('${t.id}');if(event.key==='Escape'){editingId=null;render();}"
-                    onblur="saveEdit('${t.id}')">`
-                : `<div class="task-text">${escHtml(t.text)}</div>`;
-
-            return `<div class="${cardClass}" id="card-${t.id}">
-                <div class="${checkClass}" onclick="toggleDone('${t.id}')">${checkContent}</div>
-                <div class="task-body">
-                    ${textPart}
-                    <div class="task-meta">${badge[t.priority]}<span class="task-time">${formatTime(t.created)}</span></div>
-                </div>
-                <div class="task-actions">
-                    <button class="action-btn edit-btn" title="编辑" onclick="startEdit('${t.id}')">✏️</button>
-                    <button class="action-btn" title="删除" onclick="deleteTask('${t.id}')">🗑️</button>
-                </div>
-            </div>`;
-        }
-
-        function render() {
-            // Date bar
-            const now = new Date();
-            const days = ['日','一','二','三','四','五','六'];
-            document.getElementById('dateText').textContent = now.toLocaleDateString('zh-CN', { year:'numeric', month:'long', day:'numeric' });
-            document.getElementById('dateSubText').textContent = `星期${days[now.getDay()]}`;
-
-            const active = tasks.filter(t => !t.done);
-            const done = tasks.filter(t => t.done);
-            const total = tasks.length;
-            const donePct = total ? Math.round(done.length / total * 100) : 0;
-            document.getElementById('progressFill').style.width = donePct + '%';
-            document.getElementById('progressLabel').textContent = `${done.length} / ${total} 完成`;
-
-            // Stats
-            const high = active.filter(t => t.priority === 'high');
-            const mid = active.filter(t => t.priority === 'mid');
-            const low = active.filter(t => t.priority === 'low');
-            document.getElementById('statsRow').innerHTML = `
-                <div class="stat-chip"><span class="stat-num stat-high">${high.length}</span> 高价值</div>
-                <div class="stat-chip"><span class="stat-num stat-mid">${mid.length}</span> 中价值</div>
-                <div class="stat-chip" style="color:var(--text3)"><span class="stat-num" style="color:var(--text2)">${low.length}</span> 低价值</div>
-                <div class="stat-chip"><span class="stat-num stat-done">${done.length}</span> 已完成</div>
-            `;
-
-            // Board
-            let html = '';
-
-            // High priority group
-            html += `<div class="group-header">
-                <div class="group-label"><div class="priority-dot pd-high"></div>高价值任务</div>
-                <span class="group-count">${high.length}</span>
-            </div>`;
-            if (high.length) {
-                html += `<div class="task-list">${high.map(renderCard).join('')}</div>`;
-            } else {
-                html += `<div class="empty-group">暂无高价值任务，专注才是最大的财富 🎯</div>`;
-            }
-
-            // Mid priority group (collapsed by default)
-            html += `<div class="group-header" style="margin-top:28px">
-                <div class="group-label"><div class="priority-dot pd-mid"></div>中价值任务</div>
-                <span class="group-count">${mid.length}</span>
-            </div>`;
-            if (mid.length) {
-                if (midExpanded) {
-                    html += `<div class="task-list">${mid.map(renderCard).join('')}</div>`;
-                    html += `<button class="toggle-btn" onclick="midExpanded=false;render()">▲ 收起中价值任务</button>`;
-                } else {
-                    html += `<button class="toggle-btn" onclick="midExpanded=true;render()">▼ 展开 ${mid.length} 条中价值任务</button>`;
-                }
-            } else {
-                html += `<div class="empty-group" style="font-size:13px;padding:16px">暂无中价值任务</div>`;
-            }
-
-            // Low priority group (collapsed by default)
-            html += `<div class="group-header" style="margin-top:28px">
-                <div class="group-label"><div class="priority-dot pd-low"></div>低价值任务</div>
-                <span class="group-count">${low.length}</span>
-            </div>`;
-            if (low.length) {
-                if (lowExpanded) {
-                    html += `<div class="task-list">${low.map(renderCard).join('')}</div>`;
-                    html += `<button class="toggle-btn" onclick="lowExpanded=false;render()">▲ 收起低价值任务</button>`;
-                } else {
-                    html += `<button class="toggle-btn" onclick="lowExpanded=true;render()">▼ 展开 ${low.length} 条低价值任务（这些任务优先级较低，稍后处理）</button>`;
-                }
-            } else {
-                html += `<div class="empty-group" style="font-size:13px;padding:16px">暂无低价值任务</div>`;
-            }
-
-            document.getElementById('taskBoard').innerHTML = html;
-
-            // Done section
-            const doneSection = document.getElementById('doneSection');
-            if (done.length) {
-                doneSection.style.display = '';
-                document.getElementById('doneCountBadge').textContent = done.length;
-                document.getElementById('doneArrow').textContent = doneExpanded ? '▼' : '▶';
-                if (doneExpanded) {
-                    document.getElementById('doneList').style.display = '';
-                    document.getElementById('doneList').innerHTML = `<div class="task-list">${done.map(renderCard).join('')}</div>`;
-                } else {
-                    document.getElementById('doneList').style.display = 'none';
-                }
-            } else {
-                doneSection.style.display = 'none';
-            }
-        }
-
-        function toggleDone() {
-            doneExpanded = !doneExpanded;
-            render();
-        }
-
-        function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-        function escAttr(s) { return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-
-        function toast(msg, type) {
-            const el = document.getElementById('toast');
-            el.textContent = msg;
-            el.className = 'toast show' + (type ? ' ' + type : '');
-            clearTimeout(el._t);
-            el._t = setTimeout(() => el.className = 'toast', 2500);
-        }
-
-        // Enter to add
-        document.getElementById('taskInput').addEventListener('keydown', e => {
-            if (e.key === 'Enter') addTask();
-        });
-
-        // Init
-        load();
-        render();
-
-        // Theme
-        const themeBtn = document.getElementById('themeBtn');
-        const themeIcon = document.getElementById('themeIcon');
-        function updateThemeIcon() { themeIcon.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙'; }
-        updateThemeIcon();
-        themeBtn.addEventListener('click', () => {
-            const dark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', dark ? 'dark' : 'light');
-            updateThemeIcon();
-        });
-    </script>
+  // --- Init ---
+  loadTasks();
+  renderAll();
+})();
+</script>
 </body>
 </html>

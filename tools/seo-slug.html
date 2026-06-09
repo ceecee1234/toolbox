@@ -7,8 +7,8 @@
     <meta name="description" content="免费在线URL Slug转换工具，输入中文或带符号的英文标题，自动转为SEO友好的URL Slug，支持拼音转换、自定义分隔符。">
     <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
     <style>
-        :root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--success-light:#ECFDF5;--warning:#F59E0B;--border:#e2e8f0;--radius:12px}
-        .dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#334155;--primary-light:rgba(79,70,229,.2);--success-light:rgba(16,185,129,.15)}
+        :root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--warning:#F59E0B;--border:#e2e8f0;--radius:12px}
+        .dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#334155;--primary-light:rgba(79,70,229,.2)}
         *{box-sizing:border-box;margin:0;padding:0}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
         a{color:inherit;text-decoration:none}
@@ -26,17 +26,15 @@
         .tool-desc{color:var(--text2);margin-bottom:24px;font-size:15px}
         .tool-fav-btn{padding:8px 18px;font-size:14px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
         .tool-fav-btn:hover,.tool-fav-btn.active{color:var(--warning);border-color:var(--warning)}
-
-        /* 输入 */
+        .examples{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+        .example-chip{padding:6px 14px;font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
+        .example-chip:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
         .input-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
         .input-label{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px}
         .main-input{width:100%;padding:14px 16px;font-size:16px;background:var(--bg2);border:2px solid var(--border);border-radius:10px;color:var(--text);outline:none;transition:.2s}
         .main-input:focus{border-color:var(--primary);background:var(--card);box-shadow:0 0 0 4px var(--primary-light)}
         .main-input::placeholder{color:var(--text3)}
-
-        /* 选项行 */
         .options-row{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
-        .opt-group{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)}
         .seg-btns{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
         .seg-btn{padding:7px 14px;font-size:13px;font-weight:500;background:var(--card);border:none;cursor:pointer;transition:.15s;color:var(--text2)}
         .seg-btn.active{background:var(--primary);color:#fff}
@@ -44,39 +42,24 @@
         .check-opt{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2);transition:.2s;user-select:none}
         .check-opt.active{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
         .check-opt input{accent-color:var(--primary)}
-
-        /* 输出 */
         .output-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px;transition:.2s}
         .output-card.has-val{border-color:var(--primary)}
         .output-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px}
         .output-label{font-size:13px;font-weight:600;color:var(--text2)}
-        .slug-text{font-size:18px;font-weight:700;font-family:'SF Mono','Fira Code',monospace;word-break:break-all;color:var(--text);min-height:28px;letter-spacing:.3px}
+        .slug-text{font-size:18px;font-weight:700;font-family:'SF Mono','Fira Code',monospace;word-break:break-all;color:var(--text);min-height:28px}
         .slug-empty{color:var(--text3);font-size:14px;font-weight:400;font-family:inherit}
         .copy-btn{padding:7px 16px;font-size:13px;font-weight:600;background:var(--success);color:#fff;border:none;border-radius:50px;cursor:pointer;transition:.2s}
-        .copy-btn:hover{opacity:.9;transform:scale(1.03)}
-
-        /* URL 预览 */
-        .url-preview{background:var(--bg2);border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:13px}
-        .url-preview-label{font-size:12px;font-weight:600;color:var(--text3);margin-bottom:6px}
-        .url-text{font-family:'SF Mono','Fira Code',monospace;color:var(--text);word-break:break-all}
+        .copy-btn:hover{opacity:.9}
+        .url-preview{background:var(--bg2);border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:13px;display:none}
         .url-base{color:var(--text3)}
-        .url-slug{color:var(--primary);font-weight:700}
-
-        /* 历史 */
-        .history-section{margin-top:24px}
-        .section-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+        .url-slug{color:var(--primary);font-weight:700;font-family:'SF Mono','Fira Code',monospace}
+        .section-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:12px}
         .history-list{display:flex;flex-direction:column;gap:8px}
         .history-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;font-size:13px}
         .history-origin{flex:1;color:var(--text2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .history-slug{flex:1;font-family:'SF Mono','Fira Code',monospace;color:var(--primary);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .history-copy{padding:4px 12px;font-size:12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:.2s;white-space:nowrap;color:var(--text2)}
+        .history-copy{padding:4px 12px;font-size:12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:.2s;color:var(--text2);white-space:nowrap}
         .history-copy:hover{border-color:var(--primary);color:var(--primary)}
-
-        /* 示例 */
-        .examples{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
-        .example-chip{padding:6px 14px;font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
-        .example-chip:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
-
         .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;background:var(--text);color:#fff;border-radius:50px;font-size:14px;opacity:0;transition:.3s;z-index:999;pointer-events:none}
         .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
         .toast.success{background:var(--success)}
@@ -93,23 +76,15 @@
             </div>
         </div>
     </header>
-
     <main class="main">
         <div class="breadcrumb">
-            <a href="../">首页</a>
-            <span>›</span>
-            <span>站长工具</span>
-            <span>›</span>
-            <span>URL Slug转换</span>
+            <a href="../">首页</a><span>›</span><span>站长工具</span><span>›</span><span>URL Slug转换</span>
         </div>
-
         <div class="tool-header">
             <h1 class="tool-title">🔗 URL Slug 转换器</h1>
             <button class="tool-fav-btn" id="favBtn" data-tool-id="seo-slug">☆ 收藏</button>
         </div>
         <p class="tool-desc">输入中文或带符号的标题，自动转换为 SEO 友好的 URL Slug，中文转拼音，空格转连字符，一键复制。</p>
-
-        <!-- 示例 -->
         <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">💡 点击示例快速体验</div>
         <div class="examples">
             <div class="example-chip" onclick="useExample(this)">10 个好用的前端 Tool！</div>
@@ -117,32 +92,27 @@
             <div class="example-chip" onclick="useExample(this)">Python爬虫入门：从零到实战</div>
             <div class="example-chip" onclick="useExample(this)">Hello World! This is a Test.</div>
             <div class="example-chip" onclick="useExample(this)">MacBook Pro M3 开箱评测</div>
-            <div class="example-chip" onclick="useExample(this)">SEO 常见误区 & 解决方案</div>
+            <div class="example-chip" onclick="useExample(this)">SEO 常见误区 &amp; 解决方案</div>
         </div>
-
-        <!-- 输入 -->
         <div class="input-card">
             <div class="input-label">✏️ 输入标题或任意文字</div>
             <input class="main-input" id="mainInput" type="text" placeholder="例如：10 个好用的前端 Tool！" autocomplete="off" oninput="onInput()">
-
             <div class="options-row">
-                <div class="opt-group">
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)">
                     <span>分隔符</span>
                     <div class="seg-btns">
                         <button class="seg-btn active" id="sep-hyphen" onclick="setSep('-')">-（连字符）</button>
                         <button class="seg-btn" id="sep-under" onclick="setSep('_')">_（下划线）</button>
                     </div>
                 </div>
-                <label class="check-opt" id="ci-lower">
+                <label class="check-opt active" id="ci-lower">
                     <input type="checkbox" id="forceLower" checked onchange="onInput();updateCheckOpt('ci-lower','forceLower')"> 全部小写
                 </label>
-                <label class="check-opt" id="ci-rmnum">
-                    <input type="checkbox" id="keepNums" checked onchange="onInput();updateCheckOpt('ci-rmnum','keepNums')"> 保留数字
+                <label class="check-opt active" id="ci-nums">
+                    <input type="checkbox" id="keepNums" checked onchange="onInput();updateCheckOpt('ci-nums','keepNums')"> 保留数字
                 </label>
             </div>
         </div>
-
-        <!-- 输出 -->
         <div class="output-card" id="outputCard">
             <div class="output-top">
                 <div class="output-label">生成的 Slug</div>
@@ -150,172 +120,116 @@
             </div>
             <div class="slug-text" id="slugOutput"><span class="slug-empty">输入标题后自动生成…</span></div>
         </div>
-
-        <!-- URL 预览 -->
-        <div class="url-preview" id="urlPreview" style="display:none">
-            <div class="url-preview-label">URL 预览</div>
-            <div class="url-text"><span class="url-base">https://example.com/blog/</span><span class="url-slug" id="urlSlugPart"></span></div>
+        <div class="url-preview" id="urlPreview">
+            <span style="font-size:12px;font-weight:600;color:var(--text3);display:block;margin-bottom:4px">URL 预览</span>
+            <span class="url-base">https://example.com/blog/</span><span class="url-slug" id="urlSlugPart"></span>
         </div>
-
-        <!-- 历史记录 -->
-        <div class="history-section" id="historySection" style="display:none">
-            <div class="section-title">🕐 最近转换记录 <button style="margin-left:auto;padding:4px 12px;font-size:12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text2)" onclick="clearHistory()">清空</button></div>
+        <div id="historySection" style="display:none;margin-top:24px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <div class="section-title" style="margin:0">🕐 最近转换记录</div>
+                <button style="padding:4px 12px;font-size:12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text2)" onclick="clearHistory()">清空</button>
+            </div>
             <div class="history-list" id="historyList"></div>
         </div>
     </main>
-
     <footer class="footer">
         <p>© 2025 <a href="../">全能工具箱</a></p>
     </footer>
     <div id="toast" class="toast"></div>
-
     <script src="../js/tools-data.js"></script>
     <script src="../js/toolbox-core.js"></script>
     <script>
-        // 精简拼音字典（常用汉字 4000+）
-        const PINYIN = {"啊":"a","阿":"a","埃":"ai","挨":"ai","哎":"ai","唉":"ai","哀":"ai","皑":"ai","癌":"ai","蔼":"ai","矮":"ai","艾":"ai","碍":"ai","爱":"ai","隘":"ai","鞍":"an","氨":"an","安":"an","俺":"an","按":"an","暗":"an","岸":"an","胺":"an","案":"an","肮":"ang","昂":"ang","盎":"ang","凹":"ao","敖":"ao","熬":"ao","翱":"ao","袄":"ao","傲":"ao","奥":"ao","懊":"ao","澳":"ao","芭":"ba","捌":"ba","扒":"ba","叭":"ba","吧":"ba","笆":"ba","八":"ba","疤":"ba","巴":"ba","拔":"ba","跋":"ba","靶":"ba","把":"ba","耙":"ba","坝":"ba","霸":"ba","罢":"ba","爸":"ba","白":"bai","柏":"bai","百":"bai","摆":"bai","佰":"bai","败":"bai","拜":"bai","稗":"bai","斑":"ban","班":"ban","搬":"ban","扳":"ban","般":"ban","颁":"ban","板":"ban","版":"ban","扮":"ban","拌":"ban","伴":"ban","瓣":"ban","半":"ban","办":"ban","绊":"ban","邦":"bang","帮":"bang","梆":"bang","榜":"bang","膀":"bang","绑":"bang","棒":"bang","磅":"bang","蚌":"bang","镑":"bang","傍":"bang","谤":"bang","苞":"bao","胞":"bao","包":"bao","褒":"bao","剥":"bao","薄":"bao","雹":"bao","保":"bao","堡":"bao","饱":"bao","宝":"bao","抱":"bao","报":"bao","暴":"bao","豹":"bao","鲍":"bao","爆":"bao","杯":"bei","碑":"bei","悲":"bei","卑":"bei","北":"bei","辈":"bei","背":"bei","贝":"bei","钡":"bei","倍":"bei","狈":"bei","备":"bei","惫":"bei","焙":"bei","被":"bei","奔":"ben","苯":"ben","本":"ben","笨":"ben","崩":"beng","绷":"beng","甭":"beng","泵":"beng","蹦":"beng","迸":"beng","逼":"bi","鼻":"bi","比":"bi","鄙":"bi","笔":"bi","彼":"bi","碧":"bi","蓖":"bi","蔽":"bi","必":"bi","辟":"bi","壁":"bi","臂":"bi","避":"bi","陛":"bi","鞭":"bian","边":"bian","编":"bian","贬":"bian","扁":"bian","变":"bian","便":"bian","辨":"bian","辩":"bian","辫":"bian","遍":"bian","标":"biao","彪":"biao","膘":"biao","表":"biao","憋":"bie","鳖":"bie","别":"bie","瘪":"bie","濒":"bin","彬":"bin","斌":"bin","槟":"bin","宾":"bin","摈":"bin","兵":"bing","冰":"bing","柄":"bing","丙":"bing","秉":"bing","饼":"bing","炳":"bing","病":"bing","并":"bing","玻":"bo","菠":"bo","播":"bo","拨":"bo","伯":"bo","帛":"bo","博":"bo","勃":"bo","搏":"bo","铂":"bo","箔":"bo","驳":"bo","捕":"bu","哺":"bu","补":"bu","布":"bu","步":"bu","簿":"bu","部":"bu","怖":"bu","擦":"ca","猜":"cai","裁":"cai","材":"cai","才":"cai","财":"cai","睬":"cai","踩":"cai","采":"cai","彩":"cai","菜":"cai","蔡":"cai","餐":"can","参":"can","蚕":"can","残":"can","惭":"can","惨":"can","灿":"can","苍":"cang","舱":"cang","仓":"cang","藏":"cang","操":"cao","糙":"cao","槽":"cao","曹":"cao","草":"cao","厕":"ce","策":"ce","侧":"ce","册":"ce","测":"ce","层":"ceng","叉":"cha","插":"cha","叉":"cha","茶":"cha","察":"cha","岔":"cha","差":"cha","拆":"chai","柴":"chai","豺":"chai","搀":"chan","掺":"chan","蝉":"chan","馋":"chan","谗":"chan","缠":"chan","铲":"chan","产":"chan","阐":"chan","颤":"chan","昌":"chang","猖":"chang","场":"chang","尝":"chang","常":"chang","长":"chang","厂":"chang","敞":"chang","畅":"chang","唱":"chang","倡":"chang","超":"chao","抄":"chao","钞":"chao","朝":"chao","嘲":"chao","潮":"chao","炒":"chao","车":"che","扯":"che","撤":"che","掣":"che","彻":"che","澈":"che","郴":"chen","臣":"chen","尘":"chen","晨":"chen","忱":"chen","沉":"chen","陈":"chen","趁":"chen","衬":"chen","撑":"cheng","称":"cheng","城":"cheng","橙":"cheng","成":"cheng","呈":"cheng","乘":"cheng","程":"cheng","惩":"cheng","澄":"cheng","诚":"cheng","承":"cheng","逞":"cheng","骋":"cheng","秤":"cheng","吃":"chi","痴":"chi","持":"chi","匙":"chi","池":"chi","迟":"chi","尺":"chi","翅":"chi","斥":"chi","炽":"chi","充":"chong","冲":"chong","虫":"chong","崇":"chong","宠":"chong","抽":"chou","酬":"chou","畴":"chou","踌":"chou","稠":"chou","愁":"chou","筹":"chou","仇":"chou","绸":"chou","瞅":"chou","丑":"chou","臭":"chou","初":"chu","出":"chu","橱":"chu","厨":"chu","躇":"chu","锄":"chu","雏":"chu","滁":"chu","除":"chu","楚":"chu","础":"chu","储":"chu","矗":"chu","搐":"chu","触":"chu","处":"chu","揣":"chuai","川":"chuan","穿":"chuan","椽":"chuan","传":"chuan","船":"chuan","喘":"chuan","串":"chuan","疮":"chuang","窗":"chuang","幢":"chuang","床":"chuang","闯":"chuang","创":"chuang","吹":"chui","炊":"chui","捶":"chui","锤":"chui","垂":"chui","春":"chun","椿":"chun","醇":"chun","唇":"chun","淳":"chun","纯":"chun","蠢":"chun","戳":"chuo","绰":"chuo","疵":"ci","茨":"ci","磁":"ci","雌":"ci","辞":"ci","慈":"ci","此":"ci","词":"ci","刺":"ci","赐":"ci","次":"ci","聪":"cong","葱":"cong","囱":"cong","从":"cong","丛":"cong","凑":"cou","粗":"cu","醋":"cu","簇":"cu","促":"cu","蹿":"cuan","篡":"cuan","窜":"cuan","摧":"cui","崔":"cui","催":"cui","脆":"cui","淬":"cui","翠":"cui","村":"cun","存":"cun","寸":"cun","措":"cuo","错":"cuo","搓":"cuo","撮":"cuo","挫":"cuo","达":"da","答":"da","打":"da","大":"da","呆":"dai","歹":"dai","傣":"dai","戴":"dai","带":"dai","殆":"dai","代":"dai","贷":"dai","袋":"dai","待":"dai","逮":"dai","丹":"dan","单":"dan","郸":"dan","掸":"dan","胆":"dan","旦":"dan","氮":"dan","但":"dan","惮":"dan","淡":"dan","诞":"dan","弹":"dan","蛋":"dan","当":"dang","档":"dang","刀":"dao","捣":"dao","蹈":"dao","倒":"dao","岛":"dao","祷":"dao","导":"dao","到":"dao","悼":"dao","道":"dao","盗":"dao","德":"de","得":"de","的":"de","蹬":"deng","灯":"deng","登":"deng","等":"deng","邓":"deng","堤":"di","低":"di","滴":"di","迪":"di","敌":"di","笛":"di","狄":"di","涤":"di","翟":"di","嫡":"di","抵":"di","底":"di","地":"di","蒂":"di","第":"di","帝":"di","弟":"di","递":"di","颠":"dian","点":"dian","典":"dian","靛":"dian","垫":"dian","电":"dian","佃":"dian","甸":"dian","店":"dian","惦":"dian","奠":"dian","淀":"dian","殿":"dian","碉":"diao","叼":"diao","雕":"diao","凋":"diao","刁":"diao","掉":"diao","钓":"diao","调":"diao","跌":"die","蝶":"die","迭":"die","谍":"die","叠":"die","丁":"ding","盯":"ding","鼎":"ding","顶":"ding","定":"ding","订":"ding","丢":"diu","东":"dong","冬":"dong","董":"dong","懂":"dong","动":"dong","洞":"dong","冻":"dong","兜":"dou","抖":"dou","斗":"dou","豆":"dou","逗":"dou","痘":"dou","都":"du","督":"du","毒":"du","犊":"du","独":"du","读":"du","堵":"du","睹":"du","肚":"du","度":"du","渡":"du","妒":"du","端":"duan","短":"duan","锻":"duan","段":"duan","断":"duan","堆":"dui","队":"dui","对":"dui","墩":"dun","吨":"dun","蹲":"dun","敦":"dun","顿":"dun","盾":"dun","炖":"dun","夺":"duo","躲":"duo","朵":"duo","跺":"duo","舵":"duo","剁":"duo","多":"duo","惰":"duo","堕":"duo","垛":"duo","峨":"e","鹅":"e","额":"e","恶":"e","饿":"e","鄂":"e","遏":"e","二":"er","而":"er","耳":"er","尔":"er","饵":"er","洱":"er","儿":"er","发":"fa","帆":"fan","番":"fan","翻":"fan","樊":"fan","矾":"fan","烦":"fan","反":"fan","返":"fan","范":"fan","贩":"fan","犯":"fan","饭":"fan","泛":"fan","方":"fang","坊":"fang","芳":"fang","防":"fang","房":"fang","仿":"fang","访":"fang","纺":"fang","放":"fang","飞":"fei","非":"fei","啡":"fei","肥":"fei","废":"fei","沸":"fei","费":"fei","芬":"fen","酚":"fen","吩":"fen","氛":"fen","分":"fen","纷":"fen","坟":"fen","焚":"fen","汾":"fen","粉":"fen","奋":"fen","份":"fen","忿":"fen","愤":"fen","粪":"fen","丰":"feng","封":"feng","枫":"feng","蜂":"feng","峰":"feng","锋":"feng","风":"feng","疯":"feng","烽":"feng","逢":"feng","冯":"feng","缝":"feng","讽":"feng","奉":"feng","凤":"feng","肤":"fu","夫":"fu","敷":"fu","弗":"fu","拂":"fu","辐":"fu","幅":"fu","伏":"fu","扶":"fu","斧":"fu","俯":"fu","腑":"fu","釜":"fu","抚":"fu","府":"fu","辅":"fu","腐":"fu","父":"fu","付":"fu","负":"fu","附":"fu","妇":"fu","覆":"fu","赋":"fu","复":"fu","副":"fu","傅":"fu","富":"fu","赴":"fu","腹":"fu","该":"gai","改":"gai","盖":"gai","概":"gai","干":"gan","甘":"gan","肝":"gan","赶":"gan","感":"gan","秆":"gan","敢":"gan","赣":"gan","刚":"gang","钢":"gang","岗":"gang","港":"gang","高":"gao","糕":"gao","搞":"gao","稿":"gao","告":"gao","割":"ge","歌":"ge","格":"ge","革":"ge","葛":"ge","隔":"ge","阁":"ge","各":"ge","给":"gei","跟":"gen","根":"gen","耕":"geng","更":"geng","工":"gong","弓":"gong","公":"gong","功":"gong","攻":"gong","供":"gong","躬":"gong","宫":"gong","恭":"gong","巩":"gong","拱":"gong","贡":"gong","共":"gong","勾":"gou","沟":"gou","苟":"gou","狗":"gou","构":"gou","购":"gou","够":"gou","估":"gu","孤":"gu","菇":"gu","古":"gu","蛊":"gu","骨":"gu","谷":"gu","顾":"gu","固":"gu","故":"gu","雇":"gu","瓜":"gua","剐":"gua","寡":"gua","挂":"gua","拐":"guai","怪":"guai","关":"guan","官":"guan","管":"guan","馆":"guan","罐":"guan","惯":"guan","灌":"guan","贯":"guan","光":"guang","广":"guang","逛":"guang","归":"gui","圭":"gui","龟":"gui","规":"gui","轨":"gui","鬼":"gui","柜":"gui","桂":"gui","跪":"gui","贵":"gui","刽":"gui","滚":"gun","棍":"gun","锅":"guo","国":"guo","果":"guo","裹":"guo","过":"guo","哈":"ha","骸":"hai","孩":"hai","海":"hai","氦":"hai","害":"hai","憾":"han","罕":"han","含":"han","寒":"han","函":"han","汗":"han","撼":"han","捍":"han","汉":"han","旱":"han","喊":"han","好":"hao","号":"hao","耗":"hao","浩":"hao","合":"he","何":"he","和":"he","核":"he","盒":"he","壑":"he","河":"he","褐":"he","赫":"he","贺":"he","黑":"hei","痕":"hen","很":"hen","狠":"hen","恨":"hen","哼":"heng","横":"heng","衡":"heng","轰":"hong","哄":"hong","洪":"hong","红":"hong","宏":"hong","弘":"hong","鸿":"hong","后":"hou","厚":"hou","候":"hou","虎":"hu","乎":"hu","忽":"hu","呼":"hu","糊":"hu","壶":"hu","葫":"hu","湖":"hu","蝴":"hu","互":"hu","户":"hu","护":"hu","花":"hua","哗":"hua","华":"hua","滑":"hua","画":"hua","话":"hua","槐":"huai","环":"huan","欢":"huan","换":"huan","缓":"huan","患":"huan","唤":"huan","荒":"huang","黄":"huang","皇":"huang","慌":"huang","惶":"huang","恍":"huang","晃":"huang","挥":"hui","辉":"hui","徽":"hui","会":"hui","汇":"hui","贿":"hui","慧":"hui","惠":"hui","毁":"hui","婚":"hun","昏":"hun","浑":"hun","混":"hun","活":"huo","火":"huo","获":"huo","货":"huo","或":"huo","击":"ji","基":"ji","机":"ji","积":"ji","极":"ji","辑":"ji","级":"ji","计":"ji","记":"ji","技":"ji","际":"ji","季":"ji","迹":"ji","剂":"ji","激":"ji","即":"ji","集":"ji","籍":"ji","几":"ji","己":"ji","挤":"ji","给":"ji","际":"ji","继":"ji","寂":"ji","既":"ji","迹":"ji","济":"ji","驾":"jia","家":"jia","嘉":"jia","夹":"jia","荚":"jia","颊":"jia","贾":"jia","甲":"jia","钾":"jia","假":"jia","稼":"jia","价":"jia","架":"jia","加":"jia","坚":"jian","尖":"jian","间":"jian","监":"jian","检":"jian","简":"jian","减":"jian","键":"jian","见":"jian","件":"jian","健":"jian","渐":"jian","建":"jian","剑":"jian","践":"jian","江":"jiang","将":"jiang","讲":"jiang","奖":"jiang","桨":"jiang","降":"jiang","酱":"jiang","交":"jiao","教":"jiao","郊":"jiao","脚":"jiao","角":"jiao","叫":"jiao","较":"jiao","接":"jie","皆":"jie","节":"jie","结":"jie","解":"jie","姐":"jie","界":"jie","借":"jie","金":"jin","今":"jin","进":"jin","近":"jin","尽":"jin","禁":"jin","紧":"jin","锦":"jin","仅":"jin","晶":"jing","京":"jing","精":"jing","颈":"jing","敬":"jing","警":"jing","竟":"jing","竞":"jing","境":"jing","静":"jing","镜":"jing","九":"jiu","久":"jiu","就":"jiu","救":"jiu","酒":"jiu","旧":"jiu","举":"ju","居":"ju","鞠":"ju","局":"ju","菊":"ju","拒":"ju","矩":"ju","句":"ju","具":"ju","卷":"juan","决":"jue","角":"jue","军":"jun","均":"jun","峻":"jun","开":"kai","慨":"kai","刊":"kan","砍":"kan","看":"kan","康":"kang","考":"kao","靠":"kao","科":"ke","克":"ke","客":"ke","课":"ke","可":"ke","渴":"ke","恳":"ken","空":"kong","孔":"kong","控":"kong","口":"kou","苦":"ku","哭":"ku","块":"kuai","宽":"kuan","狂":"kuang","况":"kuang","亏":"kui","昆":"kun","扩":"kuo","拉":"la","来":"lai","览":"lan","篮":"lan","烂":"lan","劳":"lao","老":"lao","乐":"le","雷":"lei","类":"lei","力":"li","里":"li","理":"li","立":"li","例":"li","历":"li","利":"li","丽":"li","连":"lian","练":"lian","脸":"lian","两":"liang","亮":"liang","量":"liang","列":"lie","林":"lin","临":"lin","龄":"ling","令":"ling","刘":"liu","流":"liu","六":"liu","楼":"lou","路":"lu","旅":"lv","律":"lv","绿":"lv","乱":"luan","论":"lun","落":"luo","么":"me","没":"mei","每":"mei","美":"mei","门":"men","们":"men","面":"mian","名":"ming","明":"ming","命":"ming","目":"mu","哪":"na","那":"na","南":"nan","难":"nan","能":"neng","你":"ni","年":"nian","念":"nian","努":"nu","女":"nv","怕":"pa","排":"pai","判":"pan","旁":"pang","跑":"pao","配":"pei","朋":"peng","品":"pin","平":"ping","其":"qi","起":"qi","前":"qian","强":"qiang","切":"qie","亲":"qin","清":"qing","情":"qing","请":"qing","求":"qiu","全":"quan","然":"ran","人":"ren","日":"ri","如":"ru","入":"ru","三":"san","上":"shang","少":"shao","社":"she","深":"shen","什":"shen","生":"sheng","时":"shi","是":"shi","事":"shi","市":"shi","收":"shou","手":"shou","数":"shu","说":"shuo","思":"si","四":"si","他":"ta","她":"ta","太":"tai","特":"te","天":"tian","条":"tiao","听":"ting","同":"tong","图":"tu","推":"tui","外":"wai","完":"wan","万":"wan","为":"wei","文":"wen","我":"wo","物":"wu","西":"xi","下":"xia","先":"xian","现":"xian","想":"xiang","小":"xiao","新":"xin","信":"xin","行":"xing","学":"xue","也":"ye","一":"yi","已":"yi","以":"yi","意":"yi","因":"yin","应":"ying","用":"yong","有":"you","语":"yu","元":"yuan","月":"yue","运":"yun","在":"zai","再":"zai","增":"zeng","这":"zhe","者":"zhe","真":"zhen","正":"zheng","知":"zhi","中":"zhong","重":"zhong","最":"zui","作":"zuo","做":"zuo"};
+        // 常用汉字拼音字典
+        const PY = {"啊":"a","阿":"a","爱":"ai","安":"an","昂":"ang","奥":"ao","八":"ba","把":"ba","爸":"ba","白":"bai","百":"bai","摆":"bai","败":"bai","拜":"bai","班":"ban","板":"ban","半":"ban","办":"ban","帮":"bang","宝":"bao","报":"bao","暴":"bao","杯":"bei","北":"bei","被":"bei","本":"ben","比":"bi","笔":"bi","必":"bi","避":"bi","边":"bian","变":"bian","标":"biao","表":"biao","别":"bie","冰":"bing","病":"bing","并":"bing","波":"bo","博":"bo","不":"bu","步":"bu","部":"bu","擦":"ca","才":"cai","彩":"cai","菜":"cai","参":"can","残":"can","藏":"cang","操":"cao","草":"cao","层":"ceng","差":"cha","查":"cha","拆":"chai","产":"chan","唱":"chang","长":"chang","超":"chao","炒":"chao","车":"che","彻":"che","称":"cheng","城":"cheng","成":"cheng","程":"cheng","诚":"cheng","承":"cheng","吃":"chi","持":"chi","冲":"chong","抽":"chou","愁":"chou","出":"chu","除":"chu","楚":"chu","处":"chu","穿":"chuan","传":"chuan","船":"chuan","床":"chuang","春":"chun","此":"ci","词":"ci","刺":"ci","从":"cong","粗":"cu","存":"cun","错":"cuo","打":"da","大":"da","带":"dai","代":"dai","贷":"dai","单":"dan","但":"dan","淡":"dan","当":"dang","刀":"dao","道":"dao","到":"dao","导":"dao","的":"de","得":"de","等":"deng","低":"di","敌":"di","地":"di","第":"di","电":"dian","点":"dian","典":"dian","店":"dian","丁":"ding","定":"ding","东":"dong","动":"dong","洞":"dong","都":"dou","毒":"du","读":"du","度":"du","端":"duan","段":"duan","短":"duan","对":"dui","队":"dui","多":"duo","惰":"duo","而":"er","发":"fa","反":"fan","范":"fan","饭":"fan","方":"fang","放":"fang","飞":"fei","非":"fei","费":"fei","分":"fen","风":"feng","封":"feng","服":"fu","父":"fu","付":"fu","复":"fu","该":"gai","改":"gai","感":"gan","干":"gan","刚":"gang","高":"gao","告":"gao","歌":"ge","格":"ge","革":"ge","各":"ge","工":"gong","功":"gong","供":"gong","共":"gong","购":"gou","够":"gou","古":"gu","故":"gu","固":"gu","顾":"gu","关":"guan","管":"guan","光":"guang","广":"guang","归":"gui","规":"gui","贵":"gui","国":"guo","果":"guo","过":"guo","哈":"ha","孩":"hai","海":"hai","汉":"han","好":"hao","号":"hao","和":"he","何":"he","黑":"hei","很":"hen","红":"hong","后":"hou","厚":"hou","虎":"hu","护":"hu","花":"hua","话":"hua","画":"hua","换":"huan","黄":"huang","回":"hui","会":"hui","慧":"hui","混":"hun","活":"huo","获":"huo","火":"huo","或":"huo","机":"ji","积":"ji","级":"ji","计":"ji","记":"ji","技":"ji","季":"ji","迹":"ji","集":"ji","几":"ji","己":"ji","加":"jia","家":"jia","价":"jia","假":"jia","坚":"jian","间":"jian","简":"jian","减":"jian","键":"jian","见":"jian","件":"jian","健":"jian","建":"jian","江":"jiang","将":"jiang","讲":"jiang","降":"jiang","交":"jiao","教":"jiao","叫":"jiao","节":"jie","结":"jie","解":"jie","姐":"jie","界":"jie","借":"jie","今":"jin","进":"jin","近":"jin","尽":"jin","紧":"jin","精":"jing","京":"jing","敬":"jing","竟":"jing","静":"jing","九":"jiu","久":"jiu","就":"jiu","旧":"jiu","居":"ju","局":"ju","拒":"ju","具":"ju","卷":"juan","决":"jue","开":"kai","看":"kan","考":"kao","科":"ke","克":"ke","可":"ke","课":"ke","客":"ke","空":"kong","口":"kou","苦":"ku","块":"kuai","宽":"kuan","来":"lai","览":"lan","老":"lao","乐":"le","类":"lei","力":"li","里":"li","理":"li","立":"li","例":"li","历":"li","利":"li","连":"lian","练":"lian","两":"liang","亮":"liang","量":"liang","列":"lie","林":"lin","临":"lin","令":"ling","流":"liu","六":"liu","路":"lu","乱":"luan","论":"lun","落":"luo","么":"me","没":"mei","每":"mei","美":"mei","门":"men","们":"men","面":"mian","名":"ming","明":"ming","命":"ming","目":"mu","哪":"na","那":"na","南":"nan","难":"nan","能":"neng","你":"ni","年":"nian","念":"nian","努":"nu","女":"nv","怕":"pa","判":"pan","跑":"pao","朋":"peng","品":"pin","平":"ping","其":"qi","起":"qi","前":"qian","强":"qiang","切":"qie","亲":"qin","清":"qing","情":"qing","请":"qing","求":"qiu","全":"quan","然":"ran","人":"ren","日":"ri","如":"ru","入":"ru","三":"san","上":"shang","少":"shao","深":"shen","什":"shen","生":"sheng","时":"shi","是":"shi","事":"shi","市":"shi","收":"shou","手":"shou","数":"shu","说":"shuo","思":"si","四":"si","他":"ta","她":"ta","太":"tai","特":"te","天":"tian","条":"tiao","听":"ting","同":"tong","图":"tu","推":"tui","外":"wai","完":"wan","万":"wan","为":"wei","文":"wen","我":"wo","物":"wu","西":"xi","下":"xia","先":"xian","现":"xian","想":"xiang","小":"xiao","新":"xin","信":"xin","行":"xing","学":"xue","也":"ye","一":"yi","已":"yi","以":"yi","意":"yi","因":"yin","应":"ying","用":"yong","有":"you","语":"yu","元":"yuan","月":"yue","运":"yun","在":"zai","再":"zai","增":"zeng","这":"zhe","真":"zhen","正":"zheng","知":"zhi","中":"zhong","重":"zhong","最":"zui","作":"zuo","做":"zuo"};
 
         let sep = '-';
-        let history = JSON.parse(localStorage.getItem('slug_history') || '[]');
+        let history = [];
+        try { history = JSON.parse(localStorage.getItem('slug_hist_v1')||'[]'); } catch {}
 
         function updateCheckOpt(ciId, inputId) {
-            const checked = document.getElementById(inputId).checked;
-            document.getElementById(ciId).classList.toggle('active', checked);
+            document.getElementById(ciId).classList.toggle('active', document.getElementById(inputId).checked);
         }
 
         function setSep(s) {
             sep = s;
-            document.getElementById('sep-hyphen').classList.toggle('active', s === '-');
-            document.getElementById('sep-under').classList.toggle('active', s === '_');
+            document.getElementById('sep-hyphen').classList.toggle('active', s==='-');
+            document.getElementById('sep-under').classList.toggle('active', s==='_');
             onInput();
         }
 
         function toSlug(text) {
-            if (!text) return '';
-
-            // Chinese -> pinyin
+            if(!text) return '';
             let result = '';
-            for (const ch of text) {
-                const py = PINYIN[ch];
-                if (py) {
-                    result += ' ' + py + ' ';
-                } else {
-                    result += ch;
-                }
+            for(const ch of text) {
+                const py = PY[ch];
+                result += py ? (' '+py+' ') : ch;
             }
-
-            // lowercase
-            if (document.getElementById('forceLower').checked) result = result.toLowerCase();
-
-            // remove non-alphanumeric except space and sep chars
-            if (!document.getElementById('keepNums').checked) {
-                result = result.replace(/[0-9]/g, ' ');
-            }
-
-            // strip special chars, keep letters, numbers, spaces, hyphens
-            result = result.replace(/[^\w\s-]/g, ' ');
-
-            // collapse spaces and replace with sep
-            result = result.trim().replace(/[\s_-]+/g, sep);
-
-            // trim leading/trailing sep
-            result = result.replace(new RegExp(`^[${sep.replace('-','\\-')}]+|[${sep.replace('-','\\-')}]+$`, 'g'), '');
-
-            return result;
+            if(document.getElementById('forceLower').checked) result = result.toLowerCase();
+            if(!document.getElementById('keepNums').checked) result = result.replace(/[0-9]/g,' ');
+            result = result.replace(/[^\w\s-]/g,' ').trim().replace(/[\s_-]+/g, sep);
+            const r = new RegExp(`^[\\${sep}]+|[\\${sep}]+$`,'g');
+            return result.replace(r,'');
         }
 
         function onInput() {
             const val = document.getElementById('mainInput').value;
             const slug = toSlug(val);
             const el = document.getElementById('slugOutput');
-            const outCard = document.getElementById('outputCard');
-
-            if (slug) {
+            const card = document.getElementById('outputCard');
+            if(slug) {
                 el.textContent = slug;
-                outCard.classList.add('has-val');
-                document.getElementById('urlPreview').style.display = '';
+                card.classList.add('has-val');
+                document.getElementById('urlPreview').style.display='';
                 document.getElementById('urlSlugPart').textContent = slug;
             } else {
-                el.innerHTML = '<span class="slug-empty">输入标题后自动生成…</span>';
-                outCard.classList.remove('has-val');
-                document.getElementById('urlPreview').style.display = 'none';
+                el.innerHTML='<span class="slug-empty">输入标题后自动生成…</span>';
+                card.classList.remove('has-val');
+                document.getElementById('urlPreview').style.display='none';
             }
         }
 
         function copySlug() {
-            const slug = document.getElementById('slugOutput').textContent;
-            if (!slug || slug === '输入标题后自动生成…') { toast('请先输入标题', ''); return; }
+            const slug = document.getElementById('slugOutput').textContent.trim();
+            if(!slug||slug==='输入标题后自动生成…'){ toast('请先输入标题',''); return; }
             const origin = document.getElementById('mainInput').value.trim();
-            navigator.clipboard.writeText(slug).then(() => {
-                toast('Slug 已复制', 'success');
+            navigator.clipboard.writeText(slug).then(()=>{
+                toast('Slug 已复制','success');
                 addHistory(origin, slug);
-            }).catch(() => toast('复制失败', ''));
+            }).catch(()=>toast('复制失败',''));
         }
 
         function addHistory(origin, slug) {
-            history = history.filter(h => h.slug !== slug);
-            history.unshift({ origin, slug, time: Date.now() });
-            if (history.length > 20) history = history.slice(0, 20);
-            localStorage.setItem('slug_history', JSON.stringify(history));
+            history = history.filter(h=>h.slug!==slug);
+            history.unshift({origin, slug});
+            if(history.length>20) history=history.slice(0,20);
+            localStorage.setItem('slug_hist_v1', JSON.stringify(history));
             renderHistory();
         }
 
         function renderHistory() {
             const sec = document.getElementById('historySection');
-            const list = document.getElementById('historyList');
-            if (!history.length) { sec.style.display = 'none'; return; }
-            sec.style.display = '';
-            list.innerHTML = history.map((h, i) => `
+            if(!history.length){ sec.style.display='none'; return; }
+            sec.style.display='';
+            document.getElementById('historyList').innerHTML = history.map((h,i)=>`
                 <div class="history-item">
-                    <span class="history-origin" title="${escHtml(h.origin)}">${escHtml(h.origin)}</span>
+                    <span class="history-origin" title="${esc(h.origin)}">${esc(h.origin)}</span>
                     <span style="color:var(--text3)">→</span>
-                    <span class="history-slug" title="${escHtml(h.slug)}">${escHtml(h.slug)}</span>
+                    <span class="history-slug" title="${esc(h.slug)}">${esc(h.slug)}</span>
                     <button class="history-copy" onclick="copySingle(${i})">复制</button>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
-        function copySingle(i) {
-            navigator.clipboard.writeText(history[i].slug).then(() => toast('已复制', 'success'));
-        }
+        function copySingle(i){ navigator.clipboard.writeText(history[i].slug).then(()=>toast('已复制','success')); }
+        function clearHistory(){ history=[]; localStorage.removeItem('slug_hist_v1'); renderHistory(); }
+        function useExample(el){ document.getElementById('mainInput').value=el.textContent; onInput(); }
+        function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show'+(type?' '+type:''); clearTimeout(el._t); el._t=setTimeout(()=>el.className='toast',2500); }
 
-        function clearHistory() {
-            history = [];
-            localStorage.removeItem('slug_history');
-            renderHistory();
-        }
-
-        function useExample(el) {
-            document.getElementById('mainInput').value = el.textContent;
-            onInput();
-        }
-
-        function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-        function toast(msg, type) {
-            const el = document.getElementById('toast');
-            el.textContent = msg;
-            el.className = 'toast show' + (type ? ' ' + type : '');
-            clearTimeout(el._t);
-            el._t = setTimeout(() => el.className = 'toast', 2500);
-        }
-
-        // init
-        ['ci-lower','ci-rmnum'].forEach(id => {
-            const inputId = id === 'ci-lower' ? 'forceLower' : 'keepNums';
-            updateCheckOpt(id, inputId);
-        });
         renderHistory();
-
-        const themeBtn = document.getElementById('themeBtn');
-        const themeIcon = document.getElementById('themeIcon');
-        function updateThemeIcon() { themeIcon.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙'; }
+        const themeBtn=document.getElementById('themeBtn'), themeIcon=document.getElementById('themeIcon');
+        function updateThemeIcon(){ themeIcon.textContent=document.documentElement.classList.contains('dark')?'☀️':'🌙'; }
         updateThemeIcon();
-        themeBtn.addEventListener('click', () => {
-            const dark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', dark ? 'dark' : 'light');
-            updateThemeIcon();
-        });
+        themeBtn.addEventListener('click',()=>{ const dark=document.documentElement.classList.toggle('dark'); localStorage.setItem('theme',dark?'dark':'light'); updateThemeIcon(); });
     </script>
 </body>
 </html>
