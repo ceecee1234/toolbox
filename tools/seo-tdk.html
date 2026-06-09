@@ -1,224 +1,551 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>网页TDK提取工具 - SEO标题描述关键词解析 | 全能工具箱</title>
-    <meta name="description" content="免费在线TDK提取工具，粘贴HTML源码即可解析Title、Description、Keywords和Open Graph标签，自动检测SEO字数是否合规。">
-    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
-    <style>
-        :root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--success-light:#ECFDF5;--warning:#F59E0B;--warning-light:#FFFBEB;--error:#EF4444;--error-light:#FEF2F2;--border:#e2e8f0;--radius:12px}
-        .dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#334155;--primary-light:rgba(79,70,229,.2);--success-light:rgba(16,185,129,.15);--warning-light:rgba(245,158,11,.15);--error-light:rgba(239,68,68,.15)}
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
-        a{color:inherit;text-decoration:none}
-        .header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border)}
-        .header-inner{max-width:900px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
-        .logo{font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
-        .icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;background:none;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:.2s}
-        .icon-btn:hover{background:var(--bg2)}
-        .dark .icon-btn{color:var(--text)}
-        .main{max-width:900px;margin:0 auto;padding:24px 20px 60px}
-        .breadcrumb{display:flex;gap:8px;font-size:13px;color:var(--text3);margin-bottom:20px;flex-wrap:wrap}
-        .breadcrumb a{color:var(--primary)}
-        .tool-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px}
-        .tool-title{font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px}
-        .tool-desc{color:var(--text2);margin-bottom:24px;font-size:15px}
-        .tool-fav-btn{padding:8px 18px;font-size:14px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
-        .tool-fav-btn:hover,.tool-fav-btn.active{color:var(--warning);border-color:var(--warning)}
-        .input-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
-        .input-label{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px}
-        .html-input{width:100%;min-height:140px;padding:14px;font-size:13px;font-family:'SF Mono','Fira Code',monospace;background:var(--bg2);border:2px solid var(--border);border-radius:10px;color:var(--text);outline:none;resize:vertical;transition:.2s;line-height:1.6}
-        .html-input:focus{border-color:var(--primary);background:var(--card);box-shadow:0 0 0 4px var(--primary-light)}
-        .html-input::placeholder{color:var(--text3)}
-        .btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-        .btn{padding:9px 18px;font-size:13px;font-weight:600;border:none;border-radius:50px;cursor:pointer;transition:.2s}
-        .btn-primary{background:var(--primary);color:#fff}
-        .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
-        .btn-ghost{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
-        .btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
-        .tdk-list{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
-        .tdk-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-        .tdk-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-        .tdk-name{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
-        .char-badge{padding:3px 10px;border-radius:50px;font-size:12px;font-weight:600}
-        .char-ok{background:var(--success-light);color:#065f46}
-        .char-warn{background:var(--warning-light);color:#92400e}
-        .char-bad{background:var(--error-light);color:#991b1b}
-        .char-na{background:var(--bg2);color:var(--text3)}
-        .dark .char-ok{color:#a7f3d0}
-        .dark .char-warn{color:#fde68a}
-        .dark .char-bad{color:#fecaca}
-        .tdk-body{padding:14px 16px;font-size:14px;word-break:break-word;line-height:1.7}
-        .tdk-empty{color:var(--text3);font-style:italic}
-        .tdk-actions{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg2)}
-        .copy-btn{padding:5px 14px;font-size:12px;font-weight:600;background:var(--card);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:.2s;color:var(--text2)}
-        .copy-btn:hover{border-color:var(--primary);color:var(--primary)}
-        .seo-tip{font-size:12px;color:var(--text3)}
-        .og-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px}
-        .og-head{padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px;font-weight:700}
-        .og-grid{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-        @media(max-width:540px){.og-grid{grid-template-columns:1fr}}
-        .og-item{background:var(--bg2);border-radius:8px;padding:12px 14px}
-        .og-key{font-size:11px;font-family:'SF Mono','Fira Code',monospace;color:var(--primary);margin-bottom:4px;font-weight:600}
-        .og-val{font-size:13px;word-break:break-word}
-        .og-empty{padding:24px;text-align:center;color:var(--text3);font-size:14px}
-        .preview-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px}
-        .preview-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:12px}
-        .serp-preview{background:#fff;border:1px solid #dfe1e5;border-radius:8px;padding:16px 20px;max-width:600px}
-        .dark .serp-preview{background:#202124;border-color:#3c4043}
-        .serp-url{font-size:13px;color:#202124;margin-bottom:2px}
-        .dark .serp-url{color:#bdc1c6}
-        .serp-title{font-size:20px;color:#1a0dab;margin-bottom:4px;line-height:1.3}
-        .dark .serp-title{color:#8ab4f8}
-        .serp-desc{font-size:14px;color:#4d5156;line-height:1.6}
-        .dark .serp-desc{color:#bdc1c6}
-        .empty-state{padding:48px 20px;text-align:center;color:var(--text3)}
-        .empty-icon{font-size:48px;margin-bottom:12px}
-        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;background:var(--text);color:#fff;border-radius:50px;font-size:14px;opacity:0;transition:.3s;z-index:999;pointer-events:none}
-        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-        .toast.success{background:var(--success)}
-        .footer{margin-top:60px;padding:24px 20px;border-top:1px solid var(--border);text-align:center;font-size:13px;color:var(--text3)}
-        .footer a{color:var(--primary)}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>网页 TDK 标签提取 - Dev Toolbox</title>
+<meta name="description" content="在线 TDK 提取工具，粘贴 HTML 源码即可解析 Title、Description、Keywords 和 Open Graph 标签，自动检测 SEO 字数合规性。">
+<link rel="icon" href="../favicon.ico">
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #1a1d27;
+    --bg3: #22263a;
+    --border: #2e3347;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --success: #22c55e;
+    --success-bg: rgba(34,197,94,0.15);
+    --success-text: #86efac;
+    --warning: #f59e0b;
+    --warning-bg: rgba(245,158,11,0.15);
+    --warning-text: #fde68a;
+    --error: #ef4444;
+    --error-bg: rgba(239,68,68,0.15);
+    --error-text: #fecaca;
+    --og-key: #a78bfa;
+  }
+  [data-theme="light"] {
+    --bg: #f8fafc;
+    --bg2: #ffffff;
+    --bg3: #f1f5f9;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text2: #475569;
+    --text3: #94a3b8;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --success-bg: rgba(34,197,94,0.1);
+    --success-text: #166534;
+    --warning-bg: rgba(245,158,11,0.1);
+    --warning-text: #92400e;
+    --error-bg: rgba(239,68,68,0.1);
+    --error-text: #991b1b;
+    --og-key: #7c3aed;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+  .page-header {
+    position: relative;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    padding: 28px 24px 20px;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 20% 50%, rgba(59,130,246,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 80% 30%, rgba(99,102,241,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+  }
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { color: var(--text); border-color: var(--accent); }
+  .header-title { flex: 1; }
+  .header-title h1 { font-size: 20px; font-weight: 700; line-height: 1.3; }
+  .header-title p { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .fav-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    transition: all .2s;
+  }
+  .fav-btn:hover { border-color: var(--accent); }
+  .fav-btn.active { color: #fbbf24; border-color: #fbbf24; background: rgba(251,191,36,0.1); }
+  .theme-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: all .2s;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .main { max-width: 900px; margin: 0 auto; padding: 20px 16px; }
+
+  .input-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text2); }
+  textarea {
+    width: 100%;
+    min-height: 140px;
+    background: var(--bg2);
+    color: var(--text);
+    border: none;
+    outline: none;
+    resize: vertical;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  textarea::placeholder { color: var(--text3); }
+  .btn-row { display: flex; gap: 8px; padding: 0 16px 14px; flex-wrap: wrap; }
+  .btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg3);
+    color: var(--text);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: #fff; }
+
+  .tdk-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+
+  .tdk-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .tdk-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .tdk-name { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .tdk-name .icon { font-size: 16px; }
+  .char-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .char-ok { background: var(--success-bg); color: var(--success-text); }
+  .char-warn { background: var(--warning-bg); color: var(--warning-text); }
+  .char-bad { background: var(--error-bg); color: var(--error-text); }
+  .char-na { background: var(--bg3); color: var(--text3); }
+  .tdk-body {
+    padding: 14px 16px;
+    font-size: 14px;
+    word-break: break-word;
+    line-height: 1.7;
+  }
+  .tdk-empty { color: var(--text3); font-style: italic; }
+  .tdk-actions {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    background: var(--bg3);
+  }
+  .copy-btn {
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text2);
+    transition: all .2s;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .seo-tip { font-size: 12px; color: var(--text3); }
+
+  .og-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .og-head {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 700;
+    background: var(--bg3);
+  }
+  .og-grid {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  .og-item {
+    background: var(--bg3);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .og-key {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    color: var(--og-key);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .og-val {
+    font-size: 13px;
+    word-break: break-word;
+    color: var(--text);
+  }
+  .og-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--text3);
+    font-size: 14px;
+  }
+
+  .preview-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .preview-head {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 700;
+    background: var(--bg3);
+  }
+  .preview-body { padding: 20px; }
+  .serp-preview {
+    background: #fff;
+    border: 1px solid #dfe1e5;
+    border-radius: 12px;
+    padding: 16px 20px;
+    max-width: 600px;
+    font-family: arial, sans-serif;
+  }
+  [data-theme="dark"] .serp-preview { background: #202124; border-color: #3c4043; }
+  .serp-url {
+    font-size: 14px;
+    color: #202124;
+    margin-bottom: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  [data-theme="dark"] .serp-url { color: #bdc1c6; }
+  .serp-title {
+    font-size: 20px;
+    color: #1a0dab;
+    margin-bottom: 4px;
+    line-height: 1.3;
+    cursor: pointer;
+  }
+  [data-theme="dark"] .serp-title { color: #8ab4f8; }
+  .serp-title:hover { text-decoration: underline; }
+  .serp-desc {
+    font-size: 14px;
+    color: #4d5156;
+    line-height: 1.6;
+  }
+  [data-theme="dark"] .serp-desc { color: #bdc1c6; }
+  .serp-date { color: #70757a; margin-right: 8px; }
+  [data-theme="dark"] .serp-date { color: #9aa0a6; }
+
+  .empty-state {
+    padding: 48px 20px;
+    text-align: center;
+    color: var(--text3);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .5; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--text);
+    box-shadow: var(--shadow);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all .3s;
+    z-index: 9999;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 500px) {
+    .og-grid { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-inner">
-            <a href="../" class="logo"><span>🛠️</span><span>全能工具箱</span></a>
-            <div style="display:flex;gap:8px">
-                <button class="icon-btn" id="themeBtn" title="切换主题"><span id="themeIcon">🌙</span></button>
-            </div>
-        </div>
-    </header>
-    <main class="main">
-        <div class="breadcrumb">
-            <a href="../">首页</a><span>›</span><span>站长工具</span><span>›</span><span>TDK提取</span>
-        </div>
-        <div class="tool-header">
-            <h1 class="tool-title">🔍 网页 TDK 标签提取</h1>
-            <button class="tool-fav-btn" id="favBtn" data-tool-id="seo-tdk">☆ 收藏</button>
-        </div>
-        <p class="tool-desc">粘贴任意 HTML 源码，自动提取 Title、Description、Keywords 及 Open Graph 标签，并检测字数是否符合 SEO 最佳实践。</p>
-        <div class="input-card">
-            <div class="input-label">📄 粘贴 HTML 源码（支持完整 &lt;head&gt; 或整页代码）</div>
-            <textarea class="html-input" id="htmlInput" placeholder="粘贴 HTML 源码…&#10;&lt;title&gt;页面标题&lt;/title&gt;&#10;&lt;meta name=&quot;description&quot; content=&quot;页面描述&quot;&gt;"></textarea>
-            <div class="btn-row">
-                <button class="btn btn-primary" onclick="extract()">🔍 提取标签</button>
-                <button class="btn btn-ghost" onclick="loadDemo()">📋 加载示例</button>
-                <button class="btn btn-ghost" onclick="clearAll()">🗑️ 清空</button>
-            </div>
-        </div>
-        <div id="resultArea" style="display:none">
-            <div class="preview-card">
-                <div class="preview-title">🖥️ Google 搜索结果预览</div>
-                <div class="serp-preview">
-                    <div class="serp-url" id="serpUrl">https://example.com</div>
-                    <div class="serp-title" id="serpTitle">（标题未设置）</div>
-                    <div class="serp-desc" id="serpDesc">（描述未设置）</div>
-                </div>
-            </div>
-            <div class="tdk-list" id="tdkList"></div>
-            <div class="og-section">
-                <div class="og-head">📱 Open Graph 标签</div>
-                <div id="ogContent"></div>
-            </div>
-        </div>
-        <div id="emptyState" class="empty-state">
-            <div class="empty-icon">🔍</div>
-            <div style="font-size:16px;font-weight:600;margin-bottom:6px">粘贴 HTML 源码开始分析</div>
-            <div style="font-size:14px">支持 Title、Description、Keywords、OG 标签等全部 SEO 相关元数据</div>
-        </div>
-    </main>
-    <footer class="footer">
-        <p>© 2025 <a href="../">全能工具箱</a> | 所有解析在浏览器本地完成</p>
-    </footer>
-    <div id="toast" class="toast"></div>
-    <script src="../js/tools-data.js"></script>
-    <script src="../js/toolbox-core.js"></script>
-    <script>
-        const DEMO_HTML = `<!DOCTYPE html>
-<html lang="zh-CN"><head>
-  <meta charset="UTF-8">
-  <title>全能工具箱 - 100+免费在线工具，打开即用</title>
-  <meta name="description" content="汇集100+免费在线工具：房贷计算器、个税计算、JSON格式化、AI工具导航等，无需下载，打开即用！覆盖开发者、内容创作者、站长等多种场景需求。">
-  <meta name="keywords" content="在线工具,免费工具,房贷计算器,个税计算器,JSON格式化,AI工具,站长工具">
-  <meta property="og:title" content="全能工具箱 - 免费在线工具集合">
-  <meta property="og:description" content="100+免费在线工具，无需下载，打开即用">
-  <meta property="og:image" content="https://example.com/og-image.png">
-  <meta property="og:url" content="https://ceecee1234.github.io/toolbox/">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <link rel="canonical" href="https://ceecee1234.github.io/toolbox/">
-</head><body>...</body></html>`;
 
-        const TDK_RULES = {
-            title:       {min:10,max:60,  ideal:'10–60 字符',  label:'Title 标题'},
-            description: {min:50,max:160, ideal:'50–160 字符', label:'Meta Description'},
-            keywords:    {min:0, max:200, ideal:'建议 3–10 个关键词', label:'Meta Keywords'},
-        };
+<header class="page-header">
+  <div class="header-inner">
+    <a href="../index.html" class="back-btn">← 返回首页</a>
+    <div class="header-title">
+      <h1>网页 TDK 标签提取</h1>
+      <p>标题 / 描述 / 关键词 / OG 标签解析 · SEO 字数检测</p>
+    </div>
+    <button class="fav-btn" id="favBtn" title="收藏此工具">☆</button>
+    <button class="theme-btn" id="themeBtn" title="切换主题">☀️</button>
+  </div>
+</header>
 
-        function extract() {
-            const html = document.getElementById('htmlInput').value.trim();
-            if(!html){ toast('请粘贴 HTML 源码',''); return; }
-            const doc = new DOMParser().parseFromString(html,'text/html');
-            const title = doc.querySelector('title')?.textContent?.trim()||'';
-            const desc  = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim()||'';
-            const kw    = doc.querySelector('meta[name="keywords"]')?.getAttribute('content')?.trim()||'';
-            const canonical = doc.querySelector('link[rel="canonical"]')?.getAttribute('href')?.trim()||'';
-            const ogTags = {};
-            doc.querySelectorAll('meta[property^="og:"],meta[name^="twitter:"]').forEach(el=>{
-                const k=el.getAttribute('property')||el.getAttribute('name');
-                const v=el.getAttribute('content');
-                if(k&&v) ogTags[k]=v;
-            });
-            document.getElementById('emptyState').style.display='none';
-            document.getElementById('resultArea').style.display='';
-            document.getElementById('serpUrl').textContent = canonical||ogTags['og:url']||'https://example.com';
-            document.getElementById('serpTitle').textContent = title||'（标题未设置）';
-            document.getElementById('serpDesc').textContent = desc ? (desc.length>160?desc.slice(0,160)+'…':desc) : '（描述未设置）';
-            const data = [{key:'title',value:title},{key:'description',value:desc},{key:'keywords',value:kw}];
-            document.getElementById('tdkList').innerHTML = data.map(({key,value})=>{
-                const rule = TDK_RULES[key];
-                const len = value.length;
-                let cls='char-na', badge='未设置', tip='';
-                if(value){
-                    if(key==='keywords'){
-                        const cnt = value.split(',').filter(k=>k.trim()).length;
-                        cls = cnt>=3&&cnt<=10?'char-ok':'char-warn';
-                        badge = `${len}字符 · ${cnt}个关键词`;
-                        tip = cnt<3?'关键词偏少，建议3–10个':cnt>10?'关键词偏多':'SEO 友好';
-                    } else {
-                        badge = `${len}字符`;
-                        if(len<rule.min){ cls='char-warn'; tip=`偏短，建议至少${rule.min}字符`; }
-                        else if(len>rule.max){ cls='char-bad'; tip=`偏长（超出${len-rule.max}字符），建议不超过${rule.max}字符`; }
-                        else { cls='char-ok'; tip='SEO 友好 ✓'; }
-                    }
-                }
-                const body = value ? `<div class="tdk-body">${esc(value)}</div>` : `<div class="tdk-body tdk-empty">未找到该标签</div>`;
-                const actions = value ? `<div class="tdk-actions"><button class="copy-btn" onclick="copyText(${JSON.stringify(value)})">📋 复制内容</button><span class="seo-tip">${tip}</span></div>` : '';
-                return `<div class="tdk-card">
-                    <div class="tdk-head">
-                        <div class="tdk-name">${rule.label} <code style="font-size:11px;background:var(--bg2);padding:1px 6px;border-radius:4px;color:var(--text3)">${key==='title'?'&lt;title&gt;':`name="${key}"`}</code></div>
-                        <div style="display:flex;align-items:center;gap:8px"><span class="char-badge ${cls}">${badge}</span><span style="font-size:12px;color:var(--text3)">建议：${rule.ideal}</span></div>
-                    </div>${body}${actions}</div>`;
-            }).join('');
-            const ogKeys = Object.keys(ogTags);
-            document.getElementById('ogContent').innerHTML = ogKeys.length
-                ? `<div class="og-grid">${ogKeys.map(k=>`<div class="og-item"><div class="og-key">${esc(k)}</div><div class="og-val">${esc(ogTags[k])}</div></div>`).join('')}</div>`
-                : '<div class="og-empty">未检测到 Open Graph 标签</div>';
-        }
+<div class="main">
+  <div class="input-card">
+    <div class="card-header">
+      <span class="card-title">粘贴 HTML 源码</span>
+    </div>
+    <textarea id="htmlInput" placeholder="粘贴网页 HTML 源码，自动提取 TDK 信息…" spellcheck="false"></textarea>
+    <div class="btn-row">
+      <button class="btn" id="clearBtn">清空</button>
+      <button class="btn btn-primary" id="parseBtn">解析 TDK</button>
+    </div>
+  </div>
 
-        function copyText(text){ navigator.clipboard.writeText(text).then(()=>toast('已复制','success')).catch(()=>toast('复制失败','')); }
-        function loadDemo(){ document.getElementById('htmlInput').value=DEMO_HTML; extract(); }
-        function clearAll(){ document.getElementById('htmlInput').value=''; document.getElementById('resultArea').style.display='none'; document.getElementById('emptyState').style.display=''; }
-        function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-        function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show'+(type?' '+type:''); clearTimeout(el._t); el._t=setTimeout(()=>el.className='toast',2500); }
+  <div id="results"></div>
+</div>
 
-        const themeBtn=document.getElementById('themeBtn'), themeIcon=document.getElementById('themeIcon');
-        function updateThemeIcon(){ themeIcon.textContent=document.documentElement.classList.contains('dark')?'☀️':'🌙'; }
-        updateThemeIcon();
-        themeBtn.addEventListener('click',()=>{ const dark=document.documentElement.classList.toggle('dark'); localStorage.setItem('theme',dark?'dark':'light'); updateThemeIcon(); });
-    </script>
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  const savedTheme = localStorage.getItem('toolbox_theme') || 'dark';
+  document.documentElement.dataset.theme = savedTheme;
+  const themeBtn = document.getElementById('themeBtn');
+  themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+  themeBtn.addEventListener('click', () => {
+    const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = t;
+    localStorage.setItem('toolbox_theme', t);
+    themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
+  });
+
+  const FAV_KEY = 'toolbox_favorites_v2';
+  const TOOL_ID = 'seo-tdk';
+  function getFavs() { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch { return []; } }
+  function setFavs(arr) { localStorage.setItem(FAV_KEY, JSON.stringify(arr)); }
+  const favBtn = document.getElementById('favBtn');
+  const favs = getFavs();
+  if (favs.includes(TOOL_ID)) { favBtn.classList.add('active'); favBtn.textContent = '★'; }
+  favBtn.addEventListener('click', () => {
+    const arr = getFavs();
+    if (arr.includes(TOOL_ID)) {
+      setFavs(arr.filter(x => x !== TOOL_ID));
+      favBtn.classList.remove('active');
+      favBtn.textContent = '☆';
+    } else {
+      setFavs([TOOL_ID, ...arr.filter(x => x !== TOOL_ID)]);
+      favBtn.classList.add('active');
+      favBtn.textContent = '★';
+    }
+  });
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function getCharStatus(cnt, type) {
+    if (type === 'title') {
+      if (cnt === 0) return { cls: 'char-na', tip: '未设置' };
+      if (cnt < 10) return { cls: 'char-bad', tip: '过短，建议 10–60 字' };
+      if (cnt > 60) return { cls: 'char-warn', tip: '过长，可能被截断' };
+      return { cls: 'char-ok', tip: 'SEO 友好' };
+    }
+    if (type === 'desc') {
+      if (cnt === 0) return { cls: 'char-na', tip: '未设置' };
+      if (cnt < 50) return { cls: 'char-warn', tip: '偏短，建议 50–160 字' };
+      if (cnt > 160) return { cls: 'char-bad', tip: '过长，超过 160 字将被截断' };
+      return { cls: 'char-ok', tip: 'SEO 友好' };
+    }
+    if (type === 'keywords') {
+      if (cnt === 0) return { cls: 'char-na', tip: '未设置' };
+      if (cnt < 3) return { cls: 'char-warn', tip: '关键词偏少，建议 3–10 个' };
+      if (cnt > 10) return { cls: 'char-warn', tip: '关键词偏多，建议 3–10 个' };
+      return { cls: 'char-ok', tip: 'SEO 友好' };
+    }
+    return { cls: 'char-na', tip: '' };
+  }
+
+  function parse() {
+    const html = document.getElementById('htmlInput').value.trim();
+    const results = document.getElementById('results');
+
+    if (!html) {
+      results.innerHTML = '<div class="empty-state"><div class="empty-icon">📄</div><div>粘贴 HTML 源码后点击解析</div></div>';
+      return;
+    }
+
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const titleEl = doc.querySelector('title');
+    const descEl = doc.querySelector('meta[name="description" i], meta[property="description" i]');
+    const kwEl = doc.querySelector('meta[name="keywords" i]');
+
+    const title = titleEl ? titleEl.textContent.trim() : '';
+    const desc = descEl ? (descEl.getAttribute('content') || '').trim() : '';
+    const keywords = kwEl ? (kwEl.getAttribute('content') || '').trim() : '';
+
+    const tStatus = getCharStatus(title.length, 'title');
+    const dStatus = getCharStatus(desc.length, 'desc');
+    const kwCount = keywords ? keywords.split(/[,，、;；\s]+/).filter(x => x.trim()).length : 0;
+    const kStatus = getCharStatus(kwCount, 'keywords');
+
+    let html_out = '<div class="tdk-list">';
+
+    html_out += '<div class="tdk-card"><div class="tdk-head"><div class="tdk-name"><span class="icon">📌</span> Title 标题</div><span class="char-badge ' + tStatus.cls + '">' + (title ? title.length + ' 字' : '0 字') + '</span></div>';
+    html_out += '<div class="tdk-body">' + (title ? escHtml(title) : '<span class="tdk-empty">未设置</span>') + '</div>';
+    html_out += '<div class="tdk-actions"><button class="copy-btn" onclick="copyText(this)" data-val="' + escHtml(title).replace(/"/g, '&quot;') + '">📋 复制</button><span class="seo-tip">' + tStatus.tip + '</span></div></div>';
+
+    html_out += '<div class="tdk-card"><div class="tdk-head"><div class="tdk-name"><span class="icon">📝</span> Description 描述</div><span class="char-badge ' + dStatus.cls + '">' + (desc ? desc.length + ' 字' : '0 字') + '</span></div>';
+    html_out += '<div class="tdk-body">' + (desc ? escHtml(desc) : '<span class="tdk-empty">未设置</span>') + '</div>';
+    html_out += '<div class="tdk-actions"><button class="copy-btn" onclick="copyText(this)" data-val="' + escHtml(desc).replace(/"/g, '&quot;') + '">📋 复制</button><span class="seo-tip">' + dStatus.tip + '</span></div></div>';
+
+    html_out += '<div class="tdk-card"><div class="tdk-head"><div class="tdk-name"><span class="icon">🔑</span> Keywords 关键词</div><span class="char-badge ' + kStatus.cls + '">' + kwCount + ' 个</span></div>';
+    html_out += '<div class="tdk-body">' + (keywords ? escHtml(keywords) : '<span class="tdk-empty">未设置</span>') + '</div>';
+    html_out += '<div class="tdk-actions"><button class="copy-btn" onclick="copyText(this)" data-val="' + escHtml(keywords).replace(/"/g, '&quot;') + '">📋 复制</button><span class="seo-tip">' + kStatus.tip + '</span></div></div>';
+
+    html_out += '</div>';
+
+    const ogTags = doc.querySelectorAll('meta[property^="og:"], meta[name^="og:"]');
+    const twitterTags = doc.querySelectorAll('meta[name^="twitter:"], meta[property^="twitter:"]');
+    const allSocial = [...ogTags, ...twitterTags];
+    const socialData = {};
+    allSocial.forEach(el => {
+      let key = el.getAttribute('property') || el.getAttribute('name') || '';
+      const val = el.getAttribute('content') || '';
+      if (key && val) socialData[key] = val;
+    });
+
+    if (Object.keys(socialData).length > 0) {
+      html_out += '<div class="og-section"><div class="og-head">Open Graph & Twitter Card 标签</div><div class="og-grid">';
+      Object.entries(socialData).forEach(([k, v]) => {
+        html_out += '<div class="og-item"><div class="og-key">' + escHtml(k) + '</div><div class="og-val">' + escHtml(v) + '</div></div>';
+      });
+      html_out += '</div></div>';
+    }
+
+    if (title) {
+      const today = new Date();
+      const dateStr = today.getFullYear() + '年' + (today.getMonth() + 1) + '月' + today.getDate() + '日';
+      html_out += '<div class="preview-card"><div class="preview-head">Google 搜索结果预览</div><div class="preview-body"><div class="serp-preview">';
+      html_out += '<div class="serp-url">https://example.com/page-url</div>';
+      html_out += '<div class="serp-title">' + escHtml(title) + '</div>';
+      html_out += '<div class="serp-desc"><span class="serp-date">' + dateStr + '</span>' + escHtml(desc || '该页面暂无描述信息…') + '</div>';
+      html_out += '</div></div></div>';
+    }
+
+    results.innerHTML = html_out;
+  }
+
+  window.copyText = function(btn) {
+    const val = btn.dataset.val;
+    if (!val) { toast('无内容可复制'); return; }
+    navigator.clipboard.writeText(val).then(() => toast('已复制')).catch(() => toast('复制失败'));
+  };
+
+  document.getElementById('parseBtn').addEventListener('click', parse);
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    document.getElementById('htmlInput').value = '';
+    document.getElementById('results').innerHTML = '<div class="empty-state"><div class="empty-icon">📄</div><div>粘贴 HTML 源码后点击解析</div></div>';
+  });
+
+  document.getElementById('htmlInput').addEventListener('input', () => {
+    clearTimeout(window.parseTimer);
+    window.parseTimer = setTimeout(parse, 500);
+  });
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  document.getElementById('results').innerHTML = '<div class="empty-state"><div class="empty-icon">📄</div><div>粘贴 HTML 源码后点击解析</div></div>';
+})();
+</script>
 </body>
 </html>

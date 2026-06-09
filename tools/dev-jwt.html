@@ -1,258 +1,661 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JWT解码与验证器 - 在线JWT解析工具 | 全能工具箱</title>
-    <meta name="description" content="免费在线JWT解码工具，纯前端实时解析Header和Payload，自动检测过期时间并以人类语言提示，无需后端。">
-    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
-    <style>
-        :root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--success-light:#ECFDF5;--warning:#F59E0B;--warning-light:#FFFBEB;--error:#EF4444;--error-light:#FEF2F2;--border:#e2e8f0;--radius:12px}
-        .dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#334155;--primary-light:rgba(79,70,229,.2);--success-light:rgba(16,185,129,.15);--warning-light:rgba(245,158,11,.15);--error-light:rgba(239,68,68,.15)}
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
-        a{color:inherit;text-decoration:none}
-        .header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border)}
-        .header-inner{max-width:1000px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
-        .logo{font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
-        .icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;background:none;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:.2s}
-        .icon-btn:hover{background:var(--bg2)}
-        .dark .icon-btn{color:var(--text)}
-        .main{max-width:1000px;margin:0 auto;padding:24px 20px 60px}
-        .breadcrumb{display:flex;gap:8px;font-size:13px;color:var(--text3);margin-bottom:20px;flex-wrap:wrap}
-        .breadcrumb a{color:var(--primary)}
-        .tool-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px}
-        .tool-title{font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px}
-        .tool-desc{color:var(--text2);margin-bottom:24px;font-size:15px}
-        .tool-fav-btn{padding:8px 18px;font-size:14px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
-        .tool-fav-btn:hover,.tool-fav-btn.active{color:var(--warning);border-color:var(--warning)}
-        .input-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
-        .input-label{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px}
-        .jwt-input{width:100%;min-height:100px;padding:14px;font-size:13px;font-family:'SF Mono','Fira Code',monospace;background:var(--bg2);border:2px solid var(--border);border-radius:10px;color:var(--text);outline:none;resize:vertical;transition:.2s;line-height:1.6}
-        .jwt-input:focus{border-color:var(--primary);background:var(--card);box-shadow:0 0 0 4px var(--primary-light)}
-        .jwt-input::placeholder{color:var(--text3)}
-        .btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-        .btn{padding:9px 18px;font-size:13px;font-weight:600;border:none;border-radius:50px;cursor:pointer;transition:.2s}
-        .btn-primary{background:var(--primary);color:#fff}
-        .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
-        .btn-ghost{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
-        .btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
-        .jwt-visual{display:flex;gap:0;margin-bottom:20px;border-radius:10px;overflow:hidden;font-family:'SF Mono','Fira Code',monospace;font-size:13px;flex-wrap:wrap}
-        .jwt-part{padding:10px 16px;flex:1;min-width:0;word-break:break-all;line-height:1.6}
-        .jwt-part-header{background:#EEF2FF;color:#4F46E5}
-        .jwt-part-payload{background:#F0FDF4;color:#16a34a}
-        .jwt-part-sig{background:#FFF7ED;color:#c2410c}
-        .dark .jwt-part-header{background:rgba(79,70,229,.25);color:#a5b4fc}
-        .dark .jwt-part-payload{background:rgba(22,163,74,.2);color:#86efac}
-        .dark .jwt-part-sig{background:rgba(194,65,12,.2);color:#fdba74}
-        .jwt-dot{padding:10px 4px;background:var(--bg2);color:var(--text3);display:flex;align-items:center}
-        .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-        @media(max-width:660px){.result-grid{grid-template-columns:1fr}}
-        .result-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-        .result-card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
-        .result-card-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
-        .tag{padding:3px 10px;border-radius:50px;font-size:11px;font-weight:600}
-        .tag-header{background:#EEF2FF;color:#4F46E5}
-        .tag-payload{background:#F0FDF4;color:#16a34a}
-        .dark .tag-header{background:rgba(79,70,229,.25);color:#a5b4fc}
-        .dark .tag-payload{background:rgba(22,163,74,.2);color:#86efac}
-        .json-block{padding:14px 16px;font-family:'SF Mono','Fira Code',monospace;font-size:12.5px;line-height:1.8;overflow-x:auto;background:var(--bg2);min-height:120px;white-space:pre}
-        .json-key{color:#0891b2}
-        .json-str{color:#16a34a}
-        .json-num{color:#9333ea}
-        .json-bool{color:#dc2626}
-        .dark .json-key{color:#67e8f9}
-        .dark .json-str{color:#86efac}
-        .dark .json-num{color:#d8b4fe}
-        .dark .json-bool{color:#fca5a5}
-        .status-banner{padding:14px 20px;border-radius:var(--radius);margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;font-size:14px}
-        .status-banner.success{background:var(--success-light);border:1px solid rgba(16,185,129,.3);color:#065f46}
-        .status-banner.warning{background:var(--warning-light);border:1px solid rgba(245,158,11,.3);color:#92400e}
-        .status-banner.error{background:var(--error-light);border:1px solid rgba(239,68,68,.3);color:#991b1b}
-        .status-banner.info{background:var(--primary-light);border:1px solid rgba(79,70,229,.3);color:#3730a3}
-        .dark .status-banner.success{color:#a7f3d0}
-        .dark .status-banner.warning{color:#fde68a}
-        .dark .status-banner.error{color:#fecaca}
-        .dark .status-banner.info{color:#c7d2fe}
-        .status-icon{font-size:20px;flex-shrink:0;margin-top:1px}
-        .status-content strong{display:block;margin-bottom:2px}
-        .claims-table{width:100%;border-collapse:collapse;font-size:13px}
-        .claims-table th{padding:10px 14px;text-align:left;font-weight:600;color:var(--text2);border-bottom:2px solid var(--border);background:var(--bg2)}
-        .claims-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
-        .claims-table tr:last-child td{border-bottom:none}
-        .claim-val{font-family:'SF Mono','Fira Code',monospace;font-size:12px;word-break:break-all}
-        .copy-btn{padding:4px 12px;font-size:12px;background:var(--card);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:.2s;color:var(--text2)}
-        .copy-btn:hover{border-color:var(--primary);color:var(--primary)}
-        .empty-state{padding:48px 20px;text-align:center;color:var(--text3)}
-        .empty-icon{font-size:48px;margin-bottom:12px}
-        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;background:var(--text);color:#fff;border-radius:50px;font-size:14px;opacity:0;transition:.3s;z-index:999;pointer-events:none}
-        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-        .toast.success{background:var(--success)}
-        .toast.error{background:var(--error)}
-        .footer{margin-top:60px;padding:24px 20px;border-top:1px solid var(--border);text-align:center;font-size:13px;color:var(--text3)}
-        .footer a{color:var(--primary)}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JWT 解码与验证器 - Dev Toolbox</title>
+<meta name="description" content="在线 JWT 解码工具，纯前端实时解析 Header 和 Payload，自动检测过期时间并显示倒计时。">
+<link rel="icon" href="../favicon.ico">
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #1a1d27;
+    --bg3: #22263a;
+    --border: #2e3347;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --header-bg: rgba(99,102,241,0.15);
+    --header-text: #a5b4fc;
+    --payload-bg: rgba(34,197,94,0.12);
+    --payload-text: #86efac;
+    --sig-bg: rgba(249,115,22,0.12);
+    --sig-text: #fdba74;
+    --json-key: #67e8f9;
+    --json-str: #86efac;
+    --json-num: #d8b4fe;
+    --json-bool: #fca5a5;
+    --json-null: #fbbf24;
+    --success-bg: rgba(34,197,94,0.15);
+    --success-border: rgba(34,197,94,0.4);
+    --success-text: #86efac;
+    --warning-bg: rgba(245,158,11,0.15);
+    --warning-border: rgba(245,158,11,0.4);
+    --warning-text: #fde68a;
+    --error-bg: rgba(239,68,68,0.15);
+    --error-border: rgba(239,68,68,0.4);
+    --error-text: #fecaca;
+    --info-bg: rgba(99,102,241,0.12);
+    --info-border: rgba(99,102,241,0.3);
+    --info-text: #c7d2fe;
+  }
+  [data-theme="light"] {
+    --bg: #f8fafc;
+    --bg2: #ffffff;
+    --bg3: #f1f5f9;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text2: #475569;
+    --text3: #94a3b8;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --header-bg: rgba(99,102,241,0.1);
+    --header-text: #4f46e5;
+    --payload-bg: rgba(34,197,94,0.08);
+    --payload-text: #166534;
+    --sig-bg: rgba(249,115,22,0.08);
+    --sig-text: #c2410c;
+    --json-key: #0891b2;
+    --json-str: #16a34a;
+    --json-num: #7c3aed;
+    --json-bool: #dc2626;
+    --json-null: #d97706;
+    --success-bg: rgba(34,197,94,0.1);
+    --success-border: rgba(34,197,94,0.3);
+    --success-text: #166534;
+    --warning-bg: rgba(245,158,11,0.1);
+    --warning-border: rgba(245,158,11,0.3);
+    --warning-text: #92400e;
+    --error-bg: rgba(239,68,68,0.1);
+    --error-border: rgba(239,68,68,0.3);
+    --error-text: #991b1b;
+    --info-bg: rgba(99,102,241,0.08);
+    --info-border: rgba(99,102,241,0.2);
+    --info-text: #3730a3;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+  .page-header {
+    position: relative;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    padding: 28px 24px 20px;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 20% 50%, rgba(59,130,246,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 80% 30%, rgba(99,102,241,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+  }
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { color: var(--text); border-color: var(--accent); }
+  .header-title { flex: 1; }
+  .header-title h1 { font-size: 20px; font-weight: 700; line-height: 1.3; }
+  .header-title p { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .fav-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    transition: all .2s;
+  }
+  .fav-btn:hover { border-color: var(--accent); }
+  .fav-btn.active { color: #fbbf24; border-color: #fbbf24; background: rgba(251,191,36,0.1); }
+  .theme-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: all .2s;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .main { max-width: 900px; margin: 0 auto; padding: 20px 16px; }
+
+  .input-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text2); }
+  textarea {
+    width: 100%;
+    min-height: 100px;
+    background: var(--bg2);
+    color: var(--text);
+    border: none;
+    outline: none;
+    resize: vertical;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  textarea::placeholder { color: var(--text3); }
+
+  .jwt-visual {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    background: var(--bg2);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+  }
+  .jwt-part {
+    flex: 1;
+    min-width: 120px;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    word-break: break-all;
+  }
+  .jwt-header-part { background: var(--header-bg); color: var(--header-text); }
+  .jwt-payload-part { background: var(--payload-bg); color: var(--payload-text); }
+  .jwt-sig-part { background: var(--sig-bg); color: var(--sig-text); }
+  .jwt-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    opacity: .7;
+    margin-bottom: 4px;
+  }
+  .jwt-dot {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    font-size: 18px;
+    color: var(--text3);
+    font-weight: 700;
+    background: var(--bg3);
+  }
+
+  .status-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .status-banner.success { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success-text); }
+  .status-banner.warning { background: var(--warning-bg); border: 1px solid var(--warning-border); color: var(--warning-text); }
+  .status-banner.error { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); }
+  .status-banner.info { background: var(--info-bg); border: 1px solid var(--info-border); color: var(--info-text); }
+  .status-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .status-content strong { display: block; margin-bottom: 2px; font-weight: 700; }
+  .status-content span { opacity: .85; }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 640px) { .result-grid { grid-template-columns: 1fr; } }
+
+  .result-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .result-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .result-title {
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tag {
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .tag-header { background: var(--header-bg); color: var(--header-text); }
+  .tag-payload { background: var(--payload-bg); color: var(--payload-text); }
+  .json-block {
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    overflow-x: auto;
+    max-height: 300px;
+    background: var(--bg2);
+  }
+  .json-key { color: var(--json-key); }
+  .json-str { color: var(--json-str); }
+  .json-num { color: var(--json-num); }
+  .json-bool { color: var(--json-bool); }
+  .json-null { color: var(--json-null); }
+
+  .claims-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .claims-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .claims-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text2);
+    border-bottom: 2px solid var(--border);
+    background: var(--bg3);
+  }
+  .claims-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    word-break: break-word;
+  }
+  .claims-table tr:last-child td { border-bottom: none; }
+  .claims-table .claim-key {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .claims-table .claim-name { color: var(--text2); font-size: 12px; }
+  .claims-table .claim-val { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 12px; }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg3);
+    color: var(--text);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--text);
+    box-shadow: var(--shadow);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all .3s;
+    z-index: 9999;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+</style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-inner">
-            <a href="../" class="logo"><span>🛠️</span><span>全能工具箱</span></a>
-            <div style="display:flex;gap:8px">
-                <button class="icon-btn" id="themeBtn" title="切换主题"><span id="themeIcon">🌙</span></button>
-            </div>
-        </div>
-    </header>
-    <main class="main">
-        <div class="breadcrumb">
-            <a href="../">首页</a><span>›</span><span>开发工具</span><span>›</span><span>JWT解码器</span>
-        </div>
-        <div class="tool-header">
-            <h1 class="tool-title">🔑 JWT 解码与验证器</h1>
-            <button class="tool-fav-btn" id="favBtn" data-tool-id="dev-jwt">☆ 收藏</button>
-        </div>
-        <p class="tool-desc">纯前端实时解析 JWT 的 Header 和 Payload，自动检测过期时间，所有数据不离开浏览器。</p>
-        <div class="input-card">
-            <div class="input-label">🔐 粘贴 JWT Token（格式：xxxxx.yyyyy.zzzzz）</div>
-            <textarea class="jwt-input" id="jwtInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"></textarea>
-            <div class="btn-row">
-                <button class="btn btn-primary" onclick="decode()">⚡ 立即解析</button>
-                <button class="btn btn-ghost" onclick="loadDemo()">📋 加载示例</button>
-                <button class="btn btn-ghost" onclick="clearAll()">🗑️ 清空</button>
-            </div>
-        </div>
-        <div id="resultArea" style="display:none">
-            <div id="jwtVisual" class="jwt-visual"></div>
-            <div id="statusBanner"></div>
-            <div class="result-grid">
-                <div class="result-card">
-                    <div class="result-card-head">
-                        <div class="result-card-title">Header <span class="tag tag-header">头部</span></div>
-                        <button class="copy-btn" onclick="copyPart('headerJson')">复制</button>
-                    </div>
-                    <pre class="json-block" id="headerJson"></pre>
-                </div>
-                <div class="result-card">
-                    <div class="result-card-head">
-                        <div class="result-card-title">Payload <span class="tag tag-payload">载荷</span></div>
-                        <button class="copy-btn" onclick="copyPart('payloadJson')">复制</button>
-                    </div>
-                    <pre class="json-block" id="payloadJson"></pre>
-                </div>
-            </div>
-            <div class="result-card" style="margin-bottom:20px">
-                <div class="result-card-head">
-                    <div class="result-card-title">📋 标准字段解读</div>
-                </div>
-                <div style="overflow-x:auto">
-                    <table class="claims-table" id="claimsTable"></table>
-                </div>
-            </div>
-        </div>
-        <div id="emptyState" class="empty-state">
-            <div class="empty-icon">🔑</div>
-            <div style="font-size:16px;font-weight:600;margin-bottom:6px">粘贴 JWT Token 开始解析</div>
-            <div style="font-size:14px">支持 HS256 / RS256 / ES256 等所有算法的 Header/Payload 解码</div>
-        </div>
-    </main>
-    <footer class="footer">
-        <p>© 2025 <a href="../">全能工具箱</a> | 所有解析在浏览器本地完成，Token 不会上传</p>
-    </footer>
-    <div id="toast" class="toast"></div>
-    <script src="../js/tools-data.js"></script>
-    <script src="../js/toolbox-core.js"></script>
-    <script>
-        const DEMO_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-            'eyJzdWIiOiJ1c2VyXzEyMyIsIm5hbWUiOiLlvKDkuIDkuIkiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6OTk5OTk5OTk5OX0.' +
-            'signature_placeholder';
 
-        function b64UrlDecode(str) {
-            str = str.replace(/-/g,'+').replace(/_/g,'/');
-            while(str.length%4) str+='=';
-            try { return JSON.parse(decodeURIComponent(atob(str).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''))); }
-            catch { return null; }
-        }
+<header class="page-header">
+  <div class="header-inner">
+    <a href="../index.html" class="back-btn">← 返回首页</a>
+    <div class="header-title">
+      <h1>JWT 解码与验证器</h1>
+      <p>纯前端实时解析 · 过期时间检测 · 人类可读倒计时</p>
+    </div>
+    <button class="fav-btn" id="favBtn" title="收藏此工具">☆</button>
+    <button class="theme-btn" id="themeBtn" title="切换主题">☀️</button>
+  </div>
+</header>
 
-        function highlight(obj) {
-            return JSON.stringify(obj,null,2).replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, m => {
-                if(/^"/.test(m)) return /:$/.test(m) ? `<span class="json-key">${m}</span>` : `<span class="json-str">${m}</span>`;
-                if(/true|false/.test(m)) return `<span class="json-bool">${m}</span>`;
-                return `<span class="json-num">${m}</span>`;
-            });
-        }
+<div class="main">
+  <div class="input-card">
+    <div class="card-header">
+      <span class="card-title">粘贴 JWT Token</span>
+    </div>
+    <textarea id="jwtInput" placeholder="粘贴 JWT 字符串（格式：Header.Payload.Signature）…" spellcheck="false"></textarea>
+    <div class="btn-row" style="padding:0 16px 14px">
+      <button class="btn" id="clearBtn">清空</button>
+      <button class="btn" id="pasteBtn">粘贴</button>
+    </div>
+  </div>
 
-        function fmtTs(ts) { return new Date(ts*1000).toLocaleString('zh-CN'); }
+  <div class="jwt-visual" id="jwtVisual" style="display:none">
+    <div class="jwt-part jwt-header-part">
+      <div class="jwt-label">Header</div>
+      <div id="jwtHeaderRaw"></div>
+    </div>
+    <div class="jwt-dot">.</div>
+    <div class="jwt-part jwt-payload-part">
+      <div class="jwt-label">Payload</div>
+      <div id="jwtPayloadRaw"></div>
+    </div>
+    <div class="jwt-dot">.</div>
+    <div class="jwt-part jwt-sig-part">
+      <div class="jwt-label">Signature</div>
+      <div id="jwtSigRaw"></div>
+    </div>
+  </div>
 
-        function timeFromNow(ts) {
-            const diff = ts*1000 - Date.now(), abs = Math.abs(diff), past = diff < 0;
-            if(abs<60000) return past?`${Math.round(abs/1000)}秒前过期`:`${Math.round(abs/1000)}秒后过期`;
-            if(abs<3600000) return past?`${Math.round(abs/60000)}分钟前过期`:`${Math.round(abs/60000)}分钟后过期`;
-            if(abs<86400000) return past?`${Math.round(abs/3600000)}小时前过期`:`${Math.round(abs/3600000)}小时后过期`;
-            return past?`${Math.round(abs/86400000)}天前过期`:`${Math.round(abs/86400000)}天后过期`;
-        }
+  <div id="statusBanner"></div>
 
-        function decode() {
-            const raw = document.getElementById('jwtInput').value.trim();
-            if(!raw) { toast('请输入 JWT Token',''); return; }
-            const parts = raw.split('.');
-            if(parts.length!==3) { toast('格式错误：JWT 应包含三个由 . 分隔的部分','error'); return; }
-            const header = b64UrlDecode(parts[0]);
-            const payload = b64UrlDecode(parts[1]);
-            if(!header||!payload) { toast('解码失败：Base64Url 格式不正确','error'); return; }
-            document.getElementById('emptyState').style.display='none';
-            document.getElementById('resultArea').style.display='';
-            document.getElementById('jwtVisual').innerHTML =
-                `<div class="jwt-part jwt-part-header">${esc(parts[0])}</div><div class="jwt-dot">.</div>` +
-                `<div class="jwt-part jwt-part-payload">${esc(parts[1])}</div><div class="jwt-dot">.</div>` +
-                `<div class="jwt-part jwt-part-sig">${esc(parts[2])}</div>`;
-            document.getElementById('headerJson').innerHTML = highlight(header);
-            document.getElementById('payloadJson').innerHTML = highlight(payload);
-            renderStatus(payload);
-            renderClaims(payload);
-        }
+  <div class="result-grid" id="resultGrid" style="display:none">
+    <div class="result-card">
+      <div class="result-head">
+        <span class="result-title"><span class="tag tag-header">Header</span> 头部信息</span>
+      </div>
+      <div class="json-block" id="headerJson"></div>
+    </div>
+    <div class="result-card">
+      <div class="result-head">
+        <span class="result-title"><span class="tag tag-payload">Payload</span> 数据载荷</span>
+      </div>
+      <div class="json-block" id="payloadJson"></div>
+    </div>
+  </div>
 
-        function renderStatus(p) {
-            const el = document.getElementById('statusBanner');
-            const now = Math.floor(Date.now()/1000);
-            if(p.exp) {
-                const diff = p.exp - now;
-                if(diff<0) { el.className='status-banner error'; el.innerHTML=`<span class="status-icon">❌</span><div class="status-content"><strong>Token 已过期</strong>${timeFromNow(p.exp)}（${fmtTs(p.exp)}）</div>`; }
-                else if(diff<300) { el.className='status-banner warning'; el.innerHTML=`<span class="status-icon">⚠️</span><div class="status-content"><strong>Token 即将过期</strong>将于 ${timeFromNow(p.exp)}（${fmtTs(p.exp)}）</div>`; }
-                else { el.className='status-banner success'; el.innerHTML=`<span class="status-icon">✅</span><div class="status-content"><strong>Token 有效</strong>将于 ${timeFromNow(p.exp)}（${fmtTs(p.exp)}）过期</div>`; }
-            } else {
-                el.className='status-banner info';
-                el.innerHTML=`<span class="status-icon">ℹ️</span><div class="status-content"><strong>无过期时间</strong>该 Token 未设置 exp 字段，永不过期</div>`;
-            }
-        }
+  <div class="claims-card" id="claimsCard" style="display:none">
+    <table class="claims-table">
+      <thead>
+        <tr>
+          <th>字段</th>
+          <th>含义</th>
+          <th>值</th>
+        </tr>
+      </thead>
+      <tbody id="claimsBody"></tbody>
+    </table>
+  </div>
+</div>
 
-        const CLAIM_NAMES = {iss:{n:'签发者',ts:false},sub:{n:'主题/用户ID',ts:false},aud:{n:'受众',ts:false},exp:{n:'过期时间',ts:true},nbf:{n:'生效时间',ts:true},iat:{n:'签发时间',ts:true},jti:{n:'JWT ID',ts:false},name:{n:'姓名',ts:false},email:{n:'邮箱',ts:false},role:{n:'角色',ts:false},scope:{n:'权限范围',ts:false}};
+<div class="toast" id="toast"></div>
 
-        function renderClaims(p) {
-            const rows = Object.entries(p).map(([k,v])=>{
-                const info = CLAIM_NAMES[k];
-                const label = info ? `${info.n} <span style="color:var(--text3);font-size:11px">(${k})</span>` : k;
-                let val = info&&info.ts&&typeof v==='number'
-                    ? `<span class="claim-val">${fmtTs(v)}</span> <span style="font-size:11px;color:var(--text3)">${v}</span>`
-                    : `<span class="claim-val">${esc(typeof v==='object'?JSON.stringify(v):String(v))}</span>`;
-                return `<tr><td style="font-size:12px;color:var(--text2);white-space:nowrap">${label}</td><td>${val}</td></tr>`;
-            }).join('');
-            document.getElementById('claimsTable').innerHTML=`<thead><tr><th>字段</th><th>值</th></tr></thead><tbody>${rows}</tbody>`;
-        }
+<script>
+(function() {
+  'use strict';
 
-        function copyPart(id) {
-            navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>toast('已复制','success')).catch(()=>toast('复制失败','error'));
-        }
+  const savedTheme = localStorage.getItem('toolbox_theme') || 'dark';
+  document.documentElement.dataset.theme = savedTheme;
+  const themeBtn = document.getElementById('themeBtn');
+  themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+  themeBtn.addEventListener('click', () => {
+    const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = t;
+    localStorage.setItem('toolbox_theme', t);
+    themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
+  });
 
-        function loadDemo() { document.getElementById('jwtInput').value=DEMO_JWT; decode(); }
-        function clearAll() { document.getElementById('jwtInput').value=''; document.getElementById('resultArea').style.display='none'; document.getElementById('emptyState').style.display=''; }
-        function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-        function toast(msg,type) { const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show'+(type?' '+type:''); clearTimeout(el._t); el._t=setTimeout(()=>el.className='toast',2500); }
+  const FAV_KEY = 'toolbox_favorites_v2';
+  const TOOL_ID = 'dev-jwt';
+  function getFavs() { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch { return []; } }
+  function setFavs(arr) { localStorage.setItem(FAV_KEY, JSON.stringify(arr)); }
+  const favBtn = document.getElementById('favBtn');
+  const favs = getFavs();
+  if (favs.includes(TOOL_ID)) { favBtn.classList.add('active'); favBtn.textContent = '★'; }
+  favBtn.addEventListener('click', () => {
+    const arr = getFavs();
+    if (arr.includes(TOOL_ID)) {
+      setFavs(arr.filter(x => x !== TOOL_ID));
+      favBtn.classList.remove('active');
+      favBtn.textContent = '☆';
+    } else {
+      setFavs([TOOL_ID, ...arr.filter(x => x !== TOOL_ID)]);
+      favBtn.classList.add('active');
+      favBtn.textContent = '★';
+    }
+  });
 
-        document.getElementById('jwtInput').addEventListener('input',()=>{ if(document.getElementById('jwtInput').value.trim().split('.').length===3) decode(); });
+  let timer = null;
 
-        const themeBtn=document.getElementById('themeBtn'), themeIcon=document.getElementById('themeIcon');
-        function updateThemeIcon(){ themeIcon.textContent=document.documentElement.classList.contains('dark')?'☀️':'🌙'; }
-        updateThemeIcon();
-        themeBtn.addEventListener('click',()=>{ const dark=document.documentElement.classList.toggle('dark'); localStorage.setItem('theme',dark?'dark':'light'); updateThemeIcon(); });
-    </script>
+  function b64UrlDecode(str) {
+    try {
+      str = str.replace(/-/g, '+').replace(/_/g, '/');
+      while (str.length % 4) str += '=';
+      const decoded = atob(str);
+      const utf8 = decodeURIComponent(decoded.split('').map(c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      ).join(''));
+      return JSON.parse(utf8);
+    } catch { return null; }
+  }
+
+  function escHtml(s) {
+    if (typeof s !== 'string') s = JSON.stringify(s);
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function syntaxHighlight(obj) {
+    const json = JSON.stringify(obj, null, 2);
+    return json.replace(/(".*?")\s*:/g, '<span class="json-key">$1</span>:')
+               .replace(/:\s*(".*?")/g, ': <span class="json-str">$1</span>')
+               .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="json-num">$1</span>')
+               .replace(/:\s*(true|false)/g, ': <span class="json-bool">$1</span>')
+               .replace(/:\s*(null)/g, ': <span class="json-null">$1</span>');
+  }
+
+  function fmtTs(ts) {
+    if (!ts) return '';
+    const d = new Date(ts * 1000);
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0') + ' ' +
+      String(d.getHours()).padStart(2, '0') + ':' +
+      String(d.getMinutes()).padStart(2, '0') + ':' +
+      String(d.getSeconds()).padStart(2, '0');
+  }
+
+  function timeFromNow(ts) {
+    const diff = ts - Math.floor(Date.now() / 1000);
+    if (diff <= 0) return '已过期';
+    const days = Math.floor(diff / 86400);
+    const hrs = Math.floor((diff % 86400) / 3600);
+    const mins = Math.floor((diff % 3600) / 60);
+    const secs = diff % 60;
+    let s = '';
+    if (days > 0) s += days + ' 天 ';
+    if (hrs > 0) s += hrs + ' 小时 ';
+    if (mins > 0) s += mins + ' 分钟 ';
+    if (!days && !hrs && !mins) s += secs + ' 秒';
+    return s.trim() + '后过期';
+  }
+
+  const CLAIMS = {
+    iss: { n: '签发者 (Issuer)', ts: false },
+    sub: { n: '主体/用户ID (Subject)', ts: false },
+    aud: { n: '受众 (Audience)', ts: false },
+    exp: { n: '过期时间 (Expiration)', ts: true },
+    nbf: { n: '生效时间 (Not Before)', ts: true },
+    iat: { n: '签发时间 (Issued At)', ts: true },
+    jti: { n: 'JWT ID', ts: false },
+    name: { n: '姓名', ts: false },
+    email: { n: '邮箱', ts: false },
+    role: { n: '角色', ts: false },
+    scope: { n: '权限范围', ts: false },
+    preferred_username: { n: '用户名', ts: false },
+    given_name: { n: '名字', ts: false },
+    family_name: { n: '姓氏', ts: false },
+    picture: { n: '头像 URL', ts: false }
+  };
+
+  function parse() {
+    const input = document.getElementById('jwtInput').value.trim();
+    const visual = document.getElementById('jwtVisual');
+    const status = document.getElementById('statusBanner');
+    const grid = document.getElementById('resultGrid');
+    const claimsCard = document.getElementById('claimsCard');
+
+    if (!input) {
+      visual.style.display = 'none';
+      status.innerHTML = '';
+      grid.style.display = 'none';
+      claimsCard.style.display = 'none';
+      return;
+    }
+
+    const parts = input.split('.');
+    if (parts.length !== 3) {
+      visual.style.display = 'none';
+      status.innerHTML = '<div class="status-banner error"><span class="status-icon">❌</span><div class="status-content"><strong>格式错误</strong>JWT 必须包含三部分（Header.Payload.Signature），用点号分隔</div></div>';
+      grid.style.display = 'none';
+      claimsCard.style.display = 'none';
+      return;
+    }
+
+    const header = b64UrlDecode(parts[0]);
+    const payload = b64UrlDecode(parts[1]);
+
+    if (!header || !payload) {
+      visual.style.display = 'none';
+      status.innerHTML = '<div class="status-banner error"><span class="status-icon">❌</span><div class="status-content"><strong>解码失败</strong>Base64Url 解码错误，请确认 JWT 格式正确</div></div>';
+      grid.style.display = 'none';
+      claimsCard.style.display = 'none';
+      return;
+    }
+
+    visual.style.display = 'flex';
+    document.getElementById('jwtHeaderRaw').textContent = parts[0];
+    document.getElementById('jwtPayloadRaw').textContent = parts[1];
+    document.getElementById('jwtSigRaw').textContent = parts[2];
+
+    grid.style.display = 'grid';
+    document.getElementById('headerJson').innerHTML = syntaxHighlight(header);
+    document.getElementById('payloadJson').innerHTML = syntaxHighlight(payload);
+
+    if (payload.exp) {
+      const now = Math.floor(Date.now() / 1000);
+      const diff = payload.exp - now;
+      if (diff <= 0) {
+        status.innerHTML = '<div class="status-banner error"><span class="status-icon">⏰</span><div class="status-content"><strong>Token 已过期</strong>于 ' + fmtTs(payload.exp) + ' 过期，已超时 ' + Math.abs(Math.floor(diff / 60)) + ' 分钟</div></div>';
+      } else if (diff < 300) {
+        status.innerHTML = '<div class="status-banner warning"><span class="status-icon">⚠️</span><div class="status-content"><strong>即将过期</strong>剩余 ' + timeFromNow(payload.exp) + '（' + fmtTs(payload.exp) + '）</div></div>';
+      } else {
+        status.innerHTML = '<div class="status-banner success"><span class="status-icon">✅</span><div class="status-content"><strong>Token 有效</strong>将于 ' + fmtTs(payload.exp) + ' 过期，剩余 ' + timeFromNow(payload.exp) + '</div></div>';
+      }
+    } else {
+      status.innerHTML = '<div class="status-banner info"><span class="status-icon">ℹ️</span><div class="status-content"><strong>无过期时间</strong>该 Token 未设置 exp 字段，永不过期</div></div>';
+    }
+
+    claimsCard.style.display = '';
+    const body = document.getElementById('claimsBody');
+    body.innerHTML = '';
+
+    const sorted = Object.keys(payload).sort((a, b) => {
+      const aStd = CLAIMS[a] ? 0 : 1;
+      const bStd = CLAIMS[b] ? 0 : 1;
+      return aStd - bStd;
+    });
+
+    sorted.forEach(key => {
+      const val = payload[key];
+      const meta = CLAIMS[key] || { n: key, ts: false };
+      let displayVal = val;
+      if (meta.ts && typeof val === 'number') {
+        displayVal = fmtTs(val) + ' (时间戳: ' + val + ')';
+      } else if (typeof val === 'object') {
+        displayVal = JSON.stringify(val);
+      } else {
+        displayVal = String(val);
+      }
+      body.innerHTML += '<tr><td class="claim-key">' + escHtml(key) + '</td><td class="claim-name">' + escHtml(meta.n) + '</td><td class="claim-val">' + escHtml(displayVal) + '</td></tr>';
+    });
+  }
+
+  document.getElementById('jwtInput').addEventListener('input', () => {
+    clearTimeout(timer);
+    timer = setTimeout(parse, 300);
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    document.getElementById('jwtInput').value = '';
+    parse();
+  });
+
+  document.getElementById('pasteBtn').addEventListener('click', async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      document.getElementById('jwtInput').value = text;
+      parse();
+    } catch { toast('无法读取剪贴板'); }
+  });
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+})();
+</script>
 </body>
 </html>

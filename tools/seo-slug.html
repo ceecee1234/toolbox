@@ -1,235 +1,633 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Slug生成器 - 中英文标题转SEO友好URL | 全能工具箱</title>
-    <meta name="description" content="免费在线URL Slug转换工具，输入中文或带符号的英文标题，自动转为SEO友好的URL Slug，支持拼音转换、自定义分隔符。">
-    <script>if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');</script>
-    <style>
-        :root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--primary:#4F46E5;--primary-light:#EEF2FF;--success:#10B981;--warning:#F59E0B;--border:#e2e8f0;--radius:12px}
-        .dark{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#334155;--primary-light:rgba(79,70,229,.2)}
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
-        a{color:inherit;text-decoration:none}
-        .header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border)}
-        .header-inner{max-width:780px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
-        .logo{font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
-        .icon-btn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;background:none;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:.2s}
-        .icon-btn:hover{background:var(--bg2)}
-        .dark .icon-btn{color:var(--text)}
-        .main{max-width:780px;margin:0 auto;padding:24px 20px 60px}
-        .breadcrumb{display:flex;gap:8px;font-size:13px;color:var(--text3);margin-bottom:20px;flex-wrap:wrap}
-        .breadcrumb a{color:var(--primary)}
-        .tool-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px}
-        .tool-title{font-size:26px;font-weight:700;display:flex;align-items:center;gap:10px}
-        .tool-desc{color:var(--text2);margin-bottom:24px;font-size:15px}
-        .tool-fav-btn{padding:8px 18px;font-size:14px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
-        .tool-fav-btn:hover,.tool-fav-btn.active{color:var(--warning);border-color:var(--warning)}
-        .examples{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
-        .example-chip{padding:6px 14px;font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:50px;cursor:pointer;transition:.2s;color:var(--text2)}
-        .example-chip:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
-        .input-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
-        .input-label{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px}
-        .main-input{width:100%;padding:14px 16px;font-size:16px;background:var(--bg2);border:2px solid var(--border);border-radius:10px;color:var(--text);outline:none;transition:.2s}
-        .main-input:focus{border-color:var(--primary);background:var(--card);box-shadow:0 0 0 4px var(--primary-light)}
-        .main-input::placeholder{color:var(--text3)}
-        .options-row{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
-        .seg-btns{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
-        .seg-btn{padding:7px 14px;font-size:13px;font-weight:500;background:var(--card);border:none;cursor:pointer;transition:.15s;color:var(--text2)}
-        .seg-btn.active{background:var(--primary);color:#fff}
-        .seg-btn:not(.active):hover{background:var(--bg2)}
-        .check-opt{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2);transition:.2s;user-select:none}
-        .check-opt.active{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
-        .check-opt input{accent-color:var(--primary)}
-        .output-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px;transition:.2s}
-        .output-card.has-val{border-color:var(--primary)}
-        .output-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px}
-        .output-label{font-size:13px;font-weight:600;color:var(--text2)}
-        .slug-text{font-size:18px;font-weight:700;font-family:'SF Mono','Fira Code',monospace;word-break:break-all;color:var(--text);min-height:28px}
-        .slug-empty{color:var(--text3);font-size:14px;font-weight:400;font-family:inherit}
-        .copy-btn{padding:7px 16px;font-size:13px;font-weight:600;background:var(--success);color:#fff;border:none;border-radius:50px;cursor:pointer;transition:.2s}
-        .copy-btn:hover{opacity:.9}
-        .url-preview{background:var(--bg2);border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:13px;display:none}
-        .url-base{color:var(--text3)}
-        .url-slug{color:var(--primary);font-weight:700;font-family:'SF Mono','Fira Code',monospace}
-        .section-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:12px}
-        .history-list{display:flex;flex-direction:column;gap:8px}
-        .history-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;font-size:13px}
-        .history-origin{flex:1;color:var(--text2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .history-slug{flex:1;font-family:'SF Mono','Fira Code',monospace;color:var(--primary);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .history-copy{padding:4px 12px;font-size:12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:.2s;color:var(--text2);white-space:nowrap}
-        .history-copy:hover{border-color:var(--primary);color:var(--primary)}
-        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;background:var(--text);color:#fff;border-radius:50px;font-size:14px;opacity:0;transition:.3s;z-index:999;pointer-events:none}
-        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-        .toast.success{background:var(--success)}
-        .footer{margin-top:60px;padding:24px 20px;border-top:1px solid var(--border);text-align:center;font-size:13px;color:var(--text3)}
-        .footer a{color:var(--primary)}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URL Slug 转换器 - Dev Toolbox</title>
+<meta name="description" content="在线 URL Slug 转换工具，输入中文或带符号的标题，自动转为 SEO 友好的 URL Slug，支持拼音转换。">
+<link rel="icon" href="../favicon.ico">
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #1a1d27;
+    --bg3: #22263a;
+    --border: #2e3347;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --success: #22c55e;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --slug-color: #60a5fa;
+  }
+  [data-theme="light"] {
+    --bg: #f8fafc;
+    --bg2: #ffffff;
+    --bg3: #f1f5f9;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text2: #475569;
+    --text3: #94a3b8;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --slug-color: #2563eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+  .page-header {
+    position: relative;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    padding: 28px 24px 20px;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 20% 50%, rgba(59,130,246,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 80% 30%, rgba(99,102,241,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+  }
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { color: var(--text); border-color: var(--accent); }
+  .header-title { flex: 1; }
+  .header-title h1 { font-size: 20px; font-weight: 700; line-height: 1.3; }
+  .header-title p { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .fav-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    transition: all .2s;
+  }
+  .fav-btn:hover { border-color: var(--accent); }
+  .fav-btn.active { color: #fbbf24; border-color: #fbbf24; background: rgba(251,191,36,0.1); }
+  .theme-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: all .2s;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .main { max-width: 780px; margin: 0 auto; padding: 20px 16px; }
+
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .example-chip {
+    padding: 6px 14px;
+    font-size: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    color: var(--text2);
+    transition: all .2s;
+  }
+  .example-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .input-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text2); }
+  input.main-input {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    background: var(--bg2);
+    border: none;
+    outline: none;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  input.main-input::placeholder { color: var(--text3); }
+
+  .options-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .seg-btns {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .seg-btn {
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--bg2);
+    border: none;
+    cursor: pointer;
+    color: var(--text2);
+    transition: all .15s;
+  }
+  .seg-btn.active {
+    background: var(--accent);
+    color: #fff;
+  }
+  .seg-btn:not(.active):hover { background: var(--bg3); }
+  .check-opt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text2);
+    transition: all .2s;
+    user-select: none;
+  }
+  .check-opt.active { border-color: var(--accent); color: var(--accent); }
+  .check-opt input { accent-color: var(--accent); }
+
+  .output-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .output-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+    gap: 10px;
+  }
+  .output-label { font-size: 13px; font-weight: 600; color: var(--text2); }
+  .copy-btn {
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--success);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .copy-btn:hover { opacity: .9; transform: translateY(-1px); }
+  .slug-display {
+    padding: 16px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--slug-color);
+    word-break: break-all;
+    line-height: 1.4;
+    min-height: 56px;
+  }
+  .slug-empty { color: var(--text3); font-size: 14px; font-weight: 400; font-family: inherit; }
+
+  .url-preview {
+    background: var(--bg3);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+  }
+  .url-base { color: var(--text3); }
+  .url-slug { color: var(--slug-color); font-weight: 700; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+
+  .history-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .history-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .history-title { font-size: 13px; font-weight: 600; color: var(--text2); }
+  .clear-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .clear-btn:hover { border-color: var(--error); color: var(--error); }
+  .history-list { display: flex; flex-direction: column; }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    transition: background .2s;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-item:hover { background: var(--bg3); }
+  .history-origin { flex: 1; color: var(--text2); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .history-slug { flex: 1; font-family: 'JetBrains Mono', 'Fira Code', monospace; color: var(--slug-color); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .history-copy-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text2);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .2s;
+  }
+  .history-copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .history-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--text3);
+    font-size: 14px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--text);
+    box-shadow: var(--shadow);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all .3s;
+    z-index: 9999;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+</style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-inner">
-            <a href="../" class="logo"><span>🛠️</span><span>全能工具箱</span></a>
-            <div style="display:flex;gap:8px">
-                <button class="icon-btn" id="themeBtn" title="切换主题"><span id="themeIcon">🌙</span></button>
-            </div>
-        </div>
-    </header>
-    <main class="main">
-        <div class="breadcrumb">
-            <a href="../">首页</a><span>›</span><span>站长工具</span><span>›</span><span>URL Slug转换</span>
-        </div>
-        <div class="tool-header">
-            <h1 class="tool-title">🔗 URL Slug 转换器</h1>
-            <button class="tool-fav-btn" id="favBtn" data-tool-id="seo-slug">☆ 收藏</button>
-        </div>
-        <p class="tool-desc">输入中文或带符号的标题，自动转换为 SEO 友好的 URL Slug，中文转拼音，空格转连字符，一键复制。</p>
-        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">💡 点击示例快速体验</div>
-        <div class="examples">
-            <div class="example-chip" onclick="useExample(this)">10 个好用的前端 Tool！</div>
-            <div class="example-chip" onclick="useExample(this)">如何在 2024 年学好 Vue.js</div>
-            <div class="example-chip" onclick="useExample(this)">Python爬虫入门：从零到实战</div>
-            <div class="example-chip" onclick="useExample(this)">Hello World! This is a Test.</div>
-            <div class="example-chip" onclick="useExample(this)">MacBook Pro M3 开箱评测</div>
-            <div class="example-chip" onclick="useExample(this)">SEO 常见误区 &amp; 解决方案</div>
-        </div>
-        <div class="input-card">
-            <div class="input-label">✏️ 输入标题或任意文字</div>
-            <input class="main-input" id="mainInput" type="text" placeholder="例如：10 个好用的前端 Tool！" autocomplete="off" oninput="onInput()">
-            <div class="options-row">
-                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)">
-                    <span>分隔符</span>
-                    <div class="seg-btns">
-                        <button class="seg-btn active" id="sep-hyphen" onclick="setSep('-')">-（连字符）</button>
-                        <button class="seg-btn" id="sep-under" onclick="setSep('_')">_（下划线）</button>
-                    </div>
-                </div>
-                <label class="check-opt active" id="ci-lower">
-                    <input type="checkbox" id="forceLower" checked onchange="onInput();updateCheckOpt('ci-lower','forceLower')"> 全部小写
-                </label>
-                <label class="check-opt active" id="ci-nums">
-                    <input type="checkbox" id="keepNums" checked onchange="onInput();updateCheckOpt('ci-nums','keepNums')"> 保留数字
-                </label>
-            </div>
-        </div>
-        <div class="output-card" id="outputCard">
-            <div class="output-top">
-                <div class="output-label">生成的 Slug</div>
-                <button class="copy-btn" onclick="copySlug()">📋 复制</button>
-            </div>
-            <div class="slug-text" id="slugOutput"><span class="slug-empty">输入标题后自动生成…</span></div>
-        </div>
-        <div class="url-preview" id="urlPreview">
-            <span style="font-size:12px;font-weight:600;color:var(--text3);display:block;margin-bottom:4px">URL 预览</span>
-            <span class="url-base">https://example.com/blog/</span><span class="url-slug" id="urlSlugPart"></span>
-        </div>
-        <div id="historySection" style="display:none;margin-top:24px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-                <div class="section-title" style="margin:0">🕐 最近转换记录</div>
-                <button style="padding:4px 12px;font-size:12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text2)" onclick="clearHistory()">清空</button>
-            </div>
-            <div class="history-list" id="historyList"></div>
-        </div>
-    </main>
-    <footer class="footer">
-        <p>© 2025 <a href="../">全能工具箱</a></p>
-    </footer>
-    <div id="toast" class="toast"></div>
-    <script src="../js/tools-data.js"></script>
-    <script src="../js/toolbox-core.js"></script>
-    <script>
-        // 常用汉字拼音字典
-        const PY = {"啊":"a","阿":"a","爱":"ai","安":"an","昂":"ang","奥":"ao","八":"ba","把":"ba","爸":"ba","白":"bai","百":"bai","摆":"bai","败":"bai","拜":"bai","班":"ban","板":"ban","半":"ban","办":"ban","帮":"bang","宝":"bao","报":"bao","暴":"bao","杯":"bei","北":"bei","被":"bei","本":"ben","比":"bi","笔":"bi","必":"bi","避":"bi","边":"bian","变":"bian","标":"biao","表":"biao","别":"bie","冰":"bing","病":"bing","并":"bing","波":"bo","博":"bo","不":"bu","步":"bu","部":"bu","擦":"ca","才":"cai","彩":"cai","菜":"cai","参":"can","残":"can","藏":"cang","操":"cao","草":"cao","层":"ceng","差":"cha","查":"cha","拆":"chai","产":"chan","唱":"chang","长":"chang","超":"chao","炒":"chao","车":"che","彻":"che","称":"cheng","城":"cheng","成":"cheng","程":"cheng","诚":"cheng","承":"cheng","吃":"chi","持":"chi","冲":"chong","抽":"chou","愁":"chou","出":"chu","除":"chu","楚":"chu","处":"chu","穿":"chuan","传":"chuan","船":"chuan","床":"chuang","春":"chun","此":"ci","词":"ci","刺":"ci","从":"cong","粗":"cu","存":"cun","错":"cuo","打":"da","大":"da","带":"dai","代":"dai","贷":"dai","单":"dan","但":"dan","淡":"dan","当":"dang","刀":"dao","道":"dao","到":"dao","导":"dao","的":"de","得":"de","等":"deng","低":"di","敌":"di","地":"di","第":"di","电":"dian","点":"dian","典":"dian","店":"dian","丁":"ding","定":"ding","东":"dong","动":"dong","洞":"dong","都":"dou","毒":"du","读":"du","度":"du","端":"duan","段":"duan","短":"duan","对":"dui","队":"dui","多":"duo","惰":"duo","而":"er","发":"fa","反":"fan","范":"fan","饭":"fan","方":"fang","放":"fang","飞":"fei","非":"fei","费":"fei","分":"fen","风":"feng","封":"feng","服":"fu","父":"fu","付":"fu","复":"fu","该":"gai","改":"gai","感":"gan","干":"gan","刚":"gang","高":"gao","告":"gao","歌":"ge","格":"ge","革":"ge","各":"ge","工":"gong","功":"gong","供":"gong","共":"gong","购":"gou","够":"gou","古":"gu","故":"gu","固":"gu","顾":"gu","关":"guan","管":"guan","光":"guang","广":"guang","归":"gui","规":"gui","贵":"gui","国":"guo","果":"guo","过":"guo","哈":"ha","孩":"hai","海":"hai","汉":"han","好":"hao","号":"hao","和":"he","何":"he","黑":"hei","很":"hen","红":"hong","后":"hou","厚":"hou","虎":"hu","护":"hu","花":"hua","话":"hua","画":"hua","换":"huan","黄":"huang","回":"hui","会":"hui","慧":"hui","混":"hun","活":"huo","获":"huo","火":"huo","或":"huo","机":"ji","积":"ji","级":"ji","计":"ji","记":"ji","技":"ji","季":"ji","迹":"ji","集":"ji","几":"ji","己":"ji","加":"jia","家":"jia","价":"jia","假":"jia","坚":"jian","间":"jian","简":"jian","减":"jian","键":"jian","见":"jian","件":"jian","健":"jian","建":"jian","江":"jiang","将":"jiang","讲":"jiang","降":"jiang","交":"jiao","教":"jiao","叫":"jiao","节":"jie","结":"jie","解":"jie","姐":"jie","界":"jie","借":"jie","今":"jin","进":"jin","近":"jin","尽":"jin","紧":"jin","精":"jing","京":"jing","敬":"jing","竟":"jing","静":"jing","九":"jiu","久":"jiu","就":"jiu","旧":"jiu","居":"ju","局":"ju","拒":"ju","具":"ju","卷":"juan","决":"jue","开":"kai","看":"kan","考":"kao","科":"ke","克":"ke","可":"ke","课":"ke","客":"ke","空":"kong","口":"kou","苦":"ku","块":"kuai","宽":"kuan","来":"lai","览":"lan","老":"lao","乐":"le","类":"lei","力":"li","里":"li","理":"li","立":"li","例":"li","历":"li","利":"li","连":"lian","练":"lian","两":"liang","亮":"liang","量":"liang","列":"lie","林":"lin","临":"lin","令":"ling","流":"liu","六":"liu","路":"lu","乱":"luan","论":"lun","落":"luo","么":"me","没":"mei","每":"mei","美":"mei","门":"men","们":"men","面":"mian","名":"ming","明":"ming","命":"ming","目":"mu","哪":"na","那":"na","南":"nan","难":"nan","能":"neng","你":"ni","年":"nian","念":"nian","努":"nu","女":"nv","怕":"pa","判":"pan","跑":"pao","朋":"peng","品":"pin","平":"ping","其":"qi","起":"qi","前":"qian","强":"qiang","切":"qie","亲":"qin","清":"qing","情":"qing","请":"qing","求":"qiu","全":"quan","然":"ran","人":"ren","日":"ri","如":"ru","入":"ru","三":"san","上":"shang","少":"shao","深":"shen","什":"shen","生":"sheng","时":"shi","是":"shi","事":"shi","市":"shi","收":"shou","手":"shou","数":"shu","说":"shuo","思":"si","四":"si","他":"ta","她":"ta","太":"tai","特":"te","天":"tian","条":"tiao","听":"ting","同":"tong","图":"tu","推":"tui","外":"wai","完":"wan","万":"wan","为":"wei","文":"wen","我":"wo","物":"wu","西":"xi","下":"xia","先":"xian","现":"xian","想":"xiang","小":"xiao","新":"xin","信":"xin","行":"xing","学":"xue","也":"ye","一":"yi","已":"yi","以":"yi","意":"yi","因":"yin","应":"ying","用":"yong","有":"you","语":"yu","元":"yuan","月":"yue","运":"yun","在":"zai","再":"zai","增":"zeng","这":"zhe","真":"zhen","正":"zheng","知":"zhi","中":"zhong","重":"zhong","最":"zui","作":"zuo","做":"zuo"};
 
-        let sep = '-';
-        let history = [];
-        try { history = JSON.parse(localStorage.getItem('slug_hist_v1')||'[]'); } catch {}
+<header class="page-header">
+  <div class="header-inner">
+    <a href="../index.html" class="back-btn">← 返回首页</a>
+    <div class="header-title">
+      <h1>URL Slug 转换器</h1>
+      <p>中文标题自动转拼音 · 特殊符号清除 · SEO 友好格式</p>
+    </div>
+    <button class="fav-btn" id="favBtn" title="收藏此工具">☆</button>
+    <button class="theme-btn" id="themeBtn" title="切换主题">☀️</button>
+  </div>
+</header>
 
-        function updateCheckOpt(ciId, inputId) {
-            document.getElementById(ciId).classList.toggle('active', document.getElementById(inputId).checked);
+<div class="main">
+  <div class="examples">
+    <span style="font-size:12px;color:var(--text3);padding:6px 0">示例：</span>
+    <button class="example-chip" data-text="10 个好用的前端 Diff 工具！V2 升级版">10 个好用的前端 Diff 工具</button>
+    <button class="example-chip" data-text="如何用 JavaScript 实现排序算法？">JavaScript 排序算法</button>
+    <button class="example-chip" data-text="2024年度最佳开源项目推荐【必看】">2024开源项目推荐</button>
+  </div>
+
+  <div class="input-card">
+    <div class="card-header">
+      <span class="card-title">输入标题</span>
+    </div>
+    <input type="text" class="main-input" id="titleInput" placeholder="输入中文或英文标题，自动生成 URL Slug…" maxlength="200">
+    <div class="options-row">
+      <div class="seg-btns">
+        <button class="seg-btn active" data-sep="-">连字符 (-)</button>
+        <button class="seg-btn" data-sep="_">下划线 (_)</button>
+      </div>
+      <label class="check-opt active" id="lowerOpt"><input type="checkbox" checked id="forceLower"> 强制小写</label>
+      <label class="check-opt active" id="numOpt"><input type="checkbox" checked id="keepNums"> 保留数字</label>
+    </div>
+  </div>
+
+  <div class="output-card">
+    <div class="output-top">
+      <span class="output-label">生成的 Slug</span>
+      <button class="copy-btn" id="copyBtn">📋 复制</button>
+    </div>
+    <div class="slug-display" id="slugOutput"><span class="slug-empty">输入标题后自动生成…</span></div>
+  </div>
+
+  <div class="url-preview" id="urlPreview" style="display:none">
+    <span class="url-base">https://example.com/blog/</span><span class="url-slug" id="urlSlug"></span>
+  </div>
+
+  <div class="history-section">
+    <div class="history-head">
+      <span class="history-title">历史记录</span>
+      <button class="clear-btn" id="clearHistoryBtn">清空</button>
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  const savedTheme = localStorage.getItem('toolbox_theme') || 'dark';
+  document.documentElement.dataset.theme = savedTheme;
+  const themeBtn = document.getElementById('themeBtn');
+  themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+  themeBtn.addEventListener('click', () => {
+    const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = t;
+    localStorage.setItem('toolbox_theme', t);
+    themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
+  });
+
+  const FAV_KEY = 'toolbox_favorites_v2';
+  const TOOL_ID = 'seo-slug';
+  function getFavs() { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch { return []; } }
+  function setFavs(arr) { localStorage.setItem(FAV_KEY, JSON.stringify(arr)); }
+  const favBtn = document.getElementById('favBtn');
+  const favs = getFavs();
+  if (favs.includes(TOOL_ID)) { favBtn.classList.add('active'); favBtn.textContent = '★'; }
+  favBtn.addEventListener('click', () => {
+    const arr = getFavs();
+    if (arr.includes(TOOL_ID)) {
+      setFavs(arr.filter(x => x !== TOOL_ID));
+      favBtn.classList.remove('active');
+      favBtn.textContent = '☆';
+    } else {
+      setFavs([TOOL_ID, ...arr.filter(x => x !== TOOL_ID)]);
+      favBtn.classList.add('active');
+      favBtn.textContent = '★';
+    }
+  });
+
+  const PY = {
+    '的':'de','是':'shi','在':'zai','不':'bu','了':'le','有':'you','人':'ren','这':'zhe','我':'wo','他':'ta','她':'ta','它':'ta',
+    '们':'men','个':'ge','中':'zhong','来':'lai','上':'shang','大':'da','去':'wu','到':'dao','说':'shuo','时':'shi','要':'yao','为':'wei',
+    '子':'zi','会':'hui','对':'dui','着':'zhe','也':'ye','那':'na','得':'de','就':'jiu','与':'yu','能':'neng','很':'hen','自':'zi',
+    '后':'hou','看':'kan','多':'duo','过':'guo','天':'tian','前':'qian','所':'suo','最':'zui','地':'de','进':'jin','出':'chu','把':'ba',
+    '好':'hao','还':'hai','让':'rang','做':'zuo','没':'mei','下':'xia','第':'di','想':'xiang','从':'cong','两':'liang','小':'xiao','如':'ru',
+    '等':'deng','又':'you','当':'dang','问':'wen','只':'zhi','其':'qi','可':'ke','些':'xie','或':'huo','给':'gei','发':'fa','方':'fang',
+    '生':'sheng','成':'cheng','以':'yi','分':'fen','行':'xing','知':'zhi','道':'dao','长':'chang','名':'ming','三':'san','次':'ci','次':'ci',
+    '月':'yue','年':'nian','日':'ri','一':'yi','二':'er','三':'san','四':'si','五':'wu','六':'liu','七':'qi','八':'ba','九':'jiu','十':'shi',
+    '百':'bai','千':'qian','万':'wan','亿':'yi','半':'ban','双':'shuang','北':'bei','南':'nan','东':'dong','西':'xi','左':'zuo','右':'you',
+    '上':'shang','下':'xia','中':'zhong','内':'nei','外':'wai','里':'li','前':'qian','后':'hou','间':'jian','边':'bian','旁':'pang',
+    '新':'xin','旧':'jiu','老':'lao','少':'shao','大':'da','小':'xiao','高':'gao','低':'di','长':'chang','短':'duan','快':'kuai','慢':'man',
+    '早':'zao','晚':'wan','远':'yuan','近':'jin','深':'shen','浅':'qian','宽':'kuan','窄':'zhai','厚':'hou','薄':'bao','重':'zhong','轻':'qing',
+    '好':'hao','坏':'huai','对':'dui','错':'cuo','真':'zhen','假':'jia','美':'mei','丑':'chou','善':'shan','恶':'e','黑':'hei','白':'bai',
+    '红':'hong','黄':'huang','蓝':'lan','绿':'lv','青':'qing','紫':'zi','灰':'hui','金':'jin','银':'yin','铜':'tong','铁':'tie','钢':'gang',
+    '水':'shui','火':'huo','土':'tu','木':'mu','石':'shi','山':'shan','河':'he','海':'hai','湖':'hu','江':'jiang','溪':'xi','泉':'quan',
+    '花':'hua','草':'cao','树':'shu','林':'lin','森':'sen','鸟':'niao','鱼':'yu','虫':'chong','兽':'shou','马':'ma','牛':'niu','羊':'yang',
+    '猪':'zhu','狗':'gou','猫':'mao','鼠':'shu','虎':'hu','兔':'tu','龙':'long','蛇':'she','猴':'hou','鸡':'ji','鹅':'e','鸭':'ya',
+    '父':'fu','母':'mu','兄':'xiong','弟':'di','姐':'jie','妹':'mei','儿':'er','女':'nv','夫':'fu','妻':'qi','爷':'ye','奶':'nai',
+    '叔':'shu','姨':'yi','哥':'ge','嫂':'sao','家':'jia','房':'fang','门':'men','窗':'chuang','床':'chuang','桌':'zhuo','椅':'yi','灯':'deng',
+    '书':'shu','笔':'bi','纸':'zhi','画':'hua','学':'xue','校':'xiao','教':'jiao','师':'shi','生':'sheng','课':'ke','业':'ye','读':'du','写':'xie',
+    '字':'zi','词':'ci','句':'ju','文':'wen','章':'zhang','信':'xin','电':'dian','话':'hua','网':'wang','机':'ji','数':'shu','算':'suan',
+    '法':'fa','码':'ma','程':'cheng','序':'xu','软':'ruan','件':'jian','硬':'ying','盘':'pan','芯':'xin','屏':'ping','显':'xian','示':'shi',
+    '图':'tu','像':'xiang','音':'yin','乐':'le','影':'ying','戏':'xi','游':'you','玩':'wan','动':'dong','静':'jing','快':'kuai','慢':'man',
+    '工':'gong','作':'zuo','职':'zhi','业':'ye','司':'si','厂':'chang','店':'dian','铺':'pu','市':'shi','货':'huo','钱':'qian','价':'jia',
+    '买':'mai','卖':'mai','费':'fei','税':'shui','利':'li','息':'xi','投':'tou','融':'rong','股':'gu','券':'quan','保':'bao','险':'xian',
+    '医':'yi','院':'yuan','药':'yao','治':'zhi','病':'bing','痛':'tong','伤':'shang','健':'jian','康':'kang','养':'yang','护':'hu','理':'li',
+    '车':'che','船':'chuan','路':'lu','道':'dao','街':'jie','巷':'xiang','桥':'qiao','塔':'ta','楼':'lou','层':'ceng','梯':'ti','层':'ceng',
+    '爱':'ai','情':'qing','恨':'hen','恩':'en','仇':'chou','信':'xin','心':'xin','念':'nian','思':'si','想':'xiang','梦':'meng','愿':'yuan',
+    '喜':'xi','怒':'nu','哀':'ai','乐':'le','笑':'xiao','哭':'ku','声':'sheng','语':'yu','话':'hua','言':'yan','谈':'tan','讲':'jiang','说':'shuo',
+    '吃':'chi','喝':'he','睡':'shui','穿':'chuan','住':'zhu','行':'xing','坐':'zuo','走':'zou','跑':'pao','跳':'tiao','飞':'fei','爬':'pa',
+    '开':'kai','关':'guan','起':'qi','停':'ting','始':'shi','终':'zhong','完':'wan','续':'xu','断':'duan','连':'lian','接':'jie','送':'song',
+    '拿':'na','放':'fang','找':'zhao','看':'kan','听':'ting','闻':'wen','摸':'mo','试':'shi','用':'yong','换':'huan','加':'jia','减':'jian',
+    '乘':'cheng','除':'chu','比':'bi','较':'jiao','选':'xuan','择':'ze','判':'pan','定':'ding','分':'fen','析':'xi','研':'yan','究':'jiu',
+    '种':'zhong','类':'lei','型':'xing','式':'shi','样':'yang','物':'wu','品':'pin','件':'jian','体':'ti','个':'ge','位':'wei','次':'ci',
+    '回':'hui','遍':'bian','番':'fan','倍':'bei','半':'ban','全':'quan','总':'zong','共':'gong','单':'dan','复':'fu','同':'tong','异':'yi',
+    '主':'zhu','要':'yao','重':'zhong','次':'ci','附':'fu','属':'shu','独':'du','特':'te','普':'pu','通':'tong','常':'chang','般':'ban',
+    '最':'zui','更':'geng','越':'yue','较':'jiao','太':'tai','很':'hen','极':'ji','非':'fei','特':'te','别':'bie','必':'bi','须':'xu','应':'ying',
+    '该':'gai','得':'de','能':'neng','可':'ke','会':'hui','可':'ke','能':'neng','若':'ruo','如':'ru','便':'bian','才':'cai','只':'zhi','仅':'jin',
+    '已':'yi','经':'jing','正':'zheng','在':'zai','将':'jiang','要':'yao','即':'ji','曾':'ceng','曾':'ceng','刚':'gang','已':'yi','先':'xian','后':'hou',
+    '早':'zao','晚':'wan','现':'xian','原':'yuan','旧':'jiu','新':'xin','初':'chu','末':'mo','始':'shi','终':'zhong','永':'yong','暂':'zan','久':'jiu',
+    '永':'yong','远':'yuan','近':'jin','将':'jiang','来':'lai','往':'wang','过':'guo','现':'xian','古':'gu','今':'jin','昔':'xi','朝':'zhao','暮':'mu',
+    '早':'zao','午':'wu','晚':'wan','夜':'ye','晨':'chen','昏':'hun','明':'ming','暗':'an','晴':'qing','阴':'yin','雨':'yu','雪':'xue','风':'feng','云':'yun',
+    '春':'chun','夏':'xia','秋':'qiu','冬':'dong','东':'dong','南':'nan','西':'xi','北':'bei','左':'zuo','右':'you','上':'shang','下':'xia','前':'qian','后':'hou',
+    '里':'li','外':'wai','内':'nei','旁':'pang','边':'bian','中':'zhong','间':'jian','顶':'ding','底':'di','角':'jiao','边':'bian','面':'mian','线':'xian','点':'dian',
+    '圆':'yuan','方':'fang','长':'chang','短':'duan','高':'gao','低':'di','宽':'kuan','窄':'zhai','厚':'hou','薄':'bao','深':'shen','浅':'qian','大':'da','小':'xiao',
+    '多':'duo','少':'shao','全':'quan','都':'dou','总':'zong','只':'zhi','各':'ge','每':'mei','任':'ren','何':'he','某':'mou','本':'ben','此':'ci','那':'na','彼':'bi',
+    '谁':'shui','哪':'na','哪':'na','什':'shen','么':'me','怎':'zen','么':'me','为':'wei','什':'shen','么':'me','几':'ji','多':'duo','少':'shao','若':'ruo','干':'gan',
+    '某':'mou','些':'xie','某':'mou','种':'zhong','这':'zhe','那':'na','其':'qi','它':'ta','此':'ci','彼':'bi','这':'zhe','里':'li','那':'na','里':'li',
+    '何':'he','处':'chu','何':'he','时':'shi','何':'he','人':'ren','何':'he','物':'wu','何':'he','事':'shi','怎':'zen','样':'yang','如':'ru','何':'he',
+    '凡':'fan','皆':'jie','即':'ji','便':'bian','纵':'zong','虽':'sui','即':'ji','使':'shi','假':'jia','如':'ru','若':'ruo','如':'ru','果':'guo',
+    '只':'zhi','是':'shi','不':'bu','过':'guo','仅':'jin','仅':'jin','唯':'wei','独':'du','光':'guang','单':'dan','净':'jing','一':'yi','概':'gai',
+    '都':'dou','全':'quan','悉':'xi','皆':'jie','均':'jun','统':'tong','通':'tong','一':'yi','齐':'qi','同':'tong','一':'yi','起':'qi','共':'gong',
+    '互':'hu','相':'xiang','彼':'bi','此':'ci','双':'shuang','两':'liang','对':'dui','当':'dang','配':'pei','偶':'ou','配':'pei','对':'dui',
+    '合':'he','同':'tong','共':'gong','与':'yu','和':'he','及':'ji','以':'yi','暨':'ji','或':'huo','并':'bing','且':'qie','而':'er','但':'dan',
+    '因':'yin','为':'wei','由':'you','于':'yu','所':'suo','以':'yi','故':'gu','然':'ran','而':'er','不':'bu','过':'guo','虽':'sui','然':'ran',
+    '但':'dan','是':'shi','可':'ke','是':'shi','却':'que','不':'bu','过':'guo','偏':'pian','偏':'pian','反':'fan','倒':'dao','反':'fan','正':'zheng',
+    '既':'ji','已':'yi','不':'bu','再':'zai','未':'wei','曾':'ceng','不':'bu','曾':'ceng','已':'yi','经':'jing','曾':'ceng','经':'jing','正':'zheng',
+    '巧':'qiao','碰':'peng','恰':'qia','恰':'qia','正':'zheng','好':'hao','刚':'gang','好':'hao','刚':'gang','才':'cai','方':'fang','才':'cai',
+    '顿':'dun','时':'shi','霎':'sha','时':'shi','转':'zhuan','瞬':'shun','忽':'hu','然':'ran','突':'tu','然':'ran','猛':'meng','然':'ran','乍':'zha',
+    '然':'ran','渐':'jian','渐':'jian','逐':'zhu','渐':'jian','徐':'xu','徐':'xu','慢':'man','慢':'man','快':'kuai','快':'kuai','急':'ji','忙':'mang',
+    '忙':'mang','碌':'lu','碌':'lu','匆':'cong','匆':'cong','匆':'cong','忙':'mang','急':'ji','匆':'cong','匆':'cong','打':'da','赶':'gan',
+    '追':'zhui','逐':'zhu','赶':'gan','上':'shang','超':'chao','过':'guo','胜':'sheng','过':'guo','强':'qiang','于':'yu','优':'you','于':'yu',
+    '劣':'lie','于':'yu','次':'ci','于':'yu','等':'deng','于':'yu','同':'tong','于':'yu','异':'yi','于':'yu','近':'jin','于':'yu','远':'yuan','于':'yu',
+    '高':'gao','招':'zhao','最':'zui','好':'hao','至':'zhi','高':'gao','无':'wu','上':'shang','无':'wu','比':'bi','无':'wu','伦':'lun','绝':'jue','顶':'ding'
+  };
+
+  let separator = '-';
+  let history = [];
+
+  try { history = JSON.parse(localStorage.getItem('slug_hist_v1') || '[]'); } catch {}
+
+  function toSlug(text) {
+    let result = '';
+    for (const ch of text) {
+      const py = PY[ch];
+      if (py) {
+        result += ' ' + py + ' ';
+      } else if (/[a-zA-Z]/.test(ch)) {
+        result += ch;
+      } else if (/[0-9]/.test(ch)) {
+        if (document.getElementById('keepNums').checked) {
+          result += ch;
         }
+      } else if (ch === ' ' || ch === '-' || ch === '_') {
+        result += ' ';
+      } else {
+        result += ' ';
+      }
+    }
+    if (document.getElementById('forceLower').checked) {
+      result = result.toLowerCase();
+    }
+    result = result.replace(/[^\w\s-]/g, ' ').trim();
+    result = result.replace(/[\s_-]+/g, separator);
+    result = result.replace(new RegExp('^[\\' + separator + ']+|[\\' + separator + ']+$', 'g'), '');
+    return result;
+  }
 
-        function setSep(s) {
-            sep = s;
-            document.getElementById('sep-hyphen').classList.toggle('active', s==='-');
-            document.getElementById('sep-under').classList.toggle('active', s==='_');
-            onInput();
-        }
+  function generateSlug() {
+    const title = document.getElementById('titleInput').value.trim();
+    const slug = toSlug(title);
+    const output = document.getElementById('slugOutput');
+    const urlPreview = document.getElementById('urlPreview');
 
-        function toSlug(text) {
-            if(!text) return '';
-            let result = '';
-            for(const ch of text) {
-                const py = PY[ch];
-                result += py ? (' '+py+' ') : ch;
-            }
-            if(document.getElementById('forceLower').checked) result = result.toLowerCase();
-            if(!document.getElementById('keepNums').checked) result = result.replace(/[0-9]/g,' ');
-            result = result.replace(/[^\w\s-]/g,' ').trim().replace(/[\s_-]+/g, sep);
-            const r = new RegExp(`^[\\${sep}]+|[\\${sep}]+$`,'g');
-            return result.replace(r,'');
-        }
+    if (slug) {
+      output.innerHTML = slug;
+      document.getElementById('urlSlug').textContent = slug;
+      urlPreview.style.display = 'block';
+    } else {
+      output.innerHTML = '<span class="slug-empty">输入标题后自动生成…</span>';
+      urlPreview.style.display = 'none';
+    }
+  }
 
-        function onInput() {
-            const val = document.getElementById('mainInput').value;
-            const slug = toSlug(val);
-            const el = document.getElementById('slugOutput');
-            const card = document.getElementById('outputCard');
-            if(slug) {
-                el.textContent = slug;
-                card.classList.add('has-val');
-                document.getElementById('urlPreview').style.display='';
-                document.getElementById('urlSlugPart').textContent = slug;
-            } else {
-                el.innerHTML='<span class="slug-empty">输入标题后自动生成…</span>';
-                card.classList.remove('has-val');
-                document.getElementById('urlPreview').style.display='none';
-            }
-        }
+  window.copySlug = function() {
+    const slug = document.getElementById('slugOutput').textContent.trim();
+    if (!slug || slug === '输入标题后自动生成…') {
+      toast('请先输入标题');
+      return;
+    }
+    navigator.clipboard.writeText(slug).then(() => {
+      toast('Slug 已复制');
+      addHistory(document.getElementById('titleInput').value.trim(), slug);
+    }).catch(() => toast('复制失败'));
+  };
 
-        function copySlug() {
-            const slug = document.getElementById('slugOutput').textContent.trim();
-            if(!slug||slug==='输入标题后自动生成…'){ toast('请先输入标题',''); return; }
-            const origin = document.getElementById('mainInput').value.trim();
-            navigator.clipboard.writeText(slug).then(()=>{
-                toast('Slug 已复制','success');
-                addHistory(origin, slug);
-            }).catch(()=>toast('复制失败',''));
-        }
+  function addHistory(origin, slug) {
+    if (!slug || !origin) return;
+    history = history.filter(h => h.slug !== slug);
+    history.unshift({ origin, slug, time: Date.now() });
+    if (history.length > 20) history = history.slice(0, 20);
+    localStorage.setItem('slug_hist_v1', JSON.stringify(history));
+    renderHistory();
+  }
 
-        function addHistory(origin, slug) {
-            history = history.filter(h=>h.slug!==slug);
-            history.unshift({origin, slug});
-            if(history.length>20) history=history.slice(0,20);
-            localStorage.setItem('slug_hist_v1', JSON.stringify(history));
-            renderHistory();
-        }
+  function renderHistory() {
+    const list = document.getElementById('historyList');
+    if (history.length === 0) {
+      list.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+      return;
+    }
+    list.innerHTML = history.map((h, i) => '<div class="history-item"><span class="history-origin" title="' + escAttr(h.origin) + '">' + escHtml(h.origin) + '</span><span class="history-slug" title="' + escAttr(h.slug) + '">' + escHtml(h.slug) + '</span><button class="history-copy-btn" onclick="copyHistory(' + i + ')">复制</button></div>').join('');
+  }
 
-        function renderHistory() {
-            const sec = document.getElementById('historySection');
-            if(!history.length){ sec.style.display='none'; return; }
-            sec.style.display='';
-            document.getElementById('historyList').innerHTML = history.map((h,i)=>`
-                <div class="history-item">
-                    <span class="history-origin" title="${esc(h.origin)}">${esc(h.origin)}</span>
-                    <span style="color:var(--text3)">→</span>
-                    <span class="history-slug" title="${esc(h.slug)}">${esc(h.slug)}</span>
-                    <button class="history-copy" onclick="copySingle(${i})">复制</button>
-                </div>`).join('');
-        }
+  window.copyHistory = function(i) {
+    const slug = history[i].slug;
+    navigator.clipboard.writeText(slug).then(() => toast('已复制')).catch(() => toast('复制失败'));
+  };
 
-        function copySingle(i){ navigator.clipboard.writeText(history[i].slug).then(()=>toast('已复制','success')); }
-        function clearHistory(){ history=[]; localStorage.removeItem('slug_hist_v1'); renderHistory(); }
-        function useExample(el){ document.getElementById('mainInput').value=el.textContent; onInput(); }
-        function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-        function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show'+(type?' '+type:''); clearTimeout(el._t); el._t=setTimeout(()=>el.className='toast',2500); }
+  function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function escAttr(s) { return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-        renderHistory();
-        const themeBtn=document.getElementById('themeBtn'), themeIcon=document.getElementById('themeIcon');
-        function updateThemeIcon(){ themeIcon.textContent=document.documentElement.classList.contains('dark')?'☀️':'🌙'; }
-        updateThemeIcon();
-        themeBtn.addEventListener('click',()=>{ const dark=document.documentElement.classList.toggle('dark'); localStorage.setItem('theme',dark?'dark':'light'); updateThemeIcon(); });
-    </script>
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  document.getElementById('titleInput').addEventListener('input', generateSlug);
+  document.getElementById('forceLower').addEventListener('change', generateSlug);
+  document.getElementById('keepNums').addEventListener('change', generateSlug);
+
+  document.querySelectorAll('.seg-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      separator = btn.dataset.sep;
+      generateSlug();
+    });
+  });
+
+  document.querySelectorAll('.example-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.getElementById('titleInput').value = chip.dataset.text;
+      generateSlug();
+    });
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', copySlug);
+  document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+    history = [];
+    localStorage.removeItem('slug_hist_v1');
+    renderHistory();
+    toast('已清空历史');
+  });
+
+  document.getElementById('lowerOpt').addEventListener('click', () => {
+    const cb = document.getElementById('forceLower');
+    cb.checked = !cb.checked;
+    document.getElementById('lowerOpt').classList.toggle('active', cb.checked);
+    generateSlug();
+  });
+
+  document.getElementById('numOpt').addEventListener('click', () => {
+    const cb = document.getElementById('keepNums');
+    cb.checked = !cb.checked;
+    document.getElementById('numOpt').classList.toggle('active', cb.checked);
+    generateSlug();
+  });
+
+  renderHistory();
+})();
+</script>
 </body>
 </html>
