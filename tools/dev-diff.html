@@ -122,6 +122,19 @@
     transition: all .2s;
   }
   .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .fav-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    transition: all .2s;
+  }
+  .fav-btn:hover { border-color: var(--accent); }
+  .fav-btn.active { color: #fbbf24; border-color: #fbbf24; background: rgba(251,191,36,0.1); }
 
   /* Main layout */
   .main { max-width: 1400px; margin: 0 auto; padding: 20px 16px; }
@@ -416,6 +429,7 @@
       <h1>代码差异对比</h1>
       <p>左右双栏 · 逐行高亮 · 内联字符差异 · 行号对齐</p>
     </div>
+    <button class="fav-btn" id="favBtn" title="收藏此工具">☆</button>
     <button class="theme-btn" id="themeBtn" title="切换主题">☀️</button>
   </div>
 </header>
@@ -499,6 +513,27 @@
     document.documentElement.dataset.theme = t;
     localStorage.setItem('toolbox_theme', t);
     themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
+  });
+
+  // --- Favorites ---
+  const FAV_KEY = 'toolbox_favorites_v2';
+  const TOOL_ID = 'dev-diff';
+  function getFavs() { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch { return []; } }
+  function setFavs(arr) { localStorage.setItem(FAV_KEY, JSON.stringify(arr)); }
+  const favBtn = document.getElementById('favBtn');
+  const favs = getFavs();
+  if (favs.includes(TOOL_ID)) { favBtn.classList.add('active'); favBtn.textContent = '★'; }
+  favBtn.addEventListener('click', () => {
+    const arr = getFavs();
+    if (arr.includes(TOOL_ID)) {
+      setFavs(arr.filter(x => x !== TOOL_ID));
+      favBtn.classList.remove('active');
+      favBtn.textContent = '☆';
+    } else {
+      setFavs([TOOL_ID, ...arr.filter(x => x !== TOOL_ID)]);
+      favBtn.classList.add('active');
+      favBtn.textContent = '★';
+    }
   });
 
   // --- State ---
@@ -835,6 +870,22 @@
   document.getElementById('leftInput').addEventListener('input', scheduleAuto);
   document.getElementById('rightInput').addEventListener('input', scheduleAuto);
   document.getElementById('diffBtn').addEventListener('click', runDiff);
+
+  // --- Scroll sync for input textareas ---
+  const leftInputEl = document.getElementById('leftInput');
+  const rightInputEl = document.getElementById('rightInput');
+  let syncScroll = true;
+  function syncScrollHandler(source, target) {
+    return function() {
+      if (!syncScroll) return;
+      syncScroll = false;
+      target.scrollTop = source.scrollTop;
+      target.scrollLeft = source.scrollLeft;
+      setTimeout(() => { syncScroll = true; }, 10);
+    };
+  }
+  leftInputEl.addEventListener('scroll', syncScrollHandler(leftInputEl, rightInputEl));
+  rightInputEl.addEventListener('scroll', syncScrollHandler(rightInputEl, leftInputEl));
 
   // View mode
   document.querySelectorAll('.view-tab').forEach(btn => {
