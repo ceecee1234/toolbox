@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>正则表达式测试器 - Dev Toolbox</title>
+<meta name="description" content="在线正则表达式测试与速查工具，实时高亮匹配结果，内置邮箱/手机号/URL/身份证/中文常用正则。">
+<link rel="icon" href="../favicon.ico">
+<style>
+  :root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--accent:#3b82f6;--accent-hover:#2563eb;--success:#22c55e;--success-bg:rgba(34,197,94,.15);--success-text:#86efac;--error:#ef4444;--error-bg:rgba(239,68,68,.15);--error-text:#fecaca;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.4);--highlight:rgba(59,130,246,.25);--highlight-text:#93c5fd;--match-bg:rgba(34,197,94,.2);--match-border:rgba(34,197,94,.5)}
+  [data-theme="light"]{--bg:#f8fafc;--bg2:#fff;--bg3:#f1f5f9;--border:#e2e8f0;--text:#1e293b;--text2:#475569;--text3:#94a3b8;--shadow:0 4px 24px rgba(0,0,0,.08);--highlight:rgba(59,130,246,.15);--highlight-text:#1d4ed8;--match-bg:rgba(34,197,94,.1);--match-border:rgba(34,197,94,.4);--success-bg:rgba(34,197,94,.1);--success-text:#166534;--error-bg:rgba(239,68,68,.1);--error-text:#991b1b}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding-bottom:60px}
+  .page-header{position:relative;background:var(--bg2);border-bottom:1px solid var(--border);overflow:hidden;padding:28px 24px 20px}
+  .page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 20% 50%,rgba(59,130,246,.12) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 80% 30%,rgba(99,102,241,.08) 0%,transparent 70%);pointer-events:none}
+  .header-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:16px;position:relative}
+  .back-btn{display:flex;align-items:center;gap:6px;color:var(--text2);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);transition:all .2s;white-space:nowrap}
+  .back-btn:hover{color:var(--text);border-color:var(--accent)}
+  .header-title{flex:1}
+  .header-title h1{font-size:20px;font-weight:700;line-height:1.3}
+  .header-title p{font-size:13px;color:var(--text2);margin-top:3px}
+  .fav-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s}
+  .fav-btn:hover{border-color:var(--accent)}
+  .fav-btn.active{color:#fbbf24;border-color:#fbbf24;background:rgba(251,191,36,.1)}
+  .theme-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s}
+  .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .main{max-width:900px;margin:0 auto;padding:20px 16px}
+
+  .text-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:20px}
+  .card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg3)}
+  .card-title{font-size:13px;font-weight:600;color:var(--text2)}
+  .card-body{padding:0}
+  textarea{width:100%;min-height:140px;background:var(--bg2);color:var(--text);border:none;outline:none;resize:vertical;padding:14px 16px;font-family:'JetBrains Mono','Fira Code',Consolas,monospace;font-size:13px;line-height:1.6;tab-size:4}
+  textarea::placeholder{color:var(--text3)}
+
+  .regex-row{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+  .regex-input-wrap{flex:1;min-width:200px;position:relative}
+  .regex-prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--accent);font-weight:700;font-family:monospace;pointer-events:none}
+  .regex-input{width:100%;padding:12px 14px 12px 28px;font-size:14px;background:var(--bg3);border:2px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono','Fira Code',monospace;outline:none;transition:border-color .2s}
+  .regex-input:focus{border-color:var(--accent)}
+  .regex-input::placeholder{color:var(--text3)}
+  .flag-btns{display:flex;gap:4px}
+  .flag-btn{padding:6px 10px;font-size:12px;font-family:'JetBrains Mono','Fira Code',monospace;font-weight:600;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text3);transition:all .15s;min-width:32px;text-align:center}
+  .flag-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .flag-btn:hover{border-color:var(--accent)}
+
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+  .preset-chip{padding:6px 14px;font-size:12px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;cursor:pointer;color:var(--text2);transition:all .2s}
+  .preset-chip:hover{border-color:var(--accent);color:var(--accent)}
+
+  .result-area{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:20px}
+  .result-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg3);flex-wrap:wrap;gap:8px}
+  .result-title{font-size:13px;font-weight:600;color:var(--text2)}
+  .result-stats{display:flex;gap:12px;font-size:12px}
+  .stat{display:flex;align-items:center;gap:4px}
+  .stat-num{font-weight:700;font-family:'JetBrains Mono','Fira Code',monospace}
+  .stat-num.green{color:var(--success)}
+  .stat-num.blue{color:var(--accent)}
+  .result-body{padding:14px 16px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-all;min-height:80px}
+  .hl{background:var(--highlight);border-radius:3px;padding:1px 0;color:var(--highlight-text)}
+  .no-match{color:var(--text3);font-style:italic;font-family:inherit}
+
+  .groups-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:20px}
+  .groups-header{padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg3);font-size:13px;font-weight:600;color:var(--text2)}
+  .groups-body{padding:14px 16px}
+  .group-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .group-item:last-child{border-bottom:none}
+  .group-label{min-width:60px;font-weight:600;color:var(--accent);font-family:'JetBrains Mono','Fira Code',monospace;font-size:12px}
+  .group-val{color:var(--text);word-break:break-all}
+  .group-empty{color:var(--text3);font-style:italic;font-size:13px}
+
+  .error-banner{padding:12px 16px;background:var(--error-bg);color:var(--error-text);font-size:13px;border-radius:8px;margin-bottom:16px;display:none}
+  .error-banner.show{display:block}
+
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--text);box-shadow:var(--shadow);transform:translateY(80px);opacity:0;transition:all .3s;z-index:9999}
+  .toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<header class="page-header">
+  <div class="header-inner">
+    <a href="../index.html" class="back-btn">← 返回首页</a>
+    <div class="header-title"><h1>正则表达式测试器</h1><p>实时高亮匹配 · 分组捕获 · 常用正则速查</p></div>
+    <button class="fav-btn" id="favBtn" title="收藏此工具">☆</button>
+    <button class="theme-btn" id="themeBtn" title="切换主题">☀️</button>
+  </div>
+</header>
+<div class="main">
+  <div class="text-card">
+    <div class="card-header"><span class="card-title">待测试文本</span></div>
+    <div class="card-body"><textarea id="testText" placeholder="在此输入待测试文本…" spellcheck="false"></textarea></div>
+  </div>
+
+  <div class="presets">
+    <span style="font-size:12px;color:var(--text3);padding:6px 0">常用正则：</span>
+    <button class="preset-chip" data-regex="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" data-flags="gm" data-name="邮箱">邮箱</button>
+    <button class="preset-chip" data-regex="^1[3-9]\d{9}$" data-flags="gm" data-name="手机号">手机号</button>
+    <button class="preset-chip" data-regex="https?://[^\s<>\"']+" data-flags="gi" data-name="URL">URL</button>
+    <button class="preset-chip" data-regex="^\d{17}[\dXx]$" data-flags="gm" data-name="身份证">身份证</button>
+    <button class="preset-chip" data-regex="[\u4e00-\u9fa5]+" data-flags="g" data-name="中文字符">中文字符</button>
+    <button class="preset-chip" data-regex="\d+" data-flags="g" data-name="数字">数字</button>
+    <button class="preset-chip" data-regex="^[\u4e00-\u9fa5]{2,4}$" data-flags="gm" data-name="中文姓名">中文姓名</button>
+    <button class="preset-chip" data-regex="^\d{4}-\d{2}-\d{2}$" data-flags="gm" data-name="日期格式">日期格式</button>
+  </div>
+
+  <div class="regex-row">
+    <div class="regex-input-wrap">
+      <span class="regex-prefix">/</span>
+      <input type="text" class="regex-input" id="regexInput" placeholder="输入正则表达式，如 \d+">
+    </div>
+    <div class="flag-btns">
+      <button class="flag-btn active" data-flag="g" title="全局匹配">g</button>
+      <button class="flag-btn" data-flag="i" title="忽略大小写">i</button>
+      <button class="flag-btn" data-flag="m" title="多行模式">m</button>
+      <button class="flag-btn" data-flag="s" title="dotAll 模式">s</button>
+    </div>
+  </div>
+
+  <div class="error-banner" id="errorBanner"></div>
+
+  <div class="result-area">
+    <div class="result-header">
+      <span class="result-title">匹配结果</span>
+      <div class="result-stats">
+        <span class="stat">匹配数: <span class="stat-num green" id="matchCount">0</span></span>
+        <span class="stat">捕获组: <span class="stat-num blue" id="groupCount">0</span></span>
+      </div>
+    </div>
+    <div class="result-body" id="resultBody"><span class="no-match">输入正则和文本后实时显示匹配结果</span></div>
+  </div>
+
+  <div class="groups-card" id="groupsCard" style="display:none">
+    <div class="groups-header">捕获分组详情</div>
+    <div class="groups-body" id="groupsBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+  'use strict';
+  const savedTheme=localStorage.getItem('toolbox_theme')||'dark';
+  document.documentElement.dataset.theme=savedTheme;
+  const themeBtn=document.getElementById('themeBtn');
+  themeBtn.textContent=savedTheme==='dark'?'☀️':'🌙';
+  themeBtn.addEventListener('click',()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('toolbox_theme',t);themeBtn.textContent=t==='dark'?'☀️':'🌙'});
+
+  const FAV_KEY='toolbox_favorites_v2',TOOL_ID='text-regex-tester';
+  function getFavs(){try{return JSON.parse(localStorage.getItem(FAV_KEY))||[]}catch{return[]}}
+  function setFavs(a){localStorage.setItem(FAV_KEY,JSON.stringify(a))}
+  const favBtn=document.getElementById('favBtn'),favs=getFavs();
+  if(favs.includes(TOOL_ID)){favBtn.classList.add('active');favBtn.textContent='★'}
+  favBtn.addEventListener('click',()=>{const a=getFavs();if(a.includes(TOOL_ID)){setFavs(a.filter(x=>x!==TOOL_ID));favBtn.classList.remove('active');favBtn.textContent='☆'}else{setFavs([TOOL_ID,...a.filter(x=>x!==TOOL_ID)]);favBtn.classList.add('active');favBtn.textContent='★'}});
+
+  const regexInput=document.getElementById('regexInput');
+  const testText=document.getElementById('testText');
+  const errorBanner=document.getElementById('errorBanner');
+  const resultBody=document.getElementById('resultBody');
+  const matchCountEl=document.getElementById('matchCount');
+  const groupCountEl=document.getElementById('groupCount');
+  const groupsCard=document.getElementById('groupsCard');
+  const groupsBody=document.getElementById('groupsBody');
+
+  let flags={'g':true,'i':false,'m':false,'s':false};
+
+  document.querySelectorAll('.flag-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const f=btn.dataset.flag;
+      flags[f]=!flags[f];
+      btn.classList.toggle('active',flags[f]);
+      runTest();
+    });
+  });
+
+  document.querySelectorAll('.preset-chip').forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      regexInput.value=chip.dataset.regex;
+      const pflags=chip.dataset.flags||'g';
+      flags={'g':false,'i':false,'m':false,'s':false};
+      for(const c of pflags){if(c in flags)flags[c]=true}
+      document.querySelectorAll('.flag-btn').forEach(btn=>{
+        btn.classList.toggle('active',flags[btn.dataset.flag]);
+      });
+      runTest();
+    });
+  });
+
+  function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+  function runTest(){
+    const pattern=regexInput.value;
+    const text=testText.value;
+    errorBanner.classList.remove('show');
+
+    if(!pattern||!text){
+      resultBody.innerHTML='<span class="no-match">输入正则和文本后实时显示匹配结果</span>';
+      matchCountEl.textContent='0';
+      groupCountEl.textContent='0';
+      groupsCard.style.display='none';
+      return;
+    }
+
+    let flagStr='';
+    for(const[k,v]of Object.entries(flags)){if(v)flagStr+=k}
+
+    let regex;
+    try{regex=new RegExp(pattern,flagStr)}
+    catch(e){
+      errorBanner.textContent='正则语法错误：'+e.message;
+      errorBanner.classList.add('show');
+      resultBody.innerHTML='<span class="no-match">正则表达式无效</span>';
+      matchCountEl.textContent='0';
+      groupCountEl.textContent='0';
+      groupsCard.style.display='none';
+      return;
+    }
+
+    if(!flags.g){
+      const match=regex.exec(text);
+      if(!match){
+        resultBody.innerHTML=escHtml(text);
+        matchCountEl.textContent='0';
+        groupCountEl.textContent='0';
+        groupsCard.style.display='none';
+        return;
+      }
+      const before=text.substring(0,match.index);
+      const matched=match[0];
+      const after=text.substring(match.index+matched.length);
+      resultBody.innerHTML=escHtml(before)+'<span class="hl">'+escHtml(matched)+'</span>'+escHtml(after);
+      matchCountEl.textContent='1';
+      groupCountEl.textContent=String(match.length-1);
+      renderGroups([match]);
+      return;
+    }
+
+    const matches=[];
+    let m;
+    const safeRegex=new RegExp(pattern,flagStr.replace('g',''));
+    let lastIndex=0;
+    let safety=0;
+    while((m=safeRegex.exec(text))!==null&&safety<10000){
+      matches.push({index:m.index,0:m[0],length:m[0].length,groups:Array.from(m)});
+      safeRegex.lastIndex=m.index+m[0].length;
+      if(m[0].length===0)safeRegex.lastIndex++;
+      safety++;
+    }
+
+    if(matches.length===0){
+      resultBody.innerHTML=escHtml(text);
+      matchCountEl.textContent='0';
+      groupCountEl.textContent='0';
+      groupsCard.style.display='none';
+      return;
+    }
+
+    let html='';
+    let cursor=0;
+    matches.forEach(match=>{
+      if(match.index>cursor){
+        html+=escHtml(text.substring(cursor,match.index));
+      }
+      html+='<span class="hl">'+escHtml(match[0])+'</span>';
+      cursor=match.index+match[0].length;
+    });
+    if(cursor<text.length){
+      html+=escHtml(text.substring(cursor));
+    }
+
+    resultBody.innerHTML=html;
+    matchCountEl.textContent=String(matches.length);
+
+    let maxGroups=0;
+    matches.forEach(m=>{if(m.groups.length-1>maxGroups)maxGroups=m.groups.length-1});
+    groupCountEl.textContent=String(maxGroups);
+
+    const fullGroups=matches.map(m=>m.groups);
+    renderGroups(fullGroups);
+  }
+
+  function renderGroups(allMatches){
+    if(allMatches.length===0||allMatches.every(m=>m.length<=1)){
+      groupsCard.style.display='none';
+      return;
+    }
+    groupsCard.style.display='';
+    let html='';
+    allMatches.forEach((match,i)=>{
+      if(match.length<=1)return;
+      if(allMatches.length>1)html+='<div style="font-size:11px;color:var(--text3);margin:4px 0 2px;font-weight:600">匹配 #'+(i+1)+'</div>';
+      for(let g=1;g<match.length;g++){
+        const label=g===0?'完整匹配':'$'+g;
+        const val=match[g]!==undefined?match[g]:'(undefined)';
+        html+='<div class="group-item"><span class="group-label">'+label+'</span><span class="group-val">'+escHtml(val)+'</span></div>';
+      }
+    });
+    if(!html)html='<div class="group-empty">无捕获分组</div>';
+    groupsBody.innerHTML=html;
+  }
+
+  let timer=null;
+  regexInput.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(runTest,150)});
+  testText.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(runTest,150)});
+})();
+</script>
+</body>
+</html>

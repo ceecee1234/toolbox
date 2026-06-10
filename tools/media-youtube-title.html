@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube 爆款标题生成器 - Dev Toolbox</title>
+<meta name="description" content="在线 YouTube 爆款标题生成工具，输入关键词一键生成 10 个双语高点击率标题，内置悬念、数字、痛点等爆款公式。">
+<link rel="icon" href="../favicon.ico">
+<style>
+  :root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--accent:#3b82f6;--accent-hover:#2563eb;--success:#22c55e;--success-bg:rgba(34,197,94,.15);--success-text:#86efac;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.4);--tag1:rgba(239,68,68,.15);--tag1t:#fca5a5;--tag2:rgba(245,158,11,.15);--tag2t:#fde68a;--tag3:rgba(34,197,94,.15);--tag3t:#86efac;--tag4:rgba(99,102,241,.15);--tag4t:#c7d2fe;--tag5:rgba(236,72,153,.15);--tag5t:#f9a8d4}
+  [data-theme="light"]{--bg:#f8fafc;--bg2:#fff;--bg3:#f1f5f9;--border:#e2e8f0;--text:#1e293b;--text2:#475569;--text3:#94a3b8;--shadow:0 4px 24px rgba(0,0,0,.08);--tag1:rgba(239,68,68,.1);--tag1t:#991b1b;--tag2:rgba(245,158,11,.1);--tag2t:#92400e;--tag3:rgba(34,197,94,.1);--tag3t:#166534;--tag4:rgba(99,102,241,.1);--tag4t:#3730a3;--tag5:rgba(236,72,153,.1);--tag5t:#9d174d}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding-bottom:60px}
+  .page-header{position:relative;background:var(--bg2);border-bottom:1px solid var(--border);overflow:hidden;padding:28px 24px 20px}
+  .page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 20% 50%,rgba(59,130,246,.12) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 80% 30%,rgba(99,102,241,.08) 0%,transparent 70%);pointer-events:none}
+  .header-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:16px;position:relative}
+  .back-btn{display:flex;align-items:center;gap:6px;color:var(--text2);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);transition:all .2s;white-space:nowrap}
+  .back-btn:hover{color:var(--text);border-color:var(--accent)}
+  .header-title{flex:1}
+  .header-title h1{font-size:20px;font-weight:700;line-height:1.3}
+  .header-title p{font-size:13px;color:var(--text2);margin-top:3px}
+  .fav-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s}
+  .fav-btn:hover{border-color:var(--accent)}
+  .fav-btn.active{color:#fbbf24;border-color:#fbbf24;background:rgba(251,191,36,.1)}
+  .theme-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s}
+  .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .main{max-width:900px;margin:0 auto;padding:20px 16px}
+  .input-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:20px}
+  .card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg3)}
+  .card-title{font-size:13px;font-weight:600;color:var(--text2)}
+  .card-body{padding:16px}
+  .form-group{margin-bottom:16px}
+  .form-group:last-child{margin-bottom:0}
+  .form-label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px}
+  .form-input{width:100%;padding:12px 14px;font-size:14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;transition:border-color .2s}
+  .form-input:focus{border-color:var(--accent)}
+  .form-input::placeholder{color:var(--text3)}
+  .type-grid{display:flex;flex-wrap:wrap;gap:8px}
+  .type-chip{padding:8px 16px;font-size:13px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;cursor:pointer;transition:all .2s;color:var(--text2)}
+  .type-chip:hover{border-color:var(--accent);color:var(--accent)}
+  .type-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .gen-btn{width:100%;padding:14px 24px;font-size:15px;font-weight:700;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;transition:all .2s;margin-top:4px}
+  .gen-btn:hover{background:var(--accent-hover);transform:translateY(-1px)}
+  .results{display:flex;flex-direction:column;gap:10px}
+  .result-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;box-shadow:var(--shadow);transition:border-color .2s}
+  .result-item:hover{border-color:var(--accent)}
+  .result-num{width:28px;height:28px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text2);flex-shrink:0;margin-top:2px}
+  .result-content{flex:1;min-width:0}
+  .result-en{font-size:15px;font-weight:600;line-height:1.5;margin-bottom:4px}
+  .result-cn{font-size:13px;color:var(--text2);line-height:1.5}
+  .result-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;margin-top:6px}
+  .tag-t{background:var(--tag1);color:var(--tag1t)}
+  .tag-n{background:var(--tag2);color:var(--tag2t)}
+  .tag-f{background:var(--tag3);color:var(--tag3t)}
+  .tag-r{background:var(--tag4);color:var(--tag4t)}
+  .tag-s{background:var(--tag5);color:var(--tag5t)}
+  .copy-btn{padding:6px 12px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text2);transition:all .2s;white-space:nowrap;flex-shrink:0}
+  .copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .empty-state{padding:48px 20px;text-align:center;color:var(--text3)}
+  .empty-icon{font-size:48px;margin-bottom:12px;opacity:.5}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--text);box-shadow:var(--shadow);transform:translateY(80px);opacity:0;transition:all .3s;z-index:9999}
+  .toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<header class="page-header">
+  <div class="header-inner">
+    <a href="../index.html" class="back-btn">← 返回首页</a>
+    <div class="header-title"><h1>YouTube 爆款标题生成器</h1><p>关键词 + 视频定位 → 10 条双语高点击率标题</p></div>
+    <button class="fav-btn" id="favBtn" title="收藏此工具">☆</button>
+    <button class="theme-btn" id="themeBtn" title="切换主题">☀️</button>
+  </div>
+</header>
+<div class="main">
+  <div class="input-card">
+    <div class="card-header"><span class="card-title">配置爆款参数</span></div>
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-label">视频核心关键词（英文）</label>
+        <input type="text" class="form-input" id="keywordInput" placeholder="例：SaaS indie development, React performance, AI side project" maxlength="100">
+      </div>
+      <div class="form-group">
+        <label class="form-label">视频定位类型</label>
+        <div class="type-grid" id="typeGrid">
+          <button class="type-chip active" data-type="tutorial">干货教程</button>
+          <button class="type-chip" data-type="story">故事评测</button>
+          <button class="type-chip" data-type="pain">痛点避坑</button>
+          <button class="type-chip" data-type="news">热点资讯</button>
+          <button class="type-chip" data-type="vs">对比横评</button>
+        </div>
+      </div>
+      <button class="gen-btn" id="genBtn">生成 10 条爆款标题</button>
+    </div>
+  </div>
+  <div id="resultsArea"><div class="empty-state"><div class="empty-icon">🎬</div><div>输入关键词后点击生成</div></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+  'use strict';
+  const savedTheme=localStorage.getItem('toolbox_theme')||'dark';
+  document.documentElement.dataset.theme=savedTheme;
+  const themeBtn=document.getElementById('themeBtn');
+  themeBtn.textContent=savedTheme==='dark'?'☀️':'🌙';
+  themeBtn.addEventListener('click',()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('toolbox_theme',t);themeBtn.textContent=t==='dark'?'☀️':'🌙'});
+
+  const FAV_KEY='toolbox_favorites_v2',TOOL_ID='media-youtube-title';
+  function getFavs(){try{return JSON.parse(localStorage.getItem(FAV_KEY))||[]}catch{return[]}}
+  function setFavs(a){localStorage.setItem(FAV_KEY,JSON.stringify(a))}
+  const favBtn=document.getElementById('favBtn'),favs=getFavs();
+  if(favs.includes(TOOL_ID)){favBtn.classList.add('active');favBtn.textContent='★'}
+  favBtn.addEventListener('click',()=>{const a=getFavs();if(a.includes(TOOL_ID)){setFavs(a.filter(x=>x!==TOOL_ID));favBtn.classList.remove('active');favBtn.textContent='☆'}else{setFavs([TOOL_ID,...a.filter(x=>x!==TOOL_ID)]);favBtn.classList.add('active');favBtn.textContent='★'}});
+
+  let selectedType='tutorial';
+  document.querySelectorAll('.type-chip').forEach(c=>{
+    c.addEventListener('click',()=>{
+      document.querySelectorAll('.type-chip').forEach(b=>b.classList.remove('active'));
+      c.classList.add('active');
+      selectedType=c.dataset.type;
+    });
+  });
+
+  const TEMPLATES={
+    tutorial:[
+      {tag:'t',tagLabel:'悬念留白',en:(k)=>`I Built a ${k} App in 48 Hours — Here's What Happened`,cn:(k)=>`我用 48 小时做了一个${k}应用——结果让人震惊`},
+      {tag:'n',tagLabel:'数字刺激',en:(k)=>`7 ${k} Mistakes That Are Costing You Thousands`,cn:(k)=>`7 个让你损失数千美元的${k}错误`},
+      {tag:'f',tagLabel:'恐惧痛点',en:(k)=>`Stop Using ${k} Like This (You're Doing It Wrong)`,cn:(k)=>`别再这样用${k}了（你的用法全错了）`},
+      {tag:'r',tagLabel:'认知颠覆',en:(k)=>`${k} Is Dead — Here's What Replaced It`,cn:(k)=>`${k}已死——替代方案来了`},
+      {tag:'s',tagLabel:'秘密武器',en:(k)=>`The ${k} Trick Top 1% Developers Won't Share`,cn:(k)=>`前 1% 开发者不愿分享的${k}秘诀`},
+      {tag:'n',tagLabel:'数字刺激',en:(k)=>`${k}: 5 Tools That Changed My Workflow Forever`,cn:(k)=>`${k}：5 个永远改变我工作流的工具`},
+      {tag:'t',tagLabel:'悬念留白',en:(k)=>`Why ${k} Projects Fail — The Real Reason No One Talks About`,cn:(k)=>`为什么${k}项目总是失败——没人说的真正原因`},
+      {tag:'f',tagLabel:'恐惧痛点',en:(k)=>`Your ${k} Stack Is Slowing You Down — Here's the Fix`,cn:(k)=>`你的${k}技术栈正在拖慢你——修复方案在此`},
+      {tag:'r',tagLabel:'认知颠覆',en:(k)=>`Everyone Is Wrong About ${k} — Let Me Prove It`,cn:(k)=>`所有人都对${k}理解错了——让我证明给你看`},
+      {tag:'s',tagLabel:'秘密武器',en:(k)=>`I Wish I Knew This ${k} Hack Before Spending $10K`,cn:(k)=>`我希望在花掉 1 万刀之前就知道这个${k}技巧`}
+    ],
+    story:[
+      {tag:'t',tagLabel:'悬念留白',en:(k)=>`My ${k} Journey: From $0 to $10K/Month — The Full Story`,cn:(k)=>`我的${k}之路：从 0 到月入 1 万刀——完整故事`},
+      {tag:'n',tagLabel:'数字刺激',en:(k)=>`3 Years of ${k} — What I'd Do Differently (6 Lessons)`,cn:(k)=>`3 年${k}经验——如果重来我会怎么做（6 条教训）`},
+      {tag:'f',tagLabel:'恐惧痛点',en:(k)=>`I Quit My Job for ${k} — And Almost Went Broke`,cn:(k)=>`我辞掉工作做${k}——差点破产`},
+      {tag:'r',tagLabel:'认知颠覆',en:(k)=>`${k} Isn't What You Think — My 12-Month Reality Check`,cn:(k)=>`${k}不是你想的那样——我的 12 个月现实检验`},
+      {tag:'s',tagLabel:'秘密武器',en:(k)=>`The ${k} Opportunity Nobody Sees Coming in 2025`,cn:(k)=>`2025 年没人预见的${k}机遇`},
+      {tag:'t',tagLabel:'悬念留白',en:(k)=>`What Happened After I Launched My ${k} Product`,cn:(k)=>`发布${k}产品之后发生了什么`},
+      {tag:'n',tagLabel:'数字刺激',en:(k)=>`${k} Road Trip: 30 Days, 1 Product, $5K Revenue`,cn:(k)=>`${k}冲刺：30 天、1 个产品、5000 刀收入`},
+      {tag:'f',tagLabel:'恐惧痛点',en:(k)=>`The Dark Side of ${k} Nobody Warns You About`,cn:(k)=>`没人提醒你的${k}黑暗面`},
+      {tag:'r',tagLabel:'认知颠覆',en:(k)=>`Why Most ${k} Creators Fail — And How the Winners Think`,cn:(k)=>`为什么大多数${k}创作者失败——赢家的思维方式`},
+      {tag:'s',tagLabel:'秘密武器',en:(k)=>`How I Found an Untapped ${k} Niche (And You Can Too)`,cn:(k)=>`我如何发现一个未被开发的${k}利基市场`}
+    ],
+    pain:[
+      {tag:'f',tagLabel:'恐惧痛点',en:(k)=>`5 ${k} Pitfalls That Will Destroy Your Project`,cn:(k)=>`5 个会毁掉你项目的${k}陷阱`},
+      {tag:'t',tagLabel:'悬念留白',en:(k)=>`The #1 ${k} Mistake I See Every Single Day`,cn:(k)=>`我每天都会看到的${k}头号错误`},
+      {tag:'n',tagLabel:'数字刺激',en:(k)=>`9 Out of 10 ${k} Projects Fail Because of This`,cn:(k)=>`90% 的${k}项目因为这个而失败`},
+      {tag:'r',tagLabel:'认知颠覆',en:(k)=>`${k} "Best Practices" Are Actually Worst Practices`,cn:(k)=>`${k}"最佳实践"其实是"最差实践"`},
+      {tag:'f',tagLabel:'恐惧痛点',en:(k)=>`Avoid This ${k} Anti-Pattern at All Costs`,cn:(k)=>`不惜一切代价避免这个${k}反模式`},
+      {tag:'s',tagLabel:'秘密武器',en:(k)=>`The ${k} Bug That Took Me 3 Days to Find — Don't Let It Happen to You`,cn:(k)=>`那个让我找了 3 天的${k} Bug——别让它发生在你身上`},
+      {tag:'t',tagLabel:'悬念留白',en:(k)=>`Why Your ${k} Keeps Breaking (And How to Fix It Forever)`,cn:(k)=>`为什么你的${k}总是崩溃（以及如何一劳永逸地修复）`},
+      {tag:'n',tagLabel:'数字刺激',en:(k)=>`8 Red Flags in Your ${k} Codebase Right Now`,cn:(k)=>`你的${k}代码库里现在就有的 8 个危险信号`},
+      {tag:'r',tagLabel:'认知颠覆',en:(k)=>`You Don't Need ${k} — And Here's the Data That Proves It`,cn:(k)=>`你不需要${k}——数据证明给你看`},
+      {tag:'s',tagLabel:'秘密武器',en:(k)=>`The ${k} Debugging Method Senior Engineers Use Daily`,cn:(k)=>`高级工程师每天使用的${k}调试方法`}
+    ],
+    news:[
+      {tag:'t',tagLabel:'悬念留白',en:(k)=>`${k} Just Changed Everything — Here's What It Means for You`,cn:(k)=>`${k}刚刚改变了一切——这对你意味着什么`},
+      {tag:'n',tagLabel:'数字刺激',en:(k)=>`3 Major ${k} Updates This Week You Can't Ignore`,cn:(k)=>`本周你不能忽视的 3 个${k}重大更新`},
+      {tag:'f',tagLabel:'恐惧痛点',en:(k)=>`If You're Not Using This ${k} Feature Yet, You're Falling Behind`,cn:(k)=>`如果你还没用这个${k}功能，你已经落后了`},
+      {tag:'r',tagLabel:'认知颠覆',en:(k)=>`The New ${k} Changes Everything We Thought We Knew`,cn:(k)=>${`新的${k}颠覆了我们的所有认知`}`},
+      {tag:'s',tagLabel:'秘密武器',en:(k)=>`${k} 2025: The Hidden Feature That Changes the Game`,cn:(k)=>`${k} 2025：改变游戏规则的隐藏功能`},
+      {tag:'t',tagLabel:'悬念留白',en:(k)=>`${k} Made a Huge Announcement — Most People Missed the Best Part`,cn:(k)=>`${k}发布重大消息——大多数人错过了最精彩的部分`},
+      {tag:'n',tagLabel:'数字刺激',en:(k)=>`2 New ${k} Tools Just Dropped — Here's My Honest Review`,cn:(k)=>`2 款新${k}工具刚刚发布——我的真实评测`},
+      {tag:'f',tagLabel:'恐惧痛点',en:(k)=>`${k} Is Getting More Expensive — How to Lock In Your Price Now`,cn:(k)=>`${k}越来越贵了——如何现在锁定你的价格`},
+      {tag:'r',tagLabel:'认知颠覆',en:(k)=>`Forget What You Read About ${k} Last Month — It's Already Outdated`,cn:(k)=>`忘掉你上个月读到的${k}内容——已经过时了`},
+      {tag:'s',tagLabel:'秘密武器',en:(k)=>`The ${k} Feature Power Users Have Been Quietly Using`,cn:(k)=>${`高级用户一直在悄悄使用的${k}功能`}`}
+    ],
+    vs:[
+      {tag:'t',tagLabel:'悬念留白',en:(k)=>`${k} vs The Competition — The Results Shocked Me`,cn:(k)=>`${k}对决竞品——结果让我震惊`},
+      {tag:'n',tagLabel:'数字刺激',en:(k)=>`5 ${k} Alternatives Compared: Only 1 Is Worth It`,cn:(k)=>`5 款${k}替代品对比：只有 1 款值得用`},
+      {tag:'f',tagLabel:'恐惧痛点',en:(k)=>`Why I Switched FROM ${k} — And What I Use Now`,cn:(k)=>`为什么我从${k}切换走了——以及我现在用什么`},
+      {tag:'r',tagLabel:'认知颠覆',en:(k)=>`${k} Is Overrated — Here's the Underrated Alternative`,cn:(k)=>`${k}被高估了——被低估的替代方案在此`},
+      {tag:'s',tagLabel:'秘密武器',en:(k)=>`${k} vs ${k} 2.0: The Benchmark Nobody Else Ran`,cn:(k)=>`${k} vs ${k} 2.0：别人都没跑过的基准测试`},
+      {tag:'t',tagLabel:'悬念留白',en:(k)=>`I Tested ${k} Against 3 Competitors — Winner Wasn't Even Close`,cn:(k)=>`我测试了${k}和 3 个竞品——赢家毫无悬念`},
+      {tag:'n',tagLabel:'数字刺激',en:(k)=>`4 ${k} Tools Ranked by Speed, Price & Features (2025)`,cn:(k)=>`4 款${k}工具按速度、价格和功能排名（2025）`},
+      {tag:'f',tagLabel:'恐惧痛点',en:(k)=>`${k} Loses to This Free Alternative on Every Metric`,cn:(k)=>`${k}在每个指标上都输给了这个免费替代品`},
+      {tag:'r',tagLabel:'认知颠覆',en:(k)=>`Everyone Recommends ${k} — But the Data Says Otherwise`,cn:(k)=>`所有人都推荐${k}——但数据说的恰恰相反`},
+      {tag:'s',tagLabel:'秘密武器',en:(k)=>`The ${k} Comparison No Influencer Wants You to See`,cn:(k)=>${`没有网红想让你看到的${k}对比`}`}}
+    ]
+  };
+
+  const TAG_MAP={t:'tag-t',n:'tag-n',f:'tag-f',r:'tag-r',s:'tag-s'};
+  const TAG_NAME={t:'悬念留白',n:'数字刺激',f:'恐惧痛点',r:'认知颠覆',s:'秘密武器'};
+
+  document.getElementById('genBtn').addEventListener('click',()=>{
+    const kw=document.getElementById('keywordInput').value.trim();
+    if(!kw){toast('请输入关键词');return}
+    const templates=TEMPLATES[selectedType]||TEMPLATES.tutorial;
+    const area=document.getElementById('resultsArea');
+    let html='<div class="results">';
+    templates.forEach((t,i)=>{
+      const en=t.en(kw);
+      const cn=t.cn(kw);
+      html+=`<div class="result-item"><div class="result-num">${i+1}</div><div class="result-content"><div class="result-en">${esc(en)}</div><div class="result-cn">${esc(cn)}</div><span class="result-tag ${TAG_MAP[t.tag]}">${TAG_NAME[t.tag]}</span></div><button class="copy-btn" onclick="copyTitle(this)" data-en="${escAttr(en)}" data-cn="${escAttr(cn)}">复制</button></div>`;
+    });
+    html+='</div>';
+    area.innerHTML=html;
+  });
+
+  window.copyTitle=function(btn){
+    const text=btn.dataset.en+'\n'+btn.dataset.cn;
+    navigator.clipboard.writeText(text).then(()=>toast('已复制双语标题')).catch(()=>toast('复制失败'));
+  };
+
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  function escAttr(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+  function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+})();
+</script>
+</body>
+</html>
