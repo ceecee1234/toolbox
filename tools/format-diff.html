@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本/代码实时全能对比工具 - 全能工具箱 V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aurora-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: aurora-animation 15s ease infinite;
+        }
+        @keyframes aurora-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .diff-added { background-color: rgba(34, 197, 94, 0.15); color: #15803d; }
+        .diff-removed { background-color: rgba(239, 68, 68, 0.15); color: #b91c1c; }
+        .diff-char-added { background-color: rgba(34, 197, 94, 0.4); text-decoration: underline; font-weight: bold; }
+        .diff-char-removed { background-color: rgba(239, 68, 68, 0.4); text-decoration: line-through; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <header class="aurora-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="返回主页">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        文本/代码文本对比工具
+                    </h1>
+                    <p class="text-white/80 text-sm mt-0.5">支持纯前端秒级差异提取，内置逐行高亮及字符级精准演变追踪</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="favBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 backdrop-blur-md border border-white/10">
+                    <i class="fa-regular fa-star" id="favIcon"></i>
+                    <span id="favText">加入收藏</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="flex flex-col">
+                    <label class="text-sm font-semibold text-slate-700 mb-2 flex items-center justify-between">
+                        <span><i class="fa-solid fa-file-invoice text-rose-500 mr-1.5"></i>原始文本 (Original Text)</span>
+                        <button onclick="clearArea('originalText')" class="text-xs text-slate-400 hover:text-slate-600"><i class="fa-solid fa-trash-can mr-1"></i>清空</button>
+                    </label>
+                    <textarea id="originalText" class="w-full h-48 p-4 rounded-xl border border-slate-200 font-mono text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all outline-none resize-none" placeholder="请在此粘贴旧的原始文本或者代码段..."></textarea>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-sm font-semibold text-slate-700 mb-2 flex items-center justify-between">
+                        <span><i class="fa-solid fa-file-signature text-emerald-500 mr-1.5"></i>修改后的新文本 (Modified Text)</span>
+                        <button onclick="clearArea('modifiedText')" class="text-xs text-slate-400 hover:text-slate-600"><i class="fa-solid fa-trash-can mr-1"></i>清空</button>
+                    </label>
+                    <textarea id="modifiedText" class="w-full h-48 p-4 rounded-xl border border-slate-200 font-mono text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none resize-none" placeholder="请在此粘贴修改后的新文本或者代码段..."></textarea>
+                </div>
+            </div>
+
+            <div class="mt-4 flex justify-between items-center border-t border-slate-100 pt-4">
+                <div class="flex items-center gap-4 text-xs text-slate-500">
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" id="ignoreSpace" checked class="text-violet-500 focus:ring-violet-500 rounded">
+                        <span>忽略首尾空白字符行干扰</span>
+                    </label>
+                </div>
+                <button onclick="compareTexts()" class="px-8 py-2.5 aurora-bg text-white text-sm font-semibold rounded-xl shadow-md shadow-violet-500/10 hover:opacity-95 transition-all transform active:scale-98">
+                    <i class="fa-solid fa-bolt mr-2"></i>开始分析差异
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center justify-between mb-4">
+                <span><i class="fa-solid fa-square-poll-horizontal text-violet-500 mr-1.5"></i> 差异比对分析报告</span>
+                <span id="diffStats" class="text-xs font-normal text-slate-400">暂无计算</span>
+            </h3>
+
+            <div id="diffOutputContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-4 font-mono text-xs border border-slate-200/60 rounded-xl overflow-hidden bg-slate-900 text-slate-300 p-4 min-h-[150px] whitespace-pre-wrap break-all leading-relaxed">
+                <div id="leftDiffView" class="space-y-0.5"></div>
+                <div id="rightDiffView" class="space-y-0.5 border-t lg:border-t-0 lg:border-l border-slate-700/60 pt-4 lg:pt-0 lg:pl-4"></div>
+            </div>
+
+            <div id="diffPlaceholder" class="py-12 border border-dashed border-slate-200 rounded-xl text-center text-slate-400 text-sm">
+                <i class="fa-solid fa-code-compare text-2xl text-slate-300 block mb-2"></i>
+                请在上方填入两组文本并点击“开始分析差异”
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function compareTexts() {
+            let oldText = document.getElementById('originalText').value;
+            let newText = document.getElementById('modifiedText').value;
+            const ignoreSpace = document.getElementById('ignoreSpace').checked;
+
+            if (ignoreSpace) {
+                oldText = oldText.split('\n').map(line => line.trimEnd()).join('\n');
+                newText = newText.split('\n').map(line => line.trimEnd()).join('\n');
+            }
+
+            const oldLines = oldText.split('\n');
+            const newLines = newText.split('\n');
+
+            const leftView = document.getElementById('leftDiffView');
+            const rightView = document.getElementById('rightDiffView');
+            const container = document.getElementById('diffOutputContainer');
+            const placeholder = document.getElementById('diffPlaceholder');
+            const stats = document.getElementById('diffStats');
+
+            leftView.innerHTML = '';
+            rightView.innerHTML = '';
+
+            // 极轻量经典 LCS 差异对比引擎算法实现
+            let i = 0, j = 0;
+            let addedCount = 0, removedCount = 0;
+
+            while (i < oldLines.length || j < newLines.length) {
+                if (i < oldLines.length && j < newLines.length && oldLines[i] === newLines[j]) {
+                    // 行完全相同
+                    leftView.appendChild(createLineNode(i + 1, oldLines[i], 'normal'));
+                    rightView.appendChild(createLineNode(j + 1, newLines[j], 'normal'));
+                    i++; j++;
+                } else {
+                    // 检测是删除了还是增加了 (寻找后续匹配项做权重探针)
+                    let lookAheadAdded = false;
+                    let lookAheadRemoved = false;
+
+                    for (let k = 1; k < 10; k++) {
+                        if (j + k < newLines.length && oldLines[i] === newLines[j + k]) { lookAheadAdded = true; break; }
+                        if (i + k < oldLines.length && oldLines[i + k] === newLines[j]) { lookAheadRemoved = true; break; }
+                    }
+
+                    if (lookAheadAdded && !lookAheadRemoved) {
+                        // 新文本多出了行 (Added)
+                        leftView.appendChild(createLineNode('', '', 'empty'));
+                        rightView.appendChild(createLineNode(j + 1, newLines[j], 'added'));
+                        addedCount++; j++;
+                    } else if (lookAheadRemoved && !lookAheadAdded) {
+                        // 旧文本行被删了 (Removed)
+                        leftView.appendChild(createLineNode(i + 1, oldLines[i], 'removed'));
+                        rightView.appendChild(createLineNode('', '', 'empty'));
+                        removedCount++; i++;
+                    } else {
+                        // 属于同位置行被修改变动 (行内字符精细比对)
+                        if (i < oldLines.length && j < newLines.length) {
+                            const charDiff = computeCharDiff(oldLines[i], newLines[j]);
+                            leftView.appendChild(createLineNode(i + 1, charDiff.oldHtml, 'removed', true));
+                            rightView.appendChild(createLineNode(j + 1, charDiff.newHtml, 'added', true));
+                            addedCount++; removedCount++; i++; j++;
+                        } else if (i < oldLines.length) {
+                            leftView.appendChild(createLineNode(i + 1, oldLines[i], 'removed'));
+                            rightView.appendChild(createLineNode('', '', 'empty'));
+                            removedCount++; i++;
+                        } else if (j < newLines.length) {
+                            leftView.appendChild(createLineNode('', '', 'empty'));
+                            rightView.appendChild(createLineNode(j + 1, newLines[j], 'added'));
+                            addedCount++; j++;
+                        }
+                    }
+                }
+            }
+
+            placeholder.classList.add('hidden');
+            container.classList.remove('hidden');
+            stats.innerHTML = `<span class="text-emerald-500 font-bold">+ ${addedCount} 行新增</span> ｜ <span class="text-rose-500 font-bold">- ${removedCount} 行变动</span>`;
+        }
+
+        function createLineNode(lineNum, content, type, isHtml = false) {
+            const div = document.createElement('div');
+            div.className = 'flex items-start px-2 py-0.5 rounded transition-colors';
+            
+            if (type === 'added') div.classList.add('bg-emerald-950/40', 'text-emerald-400');
+            if (type === 'removed') div.classList.add('bg-rose-950/40', 'text-rose-400');
+            if (type === 'empty') div.className = 'h-5 opacity-20';
+
+            const numSpan = document.createElement('span');
+            numSpan.className = 'w-8 text-slate-600 font-sans select-none shrink-0 inline-block text-right pr-2 border-r border-slate-800/40 mr-2';
+            numSpan.innerText = lineNum || ' ';
+
+            const codeSpan = document.createElement('span');
+            codeSpan.className = 'break-all';
+            if (isHtml) {
+                codeSpan.innerHTML = content;
+            } else {
+                codeSpan.innerText = content;
+            }
+
+            div.appendChild(numSpan);
+            div.appendChild(codeSpan);
+            return div;
+        }
+
+        // 精细化字符演进轨迹探针
+        function computeCharDiff(oldStr, newStr) {
+            let oldHtml = '', newHtml = '';
+            let commonPrefix = 0;
+            while (commonPrefix < oldStr.length && commonPrefix < newStr.length && oldStr[commonPrefix] === newStr[commonPrefix]) {
+                commonPrefix++;
+            }
+            
+            let commonSuffix = 0;
+            while (commonSuffix < (oldStr.length - commonPrefix) && commonSuffix < (newStr.length - commonPrefix) && 
+                   oldStr[oldStr.length - 1 - commonSuffix] === newStr[newStr.length - 1 - commonSuffix]) {
+                commonSuffix++;
+            }
+
+            const prefix = escapeHtml(oldStr.substring(0, commonPrefix));
+            const suffix = escapeHtml(oldStr.substring(oldStr.length - commonSuffix));
+
+            const oldMid = oldStr.substring(commonPrefix, oldStr.length - commonSuffix);
+            const newMid = newStr.substring(commonPrefix, newStr.length - commonSuffix);
+
+            oldHtml = prefix + (oldMid ? `<span class="diff-char-removed">${escapeHtml(oldMid)}</span>` : '') + suffix;
+            newHtml = prefix + (newMid ? `<span class="diff-char-added">${escapeHtml(newMid)}</span>` : '') + suffix;
+
+            return { oldHtml, newHtml };
+        }
+
+        function escapeHtml(string) {
+            return String(string).replace(/[&<>"']/g, function (s) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s];
+            });
+        }
+
+        function clearArea(id) {
+            document.getElementById(id).value = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.parent && window.parent.integrateToolPage) {
+                window.parent.integrateToolPage('format-diff');
+            }
+        });
+    </script>
+</body>
+</html>

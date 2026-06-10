@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正则表达式在线测试与速查器 - 全能工具箱 V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aurora-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: aurora-animation 15s ease infinite;
+        }
+        @keyframes aurora-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .match-highlight {
+            background-color: rgba(253, 224, 71, 0.6);
+            border-bottom: 2px solid #eab308;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <header class="aurora-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="返回主页">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        正则表达式测试器
+                    </h1>
+                    <p class="text-white/80 text-sm mt-0.5">支持 JavaScript 核心正则引擎实时匹配，内置站长自媒体常用正则语法速查断言</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="favBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 backdrop-blur-md border border-white/10">
+                    <i class="fa-regular fa-star" id="favIcon"></i>
+                    <span id="favText">加入收藏</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="lg:col-span-2 space-y-6">
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
+                    <div class="mb-4">
+                        <label class="text-sm font-semibold text-slate-700 mb-2 block flex items-center gap-2">
+                            <i class="fa-solid fa-code text-violet-500"></i> 正则表达式 (Regular Expression)
+                        </label>
+                        <div class="flex items-center gap-2 font-mono bg-slate-50 border border-slate-200 rounded-xl px-4 py-1">
+                            <span class="text-slate-400 font-bold text-lg">/</span>
+                            <input type="text" id="regexInput" oninput="onTestRegex()" class="flex-1 py-2 bg-transparent outline-none text-slate-800 text-sm" placeholder="例如: [a-zA-Z0-9]+">
+                            <span class="text-slate-400 font-bold text-lg">/</span>
+                            <div class="flex items-center gap-3 border-l border-slate-200 pl-4 ml-2 text-xs font-sans text-slate-500 select-none">
+                                <label class="flex items-center gap-1 cursor-pointer" title="全局匹配 (g)"><input type="checkbox" id="flagG" checked onchange="onTestRegex()" class="text-violet-500 focus:ring-violet-500">g</label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="忽略大小写 (i)"><input type="checkbox" id="flagI" checked onchange="onTestRegex()" class="text-violet-500 focus:ring-violet-500">i</label>
+                                <label class="flex items-center gap-1 cursor-pointer" title="多行匹配 (m)"><input type="checkbox" id="flagM" onchange="onTestRegex()" class="text-violet-500 focus:ring-violet-500">m</label>
+                            </div>
+                        </div>
+                        <div id="regexError" class="mt-2 text-xs text-rose-500 bg-rose-50 border border-rose-100 rounded-lg p-2 hidden font-mono"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                                <i class="fa-solid fa-file-lines text-pink-500"></i> 待匹配的测试文本 (Test String)
+                            </label>
+                            <button onclick="clearTestStr()" class="text-xs text-slate-400 hover:text-slate-600"><i class="fa-solid fa-trash-can mr-1"></i>清空</button>
+                        </div>
+                        <textarea id="testString" oninput="onTestRegex()" class="w-full h-36 p-4 rounded-xl border border-slate-200 font-mono text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all outline-none resize-none" placeholder="在此粘贴你需要进行检索、匹配或测试的原始文本串..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 mb-2 block flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> 实时匹配结果高亮渲染预览
+                        </label>
+                        <div id="highlightResult" class="w-full h-36 p-4 rounded-xl border border-slate-200 font-mono text-sm bg-slate-50 overflow-y-auto whitespace-pre-wrap break-all text-slate-600 border-dashed bg-violet-50/10">等待输入匹配条件...</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-list-check text-emerald-500"></i> 捕获数据明细 (Match List)
+                    </h3>
+                    <div class="overflow-x-auto border border-slate-150 rounded-xl bg-slate-50/30">
+                        <table class="min-w-full divide-y divide-slate-200 text-sm text-left">
+                            <thead class="bg-slate-50 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-4 py-2.5 w-16">序号</th>
+                                    <th class="px-4 py-2.5 w-24">匹配文本</th>
+                                    <th class="px-4 py-2.5">索引位置 (Index)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matchTableBody" class="divide-y divide-slate-150 bg-white text-slate-600 font-mono text-xs">
+                                <tr>
+                                    <td colspan="3" class="px-4 py-6 text-center font-sans text-slate-400">暂无匹配捕获项数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-star text-amber-400"></i> 常用快捷正则模板
+                    </h3>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <button onclick="applyTemplate('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$', 'g,i')" class="w-full text-left px-3 py-2 bg-slate-50 hover:bg-violet-50 border border-slate-150 hover:border-violet-200 rounded-xl transition-all flex items-center justify-between group">
+                            <span class="text-xs font-medium text-slate-700">电子邮箱 (Email)</span>
+                            <i class="fa-solid fa-angles-right text-slate-300 group-hover:text-violet-500 text-2xs transition-colors"></i>
+                        </button>
+                        <button onclick="applyTemplate('^1[3-9]\\d{9}$', 'g')" class="w-full text-left px-3 py-2 bg-slate-50 hover:bg-violet-50 border border-slate-150 hover:border-violet-200 rounded-xl transition-all flex items-center justify-between group">
+                            <span class="text-xs font-medium text-slate-700">中国大陆手机号</span>
+                            <i class="fa-solid fa-angles-right text-slate-300 group-hover:text-violet-500 text-2xs transition-colors"></i>
+                        </button>
+                        <button onclick="applyTemplate('^[a-zA-Z0-9_-]{4,16}$', 'g')" class="w-full text-left px-3 py-2 bg-slate-50 hover:bg-violet-50 border border-slate-150 hover:border-violet-200 rounded-xl transition-all flex items-center justify-between group">
+                            <span class="text-xs font-medium text-slate-700">用户名 (4-16位字母数字下划线)</span>
+                            <i class="fa-solid fa-angles-right text-slate-300 group-hover:text-violet-500 text-2xs transition-colors"></i>
+                        </button>
+                        <button onclick="applyTemplate('[\\u4e00-\\u9fa5]', 'g')" class="w-full text-left px-3 py-2 bg-slate-50 hover:bg-violet-50 border border-slate-150 hover:border-violet-200 rounded-xl transition-all flex items-center justify-between group">
+                            <span class="text-xs font-medium text-slate-700">纯中文字符检索</span>
+                            <i class="fa-solid fa-angles-right text-slate-300 group-hover:text-violet-500 text-2xs transition-colors"></i>
+                        </button>
+                        <button onclick="applyTemplate('^\\d{17}(\\d|X|x)$', 'g,i')" class="w-full text-left px-3 py-2 bg-slate-50 hover:bg-violet-50 border border-slate-150 hover:border-violet-200 rounded-xl transition-all flex items-center justify-between group">
+                            <span class="text-xs font-medium text-slate-700">18位身份证号</span>
+                            <i class="fa-solid fa-angles-right text-slate-300 group-hover:text-violet-500 text-2xs transition-colors"></i>
+                        </button>
+                        <button onclick="applyTemplate('https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)', 'g,i')" class="w-full text-left px-3 py-2 bg-slate-50 hover:bg-violet-50 border border-slate-150 hover:border-violet-200 rounded-xl transition-all flex items-center justify-between group">
+                            <span class="text-xs font-medium text-slate-700">URL 网址链接</span>
+                            <i class="fa-solid fa-angles-right text-slate-300 group-hover:text-violet-500 text-2xs transition-colors"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 font-sans text-xs text-slate-600">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-graduation-cap text-violet-500"></i> 元字符速查备忘
+                    </h3>
+                    <div class="space-y-2 font-mono">
+                        <div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-violet-600">.</span> <span class="text-slate-500">匹配除换行符外的任意字符</span></div>
+                        <div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-violet-600">\d / \D</span> <span class="text-slate-500">匹配数字 / 非数字</span></div>
+                        <div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-violet-600">\w / \W</span> <span class="text-slate-500">字母数字下划线 / 非</span></div>
+                        <div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-violet-600">* / + / ?</span> <span class="text-slate-500">出现0次+ / 1次+ / 0或1次</span></div>
+                        <div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-violet-600">{n,m}</span> <span class="text-slate-500">最少出现 n 次，最多 m 次</span></div>
+                        <div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-violet-600">^ / $</span> <span class="text-slate-500">匹配文本开头 / 结尾</span></div>
+                        <div class="flex justify-between"><span class="text-violet-600">(?:...)</span> <span class="text-slate-500">非捕获分组（仅匹配不存储）</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // 核心正则实时编译匹配逻辑
+        function onTestRegex() {
+            const pattern = document.getElementById('regexInput').value;
+            const testStr = document.getElementById('testString').value;
+            
+            const errBox = document.getElementById('regexError');
+            const highlightView = document.getElementById('highlightResult');
+            const tableBody = document.getElementById('matchTableBody');
+
+            // 恢复初始白璧状态
+            errBox.classList.add('hidden');
+            errBox.innerText = '';
+
+            if (!pattern) {
+                highlightView.innerText = testStr || '等待输入匹配条件...';
+                tableBody.innerHTML = `<tr><td colspan="3" class="px-4 py-6 text-center font-sans text-slate-400">暂无匹配捕获项数据</td></tr>`;
+                return;
+            }
+
+            // 构建修饰符复合串
+            let flags = '';
+            if (document.getElementById('flagG').checked) flags += 'g';
+            if (document.getElementById('flagI').checked) flags += 'i';
+            if (document.getElementById('flagM').checked) flags += 'm';
+
+            try {
+                const regex = new RegExp(pattern, flags);
+                
+                // 1. 渲染高亮效果视图
+                if (testStr) {
+                    let highlightedText = '';
+                    
+                    if (flags.includes('g')) {
+                        let lastIndex = 0;
+                        let match;
+                        let safetyCounter = 0;
+
+                        while ((match = regex.exec(testStr)) !== null) {
+                            // 极高阶防御：防止零宽断言正则陷入死循环死锁死浏览器
+                            if (match.index === regex.lastIndex) {
+                                regex.lastIndex++;
+                            }
+                            safetyCounter++;
+                            if(safetyCounter > 5000) break; // 强行拉闸防死锁
+
+                            highlightedText += escapeHtml(testStr.substring(lastIndex, match.index));
+                            highlightedText += `<span class="match-highlight">${escapeHtml(match[0])}</span>`;
+                            lastIndex = regex.lastIndex;
+                        }
+                        highlightedText += escapeHtml(testStr.substring(lastIndex));
+                    } else {
+                        // 针对非全局单次匹配
+                        const match = testStr.match(regex);
+                        if (match) {
+                            highlightedText = escapeHtml(testStr.substring(0, match.index)) + 
+                                              `<span class="match-highlight">${escapeHtml(match[0])}</span>` + 
+                                              escapeHtml(testStr.substring(match.index + match[0].length));
+                        } else {
+                            highlightedText = escapeHtml(testStr);
+                        }
+                    }
+                    highlightView.innerHTML = highlightedText;
+                } else {
+                    highlightView.innerText = '测试文本为空，请输入文本查看高亮效果。';
+                }
+
+                // 2. 渲染下方明细表格
+                regex.lastIndex = 0; // 重置游标
+                let tableHtml = '';
+                let matchIndex = 0;
+                
+                if (testStr) {
+                    if (flags.includes('g')) {
+                        let m;
+                        let safetyCounter = 0;
+                        while ((m = regex.exec(testStr)) !== null) {
+                            if (m.index === regex.lastIndex) regex.lastIndex++;
+                            safetyCounter++; if(safetyCounter > 1000) break;
+
+                            matchIndex++;
+                            tableHtml += `
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-4 py-2 font-semibold text-slate-400">${matchIndex}</td>
+                                    <td class="px-4 py-2 text-violet-700 bg-violet-50/40 break-all font-bold">${escapeHtml(m[0])}</td>
+                                    <td class="px-4 py-2 text-slate-500">字符 [${m.index}] 至 [${m.index + m[0].length}]</td>
+                                </tr>`;
+                        }
+                    } else {
+                        const m = testStr.match(regex);
+                        if (m) {
+                            tableHtml = `
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-4 py-2 font-semibold text-slate-400">1</td>
+                                    <td class="px-4 py-2 text-violet-700 bg-violet-50/40 break-all font-bold">${escapeHtml(m[0])}</td>
+                                    <td class="px-4 py-2 text-slate-500">字符 [${m.index}] 至 [${m.index + m[0].length}]</td>
+                                </tr>`;
+                        }
+                    }
+                }
+
+                tableBody.innerHTML = tableHtml || `<tr><td colspan="3" class="px-4 py-6 text-center font-sans text-rose-400 font-medium"><i class="fa-solid fa-face-frown mr-1.5"></i>在当前文本中未匹配到任何合规数据</td></tr>`;
+
+            } catch (err) {
+                // 正则语法编写错误，拉响红灯警报
+                errBox.innerText = `正则编译异常: ${err.message}`;
+                errBox.classList.remove('hidden');
+                highlightView.innerText = testStr;
+                tableBody.innerHTML = `<tr><td colspan="3" class="px-4 py-6 text-center font-sans text-slate-400">正则表达式语法有误</td></tr>`;
+            }
+        }
+
+        // 模板一键装配套用
+        function applyTemplate(regexStr, flagsStr) {
+            document.getElementById('regexInput').value = regexStr;
+            document.getElementById('flagG').checked = flagsStr.includes('g');
+            document.getElementById('flagI').checked = flagsStr.includes('i');
+            document.getElementById('flagM').checked = flagsStr.includes('m');
+            
+            // 预置一段好玩的演示测试文本
+            if(!document.getElementById('testString').value.trim()){
+                document.getElementById('testString').value = `全能工具箱演示文本：\nEmail: sissy_yan@gmail.com\nPhone: 13812345678\n网址: https://ceecee1234.github.io/toolbox\n身份证: 11010119900307234X\n含有中文和 English 数字123混合。`;
+            }
+            onTestRegex();
+        }
+
+        function escapeHtml(string) {
+            return String(string).replace(/[&<>"']/g, function (s) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s];
+            });
+        }
+
+        function clearTestStr() {
+            document.getElementById('testString').value = '';
+            onTestRegex();
+        }
+
+        // 绑定组件集成逻辑
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.parent && window.parent.integrateToolPage) {
+                window.parent.integrateToolPage('format-regex');
+            }
+        });
+    </script>
+</body>
+</html>

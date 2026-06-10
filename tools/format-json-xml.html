@@ -1,293 +1,296 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JSON 与 XML 互转器 - Dev Toolbox</title>
-<meta name="description" content="在线 JSON 与 XML 万能互转工具，纯前端实现，支持实时语法检查、格式化高亮、一键复制。">
-<link rel="icon" href="../favicon.ico">
-<style>
-  :root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--accent:#3b82f6;--accent-hover:#2563eb;--success:#22c55e;--success-bg:rgba(34,197,94,.15);--success-text:#86efac;--error:#ef4444;--error-bg:rgba(239,68,68,.15);--error-text:#fecaca;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.4)}
-  [data-theme="light"]{--bg:#f8fafc;--bg2:#fff;--bg3:#f1f5f9;--border:#e2e8f0;--text:#1e293b;--text2:#475569;--text3:#94a3b8;--shadow:0 4px 24px rgba(0,0,0,.08);--success-bg:rgba(34,197,94,.1);--success-text:#166534;--error-bg:rgba(239,68,68,.1);--error-text:#991b1b}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding-bottom:60px}
-  .page-header{position:relative;background:var(--bg2);border-bottom:1px solid var(--border);overflow:hidden;padding:28px 24px 20px}
-  .page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 20% 50%,rgba(59,130,246,.12) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 80% 30%,rgba(99,102,241,.08) 0%,transparent 70%);pointer-events:none}
-  .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:16px;position:relative}
-  .back-btn{display:flex;align-items:center;gap:6px;color:var(--text2);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);transition:all .2s;white-space:nowrap}
-  .back-btn:hover{color:var(--text);border-color:var(--accent)}
-  .header-title{flex:1}
-  .header-title h1{font-size:20px;font-weight:700;line-height:1.3}
-  .header-title p{font-size:13px;color:var(--text2);margin-top:3px}
-  .fav-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s}
-  .fav-btn:hover{border-color:var(--accent)}
-  .fav-btn.active{color:#fbbf24;border-color:#fbbf24;background:rgba(251,191,36,.1)}
-  .theme-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s}
-  .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
-  .main{max-width:1200px;margin:0 auto;padding:20px 16px}
-  .controls{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
-  .dir-btn{padding:10px 20px;font-size:14px;font-weight:700;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
-  .dir-btn:hover{border-color:var(--accent);color:var(--accent)}
-  .dir-btn .arrow{font-size:18px}
-  .panels{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:700px){.panels{grid-template-columns:1fr}}
-  .panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
-  .panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg3)}
-  .panel-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
-  .panel-tag{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
-  .tag-json{background:rgba(245,158,11,.15);color:#fde68a}
-  .tag-xml{background:rgba(99,102,241,.15);color:#c7d2fe}
-  [data-theme="light"] .tag-json{background:rgba(245,158,11,.1);color:#92400e}
-  [data-theme="light"] .tag-xml{background:rgba(99,102,241,.1);color:#3730a3}
-  .panel-actions{display:flex;gap:6px}
-  .sm-btn{padding:4px 10px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;color:var(--text2);cursor:pointer;transition:all .15s}
-  .sm-btn:hover{border-color:var(--accent);color:var(--accent)}
-  textarea{width:100%;flex:1;min-height:280px;background:var(--bg2);color:var(--text);border:none;outline:none;resize:vertical;padding:14px 16px;font-family:'JetBrains Mono','Fira Code',Consolas,monospace;font-size:13px;line-height:1.6;tab-size:2}
-  textarea::placeholder{color:var(--text3)}
-  .error-bar{padding:10px 16px;background:var(--error-bg);color:var(--error-text);font-size:12px;font-family:'JetBrains Mono','Fira Code',monospace;display:none;border-top:1px solid rgba(239,68,68,.3)}
-  .error-bar.show{display:block}
-  .toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--text);box-shadow:var(--shadow);transform:translateY(80px);opacity:0;transition:all .3s;z-index:9999}
-  .toast.show{transform:translateY(0);opacity:1}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON与XML万能双向互转器 - 全能工具箱 V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aurora-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: aurora-animation 15s ease infinite;
+        }
+        @keyframes aurora-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
 </head>
-<body>
-<header class="page-header">
-  <div class="header-inner">
-    <a href="../index.html" class="back-btn">← 返回首页</a>
-    <div class="header-title"><h1>JSON 与 XML 互转器</h1><p>双向转换 · 实时语法检查 · 格式化高亮</p></div>
-    <button class="fav-btn" id="favBtn" title="收藏此工具">☆</button>
-    <button class="theme-btn" id="themeBtn" title="切换主题">☀️</button>
-  </div>
-</header>
-<div class="main">
-  <div class="controls">
-    <button class="dir-btn" id="toXmlBtn"><span>JSON</span><span class="arrow">→</span><span>XML</span></button>
-    <button class="dir-btn" id="toJsonBtn"><span>XML</span><span class="arrow">→</span><span>JSON</span></button>
-    <button class="dir-btn" id="fmtJsonBtn"><span>格式化 JSON</span></button>
-    <button class="dir-btn" id="fmtXmlBtn"><span>格式化 XML</span></button>
-  </div>
-  <div class="panels">
-    <div class="panel">
-      <div class="panel-header"><span class="panel-title"><span class="panel-tag tag-json">JSON</span>输入</span><div class="panel-actions"><button class="sm-btn" id="clearJsonBtn">清空</button><button class="sm-btn" id="copyJsonBtn">复制</button></div></div>
-      <textarea id="jsonInput" placeholder='粘贴 JSON，例如：{"name":"Alice","age":30}' spellcheck="false"></textarea>
-      <div class="error-bar" id="jsonError"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-header"><span class="panel-title"><span class="panel-tag tag-xml">XML</span>输出</span><div class="panel-actions"><button class="sm-btn" id="clearXmlBtn">清空</button><button class="sm-btn" id="copyXmlBtn">复制</button></div></div>
-      <textarea id="xmlInput" placeholder='粘贴 XML，例如：<root><name>Alice</name><age>30</age></root>' spellcheck="false"></textarea>
-      <div class="error-bar" id="xmlError"></div>
-    </div>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
-<script>
-(function(){
-  'use strict';
-  const savedTheme=localStorage.getItem('toolbox_theme')||'dark';
-  document.documentElement.dataset.theme=savedTheme;
-  const themeBtn=document.getElementById('themeBtn');
-  themeBtn.textContent=savedTheme==='dark'?'☀️':'🌙';
-  themeBtn.addEventListener('click',()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('toolbox_theme',t);themeBtn.textContent=t==='dark'?'☀️':'🌙'});
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
 
-  const FAV_KEY='toolbox_favorites_v2',TOOL_ID='format-json-xml';
-  function getFavs(){try{return JSON.parse(localStorage.getItem(FAV_KEY))||[]}catch{return[]}}
-  function setFavs(a){localStorage.setItem(FAV_KEY,JSON.stringify(a))}
-  const favBtn=document.getElementById('favBtn'),favs=getFavs();
-  if(favs.includes(TOOL_ID)){favBtn.classList.add('active');favBtn.textContent='★'}
-  favBtn.addEventListener('click',()=>{const a=getFavs();if(a.includes(TOOL_ID)){setFavs(a.filter(x=>x!==TOOL_ID));favBtn.classList.remove('active');favBtn.textContent='☆'}else{setFavs([TOOL_ID,...a.filter(x=>x!==TOOL_ID)]);favBtn.classList.add('active');favBtn.textContent='★'}});
+    <header class="aurora-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="返回主页">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        JSON ↔ XML 万能互转
+                    </h1>
+                    <p class="text-white/80 text-sm mt-0.5">支持纯前端秒级双向格式转换，内置严格的实时语法纠错与排版美化面板</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="favBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 backdrop-blur-md border border-white/10">
+                    <i class="fa-regular fa-star" id="favIcon"></i>
+                    <span id="favText">加入收藏</span>
+                </button>
+            </div>
+        </div>
+    </header>
 
-  const jsonIn=document.getElementById('jsonInput');
-  const xmlIn=document.getElementById('xmlInput');
-  const jsonErr=document.getElementById('jsonError');
-  const xmlErr=document.getElementById('xmlError');
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                        <i class="fa-brands fa-js text-amber-500 text-base"></i> JSON 数据源
+                    </label>
+                    <div class="flex gap-3 text-xs">
+                        <button onclick="formatJSON()" class="text-violet-600 hover:text-violet-800 font-semibold"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>美化排版</button>
+                        <button onclick="clearArea('jsonInput')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-trash-can mr-1"></i>清空</button>
+                    </div>
+                </div>
+                <textarea id="jsonInput" oninput="validateJSONRealtime()" class="w-full h-[450px] p-4 rounded-xl border border-slate-200 font-mono text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all outline-none resize-none" placeholder='在此处输入或粘贴 JSON 字符串，例如：&#10;{&#10;  "site": "全能工具箱",&#10;  "status": "active"&#10;}'></textarea>
+                
+                <div id="jsonAlert" class="mt-2 text-xs text-rose-500 bg-rose-50 border border-rose-100 rounded-lg p-2.5 hidden font-mono">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> <span id="jsonErrorMsg"></span>
+                </div>
 
-  function escXml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;')}
+                <button onclick="jsonToXml()" class="w-full mt-4 py-3 aurora-bg text-white text-sm font-semibold rounded-xl shadow-md shadow-violet-500/10 hover:opacity-95 transition-all flex items-center justify-center gap-2">
+                    <span>转换为 XML</span><i class="fa-solid fa-angles-right"></i>
+                </button>
+            </div>
 
-  function jsonToXml(obj,root,indent){
-    root=root||'root';
-    indent=indent||0;
-    const pad='  '.repeat(indent);
-    let xml='';
-    if(Array.isArray(obj)){
-      obj.forEach((item,i)=>{
-        xml+=pad+'<item>';
-        if(typeof item==='object'&&item!==null){
-          xml+='\n'+jsonToXml(item,'item',indent+1)+pad;
-        }else{
-          xml+=escXml(String(item));
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-code text-teal-500"></i> XML 数据源
+                    </label>
+                    <div class="flex gap-3 text-xs">
+                        <button onclick="formatXML()" class="text-teal-600 hover:text-teal-800 font-semibold"><i class="fa-solid fa-align-left mr-1"></i>规范缩进</button>
+                        <button onclick="clearArea('xmlInput')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-trash-can mr-1"></i>清空</button>
+                    </div>
+                </div>
+                <textarea id="xmlInput" class="w-full h-[450px] p-4 rounded-xl border border-slate-200 font-mono text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all outline-none resize-none" placeholder='在此处输入或粘贴 XML 文本，例如：&#10;&lt;root&gt;&#10;  &lt;site&gt;全能工具箱&lt;/site&gt;&#10;  &lt;status&gt;active&lt;/status&gt;&#10;&lt;/root&gt;'></textarea>
+                
+                <div id="xmlAlert" class="mt-2 text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-lg p-2.5 hidden font-mono">
+                    <i class="fa-solid fa-circle-info mr-1"></i> 提示：逆向解析 XML 时，默认将采用 &lt;root&gt; 作为外层统一根节点。
+                </div>
+
+                <button onclick="xmlToJson()" class="w-full mt-4 py-3 bg-slate-800 text-white hover:bg-slate-900 text-sm font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-angles-left"></i><span>逆向转换为 JSON</span>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // 1. JSON 实时严格语法错误分析提示
+        function validateJSONRealtime() {
+            const raw = document.getElementById('jsonInput').value.trim();
+            const alertBox = document.getElementById('jsonAlert');
+            const msgSpan = document.getElementById('jsonErrorMsg');
+
+            if(!raw) {
+                alertBox.classList.add('hidden');
+                return;
+            }
+
+            try {
+                JSON.parse(raw);
+                alertBox.classList.add('hidden'); // 校验成功，隐藏红灯
+            } catch (err) {
+                msgSpan.innerText = `语法错误: ${err.message}`;
+                alertBox.classList.remove('hidden'); // 暴露缺陷位置
+            }
         }
-        xml+='</item>\n';
-      });
-    }else if(typeof obj==='object'&&obj!==null){
-      const keys=Object.keys(obj);
-      keys.forEach(key=>{
-        const val=obj[key];
-        const tag=key.replace(/[^a-zA-Z0-9_-]/g,'_');
-        xml+=pad+'<'+tag+'>';
-        if(val===null){
-          xml+=' xsi:nil="true"';
-          xml+='></'+tag+'>\n';
-        }else if(typeof val==='object'){
-          xml+='\n'+jsonToXml(val,tag,indent+1)+pad+'</'+tag+'>\n';
-        }else{
-          xml+=escXml(String(val));
-          xml+='</'+tag+'>\n';
+
+        // 2. JSON 一键格式化美化排版
+        function formatJSON() {
+            const val = document.getElementById('jsonInput').value.trim();
+            if(!val) return;
+            try {
+                document.getElementById('jsonInput').value = JSON.stringify(JSON.parse(val), null, 2);
+                document.getElementById('jsonAlert').classList.add('hidden');
+            } catch (e) {
+                alert('排版失败，请确保当前的 JSON 语法没有拼写缺陷！');
+            }
         }
-      });
-    }
-    return xml;
-  }
 
-  function xmlToJson(xmlStr){
-    const parser=new DOMParser();
-    const doc=parser.parseFromString(xmlStr,'text/xml');
-    const errNode=doc.querySelector('parsererror');
-    if(errNode){
-      throw new Error(errNode.textContent.substring(0,200));
-    }
-    function nodeToObj(node){
-      if(node.nodeType===3) return node.textContent.trim();
-      const obj={};
-      const children=Array.from(node.childNodes).filter(n=>n.nodeType===1||(n.nodeType===3&&n.textContent.trim()));
-      if(children.length===1&&children[0].nodeType===3){
-        const num=Number(children[0].textContent.trim());
-        if(!isNaN(num)&&children[0].textContent.trim()!=='') return num;
-        if(children[0].textContent.trim()==='true') return true;
-        if(children[0].textContent.trim()==='false') return false;
-        return children[0].textContent.trim();
-      }
-      const textChild=Array.from(node.childNodes).find(n=>n.nodeType===3&&n.textContent.trim());
-      if(children.length===0&&textChild){
-        const t=textChild.textContent.trim();
-        const num=Number(t);
-        if(!isNaN(num)&&t!=='') return num;
-        if(t==='true') return true;
-        if(t==='false') return false;
-        return t;
-      }
-      children.forEach(child=>{
-        if(child.nodeType!==1) return;
-        const name=child.nodeName;
-        const val=nodeToObj(child);
-        if(obj[name]!==undefined){
-          if(!Array.isArray(obj[name])) obj[name]=[obj[name]];
-          obj[name].push(val);
-        }else{
-          obj[name]=val;
+        // 3. 核心大招：JSON ➡️ XML
+        function jsonToXml() {
+            const jsonStr = document.getElementById('jsonInput').value.trim();
+            if(!jsonStr) return alert('请输入需要处理的 JSON 字符串！');
+
+            try {
+                const jsonObj = JSON.parse(jsonStr);
+                let xmlResult = '<?xml version="1.0" encoding="UTF-8"?>\n<root>\n';
+                
+                function objectToXml(obj, indent = '  ') {
+                    let parts = '';
+                    for (let key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            let value = obj[key];
+                            // 处理嵌套对象
+                            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                                parts += `${indent}<${key}>\n${objectToXml(value, indent + '  ')}${indent}</${key}>\n`;
+                            } 
+                            // 处理数组
+                            else if (Array.isArray(value)) {
+                                value.forEach(item => {
+                                    if (typeof item === 'object' && item !== null) {
+                                        parts += `${indent}<${key}>\n${objectToXml(item, indent + '  ')}${indent}</${key}>\n`;
+                                    } else {
+                                        parts += `${indent}<${key}>${escapeXmlEntities(item)}</${key}>\n`;
+                                    }
+                                });
+                            } 
+                            // 普通基础属性
+                            else {
+                                parts += `${indent}<${key}>${escapeXmlEntities(value)}</${key}>\n`;
+                            }
+                        }
+                    }
+                    return parts;
+                }
+
+                xmlResult += objectToXml(jsonObj);
+                xmlResult += '</root>';
+                document.getElementById('xmlInput').value = xmlResult;
+                document.getElementById('xmlAlert').classList.add('hidden');
+            } catch (err) {
+                alert('核心转换中断：由于 JSON 侧存在拼写语法错误，无法完成向下解析生成！');
+            }
         }
-      });
-      return obj;
-    }
-    return nodeToObj(doc.documentElement);
-  }
 
-  function validateJson(str){
-    try{JSON.parse(str);return null}
-    catch(e){
-      const msg=e.message;
-      const posMatch=msg.match(/position\s+(\d+)/i);
-      if(posMatch){
-        const pos=parseInt(posMatch[1]);
-        const lines=str.substring(0,pos).split('\n');
-        return '第 '+lines.length+' 行，第 '+(lines[lines.length-1].length+1)+' 列：'+msg;
-      }
-      return msg;
-    }
-  }
+        // 4. 逆向神技：XML ➡️ JSON
+        function xmlToJson() {
+            const xmlStr = document.getElementById('xmlInput').value.trim();
+            if(!xmlStr) return alert('请输入需要逆向提取的 XML 文本！');
 
-  document.getElementById('toXmlBtn').addEventListener('click',()=>{
-    const raw=jsonIn.value.trim();
-    if(!raw){toast('请先输入 JSON');return}
-    jsonErr.classList.remove('show');
-    const err=validateJson(raw);
-    if(err){jsonErr.textContent='JSON 语法错误：'+esc(err);jsonErr.classList.add('show');return}
-    try{
-      const obj=JSON.parse(raw);
-      let xml='<?xml version="1.0" encoding="UTF-8"?>\n<root>\n'+jsonToXml(obj,'root',1)+'</root>';
-      xmlIn.value=xml;
-      xmlErr.classList.remove('show');
-      toast('转换成功');
-    }catch(e){jsonErr.textContent='转换错误：'+esc(e.message);jsonErr.classList.add('show')}
-  });
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlStr, "text/xml");
+                
+                // 检查是否有 XML 解析错误
+                const parserError = xmlDoc.getElementsByTagName("parsererror");
+                if (parserError.length > 0) {
+                    return alert('XML 结构解析发生灾难性错误，请检查标签闭合状况！');
+                }
 
-  document.getElementById('toJsonBtn').addEventListener('click',()=>{
-    const raw=xmlIn.value.trim();
-    if(!raw){toast('请先输入 XML');return}
-    xmlErr.classList.remove('show');
-    try{
-      const obj=xmlToJson(raw);
-      const rootName=new DOMParser().parseFromString(raw,'text/xml').documentElement.nodeName;
-      const result={};
-      result[rootName]=obj;
-      jsonIn.value=JSON.stringify(result,null,2);
-      jsonErr.classList.remove('show');
-      toast('转换成功');
-    }catch(e){xmlErr.textContent='XML 解析错误：'+esc(e.message);xmlErr.classList.add('show')}
-  });
+                function domToJson(node) {
+                    // 如果节点只是个纯文本
+                    if (node.nodeType === 3) {
+                        return node.nodeValue.trim();
+                    }
+                    
+                    let obj = {};
+                    if (node.hasChildNodes()) {
+                        for (let i = 0; i < node.childNodes.length; i++) {
+                            let item = node.childNodes.item(i);
+                            let nodeName = item.nodeName;
 
-  document.getElementById('fmtJsonBtn').addEventListener('click',()=>{
-    const raw=jsonIn.value.trim();
-    if(!raw){toast('请先输入 JSON');return}
-    jsonErr.classList.remove('show');
-    const err=validateJson(raw);
-    if(err){jsonErr.textContent='JSON 语法错误：'+esc(err);jsonErr.classList.add('show');return}
-    try{jsonIn.value=JSON.stringify(JSON.parse(raw),null,2);toast('已格式化')}
-    catch(e){jsonErr.textContent='格式化错误：'+esc(e.message);jsonErr.classList.add('show')}
-  });
+                            // 过滤空白文本干扰项
+                            if (item.nodeType === 3 && !item.nodeValue.trim()) continue;
 
-  document.getElementById('fmtXmlBtn').addEventListener('click',()=>{
-    const raw=xmlIn.value.trim();
-    if(!raw){toast('请先输入 XML');return}
-    xmlErr.classList.remove('show');
-    try{
-      const doc=new DOMParser().parseFromString(raw,'text/xml');
-      if(doc.querySelector('parsererror')) throw new Error('XML 格式错误');
-      const ser=new XMLSerializer();
-      let formatted=ser.serializeToString(doc);
-      formatted=formatXmlString(formatted);
-      xmlIn.value=formatted;
-      toast('已格式化');
-    }catch(e){xmlErr.textContent='格式化错误：'+esc(e.message);xmlErr.classList.add('show')}
-  });
+                            if (item.nodeType === 3 || item.nodeType === 4) {
+                                return item.nodeValue;
+                            }
 
-  function formatXmlString(xml){
-    let formatted='';
-    let indent=0;
-    const tabs=()=>'\n'+'  '.repeat(indent);
-    xml.replace(/>\s*</g,'><').split(/>\s*</).forEach(function(node){
-      if(node.match(/^\/\w/)) indent--;
-      formatted+=tabs()+'<'+node+'>';
-      if(node.match(/^<?\w[^>]*[^/]$/)&&!node.startsWith('?')&&!node.startsWith('!')) indent++;
-    });
-    return formatted.replace(/>\s*$/,'>').replace(/<\/>/g,'');
-  }
+                            if (typeof obj[nodeName] === 'undefined') {
+                                let val = domToJson(item);
+                                if (val !== "") obj[nodeName] = val;
+                            } else {
+                                if (!Array.isArray(obj[nodeName])) {
+                                    let old = obj[nodeName];
+                                    obj[nodeName] = [];
+                                    obj[nodeName].push(old);
+                                }
+                                obj[nodeName].push(domToJson(item));
+                            }
+                        }
+                    }
+                    
+                    // 如果对象内部是空的，退化为纯文本或者空结构
+                    if (Object.keys(obj).length === 0) {
+                        return "";
+                    }
+                    return obj;
+                }
 
-  jsonIn.addEventListener('input',()=>{
-    const raw=jsonIn.value.trim();
-    if(!raw){jsonErr.classList.remove('show');return}
-    const err=validateJson(raw);
-    if(err){jsonErr.textContent='JSON 语法错误：'+esc(err);jsonErr.classList.add('show')}
-    else{jsonErr.classList.remove('show')}
-  });
+                const resultObj = domToJson(xmlDoc.documentElement);
+                document.getElementById('jsonInput').value = JSON.stringify(resultObj, null, 2);
+                document.getElementById('jsonAlert').classList.add('hidden');
+            } catch (e) {
+                alert('逆向解析转换失败，请确保输入的 XML 拥有唯一的根标签，且内容闭合严密！');
+            }
+        }
 
-  xmlIn.addEventListener('input',()=>{
-    const raw=xmlIn.value.trim();
-    if(!raw){xmlErr.classList.remove('show');return}
-    try{
-      const doc=new DOMParser().parseFromString(raw,'text/xml');
-      if(doc.querySelector('parsererror')) throw new Error('XML 格式错误');
-      xmlErr.classList.remove('show');
-    }catch(e){xmlErr.textContent='XML 解析错误：'+esc(e.message);xmlErr.classList.add('show')}
-  });
+        // 5. XML 纯前端轻量化排版美化
+        function formatXML() {
+            const xml = document.getElementById('xmlInput').value.trim();
+            if(!xml) return;
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xml, "text/xml");
+                if(xmlDoc.getElementsByTagName("parsererror").length > 0) throw new Error();
 
-  document.getElementById('clearJsonBtn').addEventListener('click',()=>{jsonIn.value='';jsonErr.classList.remove('show')});
-  document.getElementById('clearXmlBtn').addEventListener('click',()=>{xmlIn.value='';xmlErr.classList.remove('show')});
-  document.getElementById('copyJsonBtn').addEventListener('click',()=>{navigator.clipboard.writeText(jsonIn.value).then(()=>toast('已复制')).catch(()=>toast('复制失败'))});
-  document.getElementById('copyXmlBtn').addEventListener('click',()=>{navigator.clipboard.writeText(xmlIn.value).then(()=>toast('已复制')).catch(()=>toast('复制失败'))});
+                let formatted = '';
+                let reg = /(>)(<)(\/*)/g;
+                let pad = 0;
+                
+                let xmlString = new XMLSerializer().serializeToString(xmlDoc);
+                xmlString = xmlString.replace(reg, '$1\r\n$2$3');
+                
+                xmlString.split('\r\n').forEach(function(node) {
+                    let indent = 0;
+                    if (node.match( /.+<\/\w[^>]*>$/ )) {
+                        indent = 0;
+                    } else if (node.match( /^<\/\w/ )) {
+                        if (pad !== 0) pad -= 1;
+                    } else if (node.match( /^<\w([^>]*[^\/])?>.*$/ )) {
+                        indent = 1;
+                    } else {
+                        indent = 0;
+                    }
 
-  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-  function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
-})();
-</script>
+                    let padding = '';
+                    for (let i = 0; i < pad; i++) padding += '  ';
+                    formatted += padding + node + '\r\n';
+                    pad += indent;
+                });
+
+                document.getElementById('xmlInput').value = formatted.trim();
+            } catch (e) {
+                alert('XML 排版美化失败，请保证标签合规！');
+            }
+        }
+
+        function escapeXmlEntities(string) {
+            return String(string).replace(/[<>&"']/g, function (s) {
+                return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[s];
+            });
+        }
+
+        function clearArea(id) {
+            document.getElementById(id).value = '';
+            if(id === 'jsonInput') document.getElementById('jsonAlert').classList.add('hidden');
+        }
+
+        // 挂载收藏页联动
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.parent && window.parent.integrateToolPage) {
+                window.parent.integrateToolPage('format-json-xml');
+            }
+        });
+    </script>
 </body>
 </html>
