@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unix时间戳在线极速转换器 - 全能工具箱 V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aurora-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: aurora-animation 15s ease infinite;
+        }
+        @keyframes aurora-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <header class="aurora-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="返回主页">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        Unix 时间戳转换器
+                    </h1>
+                    <p class="text-white/80 text-sm mt-0.5">支持秒与毫秒级双向实时互转，内置本地北京时间与 UTC 标准时区精准对照</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="favBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 backdrop-blur-md border border-white/10">
+                    <i class="fa-regular fa-star" id="favIcon"></i>
+                    <span id="favText">加入收藏</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                <span class="text-sm font-semibold text-slate-600">当前实时 Unix 时间戳：</span>
+                <span id="currentTimestamp" class="font-mono text-lg font-bold text-violet-600 bg-violet-50 px-3 py-1 rounded-lg">-</span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="toggleClock()" id="clockToggleBtn" class="px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-lg transition-colors">
+                    <i class="fa-solid fa-pause mr-1"></i>暂停跳动
+                </button>
+                <button onclick="copyCurrentStamp()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors">
+                    <i class="fa-solid fa-copy mr-1"></i>一键复制
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-arrow-right-left text-violet-500"></i> Unix 时间戳 ➡️ 北京时间
+                    </h3>
+                    <div class="flex items-center gap-2 mb-4">
+                        <input type="text" id="inputStamp" class="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl font-mono text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none transition-all" placeholder="输入待转换的时间戳，例如: 1772345678">
+                        <select id="stampUnit" class="px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium outline-none text-slate-600">
+                            <option value="s">秒 (s)</option>
+                            <option value="ms">毫秒 (ms)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-3 bg-slate-50/50 p-4 rounded-xl border border-slate-100 font-mono text-xs text-slate-600">
+                        <div class="flex justify-between py-1 border-b border-slate-200/40">
+                            <span class="font-sans text-slate-400">北京时间 (Local Localtime):</span>
+                            <span id="outLocalTime" class="text-slate-800 font-semibold">-</span>
+                        </div>
+                        <div class="flex justify-between py-1">
+                            <span class="font-sans text-slate-400">格林威治时区 (GMT / UTC):</span>
+                            <span id="outUtcTime" class="text-slate-500">-</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="convertStampToDate()" class="w-full mt-5 py-2.5 aurora-bg text-white text-sm font-semibold rounded-xl shadow-md shadow-violet-500/10 hover:opacity-95 transition-all">
+                    开始转换日期
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-arrow-right-left text-pink-500"></i> 北京时间 ➡️ Unix 时间戳
+                    </h3>
+                    <div class="flex items-center gap-2 mb-4">
+                        <input type="text" id="inputDate" class="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl font-mono text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 outline-none transition-all" placeholder="标准格式: YYYY-MM-DD HH:mm:ss">
+                        <button onclick="fillCurrentDate()" class="px-3 py-2.5 bg-pink-50 text-pink-600 hover:bg-pink-100 border border-pink-100 text-xs font-semibold rounded-xl transition-all">填入当前</button>
+                    </div>
+                    <div class="space-y-3 bg-slate-50/50 p-4 rounded-xl border border-slate-100 font-mono text-xs text-slate-600">
+                        <div class="flex justify-between py-1 border-b border-slate-200/40">
+                            <span class="font-sans text-slate-400">转换结果 (秒级戳 - s):</span>
+                            <span id="outSecStamp" class="text-slate-800 font-semibold select-all">-</span>
+                        </div>
+                        <div class="flex justify-between py-1">
+                            <span class="font-sans text-slate-400">转换结果 (毫秒级戳 - ms):</span>
+                            <span id="outMsStamp" class="text-slate-500 select-all">-</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="convertDateToStamp()" class="w-full mt-5 py-2.5 bg-slate-800 text-white hover:bg-slate-900 text-sm font-semibold rounded-xl transition-all">
+                    反向计算时间戳
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        let clockTimer = null;
+        let isClockRunning = true;
+
+        // 页面启动时初始化逻辑
+        document.addEventListener('DOMContentLoaded', () => {
+            startClock();
+            fillCurrentDate();
+            
+            // 同步全能框架路由
+            if (window.parent && window.parent.integrateToolPage) {
+                window.parent.integrateToolPage('format-timestamp');
+            }
+        });
+
+        // 实时时钟核心控制器
+        function startClock() {
+            if(clockTimer) clearInterval(clockTimer);
+            clockTimer = setInterval(() => {
+                document.getElementById('currentTimestamp').innerText = Math.floor(Date.now() / 1000);
+            }, 1000);
+        }
+
+        function toggleClock() {
+            const btn = document.getElementById('clockToggleBtn');
+            if (isClockRunning) {
+                clearInterval(clockTimer);
+                btn.innerHTML = `<i class="fa-solid fa-play mr-1"></i>恢复跳动`;
+            } else {
+                startClock();
+                btn.innerHTML = `<i class="fa-solid fa-pause mr-1"></i>暂停跳动`;
+            }
+            isClockRunning = !isClockRunning;
+        }
+
+        function copyCurrentStamp() {
+            const text = document.getElementById('currentTimestamp').innerText;
+            navigator.clipboard.writeText(text).then(() => alert('当前 Unix 时间戳已复制成功！'));
+        }
+
+        // 逻辑一：时间戳 ➡️ 易读日期时间
+        function convertStampToDate() {
+            let stampStr = document.getElementById('inputStamp').value.trim();
+            const unit = document.getElementById('stampUnit').value;
+
+            if (!stampStr) return alert('请先输入需要转化的时间戳数值！');
+            
+            let stamp = parseInt(stampStr, 10);
+            if (isNaN(stamp)) return alert('输入内容有误，时间戳必须为纯数字结构！');
+
+            // 如果选的是秒，需要乘以1000传入 Date
+            let dateObj = new Date(unit === 's' ? stamp * 1000 : stamp);
+
+            if (dateObj.toString() === 'Invalid Date') {
+                return alert('解析失败，请输入正确的合法时间戳范围！');
+            }
+
+            // 排版北京时间布局 (补齐零位)
+            const pad = (n) => n < 10 ? '0' + n : n;
+            const localStr = dateObj.getFullYear() + '-' +
+                pad(dateObj.getMonth() + 1) + '-' +
+                pad(dateObj.getDate()) + ' ' +
+                pad(dateObj.getHours()) + ':' +
+                pad(dateObj.getMinutes()) + ':' +
+                pad(dateObj.getSeconds());
+
+            document.getElementById('outLocalTime').innerText = localStr;
+            document.getElementById('outUtcTime').innerText = dateObj.toUTCString();
+        }
+
+        // 逻辑二：可读日期时间 ➡️ 时间戳数值
+        function convertDateToStamp() {
+            const dateStr = document.getElementById('inputDate').value.trim();
+            if(!dateStr) return alert('请输入需要还原的日期时间字符串！');
+
+            // 兼容将横杠和斜杠时间文本安全喂给标准 Date 对象
+            let parsedMs = Date.parse(dateStr.replace(/-/g, '/'));
+            if (isNaN(parsedMs)) {
+                return alert('转换失败：时间文本格式有误，请严格保持 YYYY-MM-DD HH:mm:ss 排版！');
+            }
+
+            document.getElementById('outSecStamp').innerText = Math.floor(parsedMs / 1000);
+            document.getElementById('outMsStamp').innerText = parsedMs;
+        }
+
+        function fillCurrentDate() {
+            const d = new Date();
+            const pad = (n) => n < 10 ? '0' + n : n;
+            const curStr = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+            document.getElementById('inputDate').value = curStr;
+        }
+    </script>
+</body>
+</html>

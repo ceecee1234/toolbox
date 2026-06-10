@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD5/SHA系列在线哈希计算器 - 全能工具箱 V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        .aurora-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: aurora-animation 15s ease infinite;
+        }
+        @keyframes aurora-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <header class="aurora-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="返回主页">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        MD5 & 哈希生成器
+                    </h1>
+                    <p class="text-white/80 text-sm mt-0.5">支持 MD5、SHA-1、SHA-256、SHA-512 实时生成，多格式一键导出</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="favBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 backdrop-blur-md border border-white/10">
+                    <i class="fa-regular fa-star" id="favIcon"></i>
+                    <span id="favText">加入收藏</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 mb-6">
+            <div class="flex justify-between items-center mb-3">
+                <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-keyboard text-violet-500"></i> 输入待加密的原始文本 (支持任意字符及长文本)
+                </label>
+                <button onclick="clearInput()" class="text-xs text-slate-400 hover:text-slate-600 transition-colors">
+                    <i class="fa-solid fa-trash-can mr-1"></i>清空
+                </button>
+            </div>
+            <textarea id="textInput" oninput="calculateHashes()" class="w-full h-32 p-4 rounded-xl border border-slate-200 font-mono text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all outline-none resize-none" placeholder="请在此处输入或粘贴你需要生成哈希摘要的明文内容（实时计算差异）..."></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4">
+            
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="md:w-32 flex-shrink-0">
+                    <span class="px-3 py-1 bg-violet-50 text-violet-700 text-xs font-bold rounded-lg tracking-wider border border-violet-100">MD5 (32位)</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <input id="hash-md5" readonly class="w-full bg-slate-50 border border-slate-150 px-3 py-2 rounded-xl font-mono text-sm text-slate-600 outline-none select-all focus:border-violet-300" placeholder="等待明文输入...">
+                    <div class="flex gap-4 mt-2 text-xs text-slate-400 pl-1">
+                        <span>16位大写: <span id="md5-16-up" class="font-mono text-slate-500">-</span></span>
+                        <span>16位小写: <span id="md5-16-low" class="font-mono text-slate-500">-</span></span>
+                    </div>
+                </div>
+                <div class="flex gap-2 flex-shrink-0">
+                    <button onclick="copyHash('hash-md5', 'lower')" class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition-all">小写复制</button>
+                    <button onclick="copyHash('hash-md5', 'upper')" class="px-3 py-2 bg-violet-50 hover:bg-violet-100 border border-violet-100 text-violet-700 text-xs font-semibold rounded-xl transition-all">大写复制</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="md:w-32 flex-shrink-0">
+                    <span class="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg tracking-wider border border-emerald-100">SHA-256</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <input id="hash-sha256" readonly class="w-full bg-slate-50 border border-slate-150 px-3 py-2 rounded-xl font-mono text-sm text-slate-600 outline-none select-all focus:border-emerald-300" placeholder="等待明文输入...">
+                </div>
+                <div class="flex gap-2 flex-shrink-0">
+                    <button onclick="copyHash('hash-sha256', 'lower')" class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition-all">小写复制</button>
+                    <button onclick="copyHash('hash-sha256', 'upper')" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 text-emerald-700 text-xs font-semibold rounded-xl transition-all">大写复制</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="md:w-32 flex-shrink-0">
+                    <span class="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg tracking-wider border border-amber-100">SHA-1</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <input id="hash-sha1" readonly class="w-full bg-slate-50 border border-slate-150 px-3 py-2 rounded-xl font-mono text-sm text-slate-600 outline-none select-all focus:border-amber-300" placeholder="等待明文输入...">
+                </div>
+                <div class="flex gap-2 flex-shrink-0">
+                    <button onclick="copyHash('hash-sha1', 'lower')" class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition-all">小写复制</button>
+                    <button onclick="copyHash('hash-sha1', 'upper')" class="px-3 py-2 bg-amber-50 hover:bg-amber-100 border border-amber-100 text-amber-700 text-xs font-semibold rounded-xl transition-all">大写复制</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="md:w-32 flex-shrink-0">
+                    <span class="px-3 py-1 bg-pink-50 text-pink-700 text-xs font-bold rounded-lg tracking-wider border border-pink-100">SHA-512</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <input id="hash-sha512" readonly class="w-full bg-slate-50 border border-slate-150 px-3 py-2 rounded-xl font-mono text-xs text-slate-600 outline-none select-all focus:border-pink-300" placeholder="等待明文输入...">
+                </div>
+                <div class="flex gap-2 flex-shrink-0">
+                    <button onclick="copyHash('hash-sha512', 'lower')" class="px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition-all">小写复制</button>
+                    <button onclick="copyHash('hash-sha512', 'upper')" class="px-3 py-2 bg-pink-50 hover:bg-pink-100 border border-pink-100 text-pink-700 text-xs font-semibold rounded-xl transition-all">大写复制</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // 核心哈希实时计算逻辑
+        function calculateHashes() {
+            const srcText = document.getElementById('textInput').value;
+            
+            const md5View = document.getElementById('hash-md5');
+            const sha1View = document.getElementById('hash-sha1');
+            const sha256View = document.getElementById('hash-sha256');
+            const sha512View = document.getElementById('hash-sha512');
+            
+            const md5Up16 = document.getElementById('md5-16-up');
+            const md5Low16 = document.getElementById('md5-16-low');
+
+            if (!srcText) {
+                // 清空状态
+                md5View.value = ''; sha1View.value = ''; sha250View.value = ''; sha512View.value = '';
+                md5Up16.innerText = '-'; md5Low16.innerText = '-';
+                return;
+            }
+
+            // 计算全量哈希摘要（默认吐出为32位/长位小写字符串）
+            const md5Result = CryptoJS.MD5(srcText).toString();
+            const sha1Result = CryptoJS.SHA1(srcText).toString();
+            const sha256Result = CryptoJS.SHA256(srcText).toString();
+            const sha512Result = CryptoJS.SHA512(srcText).toString();
+
+            // 赋值给主输入框
+            md5View.value = md5Result;
+            sha1View.value = sha1Result;
+            sha256View.value = sha256Result;
+            sha512View.value = sha512Result;
+
+            // 单独切分 MD5 的 16 位衍生版本（即取 32 位的第 9 到第 24 位字符）
+            const shortMd5 = md5Result.substring(8, 24);
+            md5Up16.innerText = shortMd5.toUpperCase();
+            md5Low16.innerText = shortMd5.toLowerCase();
+        }
+
+        // 精准复制控制逻辑
+        function copyHash(elementId, caseType) {
+            let targetValue = document.getElementById(elementId).value;
+            if (!targetValue) return alert('请先输入文本内容以生成哈希值！');
+
+            if (caseType === 'upper') {
+                targetValue = targetValue.toUpperCase();
+            } else {
+                targetValue = targetValue.toLowerCase();
+            }
+
+            navigator.clipboard.writeText(targetValue).then(() => {
+                alert(`哈希值（${caseType === 'upper' ? '大写' : '小写'}）已成功复制到剪贴板！`);
+            });
+        }
+
+        function clearInput() {
+            document.getElementById('textInput').value = '';
+            calculateHashes();
+        }
+
+        // 绑定组件集成逻辑
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.parent && window.parent.integrateToolPage) {
+                window.parent.integrateToolPage('format-md5');
+            }
+        });
+    </script>
+</body>
+</html>
