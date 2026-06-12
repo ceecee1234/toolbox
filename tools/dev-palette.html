@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>像素级色彩提取与格式万能转换板 - 全能工具箱 V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aurora-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: aurora-animation 15s ease infinite;
+        }
+        @keyframes aurora-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <header class="aurora-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="返回主页">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        全能色彩格式转换板
+                    </h1>
+                    <p class="text-white/80 text-sm mt-0.5">支持 HEX、RGB、HSL、CMYK 像素级多向实时互转，内置专业色彩演进阶梯与主流规范推荐</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="favBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 backdrop-blur-md border border-white/10">
+                    <i class="fa-regular fa-star" id="favIcon"></i>
+                    <span id="favText">加入收藏</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 space-y-5">
+                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-eye-dropper text-violet-500"></i> 色彩捕获与实时联动
+                </h3>
+
+                <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-150">
+                    <input type="color" id="colorPicker" value="#8b5cf6" oninput="handlePickerInput(this.value)" class="w-16 h-16 rounded-xl cursor-pointer border-0 bg-transparent shrink-0">
+                    <div class="w-full">
+                        <div class="text-xs font-bold text-slate-700">点击左侧色块</div>
+                        <div class="text-2xs text-slate-400 mt-0.5 leading-normal">可激活系统原生吸管工具，捕获屏幕或调色盘上的任意像素色彩</div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 pt-2">
+                    <div>
+                        <label class="text-2xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">HEX 格式 (十六进制)</label>
+                        <div class="relative">
+                            <input type="text" id="inputHex" value="#8B5CF6" oninput="handleTextInput('hex', this.value)" class="w-full bg-slate-50/50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 rounded-xl text-xs font-mono px-3 py-2.5 text-slate-700 uppercase outline-none transition-all">
+                            <button onclick="copyField('inputHex')" class="absolute right-3 top-2.5 text-slate-400 hover:text-violet-600 text-xs"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-2xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">RGB 格式 (红绿蓝)</label>
+                        <div class="relative">
+                            <input type="text" id="inputRgb" value="rgb(139, 92, 246)" oninput="handleTextInput('rgb', this.value)" class="w-full bg-slate-50/50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 rounded-xl text-xs font-mono px-3 py-2.5 text-slate-700 outline-none transition-all">
+                            <button onclick="copyField('inputRgb')" class="absolute right-3 top-2.5 text-slate-400 hover:text-violet-600 text-xs"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-2xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">HSL 格式 (色相饱和度亮度)</label>
+                        <div class="relative">
+                            <input type="text" id="inputHsl" value="hsl(258, 91%, 66%)" oninput="handleTextInput('inputHsl', this.value)" class="w-full bg-slate-50/50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 rounded-xl text-xs font-mono px-3 py-2.5 text-slate-700 outline-none transition-all">
+                            <button onclick="copyField('inputHsl')" class="absolute right-3 top-2.5 text-slate-400 hover:text-violet-600 text-xs"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-2xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">CMYK 格式 (印刷四色)</label>
+                        <div class="relative">
+                            <input type="text" id="inputCmyk" value="cmyk(43%, 63%, 0%, 4%)" readonly class="w-full bg-slate-100/70 border border-slate-200 text-slate-400 rounded-xl text-xs font-mono px-3 py-2.5 cursor-not-allowed outline-none select-all">
+                            <button onclick="copyField('inputCmyk')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-layer-group text-pink-500"></i> 单色深度梯度拉伸演进 (Scale 50 - 900)
+                    </h3>
+                    <div class="grid grid-cols-10 gap-1 rounded-xl overflow-hidden shadow-sm" id="scaleContainer">
+                        </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-swatchbook text-amber-500"></i> UI 高频大师安全色灵感库
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <div class="text-2xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Brand Primaries (重磅品牌主色)</div>
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                                <div onclick="handlePickerInput('#3b82f6')" class="p-2 border border-slate-100 rounded-xl flex items-center gap-2 hover:bg-slate-50 cursor-pointer transition-all"><span class="w-4 h-4 rounded bg-[#3b82f6] shrink-0"></span><span class="font-mono text-2xs text-slate-600">#3B82F6</span></div>
+                                <div onclick="handlePickerInput('#10b981')" class="p-2 border border-slate-100 rounded-xl flex items-center gap-2 hover:bg-slate-50 cursor-pointer transition-all"><span class="w-4 h-4 rounded bg-[#10b981] shrink-0"></span><span class="font-mono text-2xs text-slate-600">#10B981</span></div>
+                                <div onclick="handlePickerInput('#f59e0b')" class="p-2 border border-slate-100 rounded-xl flex items-center gap-2 hover:bg-slate-50 cursor-pointer transition-all"><span class="w-4 h-4 rounded bg-[#f59e0b] shrink-0"></span><span class="font-mono text-2xs text-slate-600">#F59E0B</span></div>
+                                <div onclick="handlePickerInput('#ef4444')" class="p-2 border border-slate-100 rounded-xl flex items-center gap-2 hover:bg-slate-50 cursor-pointer transition-all"><span class="w-4 h-4 rounded bg-[#ef4444] shrink-0"></span><span class="font-mono text-2xs text-slate-600">#EF4444</span></div>
+                                <div onclick="handlePickerInput('#6366f1')" class="p-2 border border-slate-100 rounded-xl flex items-center gap-2 hover:bg-slate-50 cursor-pointer transition-all"><span class="w-4 h-4 rounded bg-[#6366f1] shrink-0"></span><span class="font-mono text-2xs text-slate-600">#6366F1</span></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="text-2xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Premium Slate Neutrals (高级质感中性黑白灰)</div>
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                                <div onclick="handlePickerInput('#0f172a')" class="p-2 border border-slate-100 rounded-xl flex items-center gap-2 hover:bg-slate-50 cursor-pointer transition-all"><span class="w-4 h-4 rounded bg-[#0f172a] shrink-0"></span><span class="font-mono text-2xs text-slate-600">#0F172A</span></div>
+                                <div onclick="handlePickerInput('#334155')" class="p-2 border border-slate-100 rounded-xl flex items-center gap-2 hover:bg-slate-50 cursor-pointer transition-all"><span class="w-4 h-4 rounded bg-[#334155] shrink-0"></span><span class="font-mono text-2xs text-slate-600">#334155</span></div>
+                                <div onclick="handlePickerInput('#64748b')" class="p-2 border border-slate-100 rounded-xl flex items-center gap-2 hover:bg-slate-50 cursor-pointer transition-all"><span class="w-4 h-4 rounded bg-[#64748b] shrink-0"></span><span class="font-mono text-2xs text-slate-600">#64748b</span></div>
+                                <div onclick="handlePickerInput('#cbd5e1')" class="p-2 border border-slate-100 rounded-xl flex items-center gap-2 hover:bg-slate-50 cursor-pointer transition-all"><span class="w-4 h-4 rounded bg-[#cbd5e1] shrink-0"></span><span class="font-mono text-2xs text-slate-600">#CBD5E1</span></div>
+                                <div onclick="handlePickerInput('#f8fafc')" class="p-2 border border-slate-100 rounded-xl flex items-center gap-2 hover:bg-slate-50 cursor-pointer transition-all"><span class="w-4 h-4 rounded bg-[#f8fafc] shrink-0"></span><span class="font-mono text-2xs text-slate-600">#F8FAFC</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // 核心中央色彩处理器，接收任意 HEX，向外辐射联动所有组件
+        function renderAllColorFormats(hex) {
+            if(!/^#[0-9A-F]{6}$/i.test(hex)) return;
+            
+            // 1. 同步取色盘状态
+            document.getElementById('colorPicker').value = hex;
+            document.getElementById('inputHex').value = hex.toUpperCase();
+
+            // 2. 转换并同步 RGB
+            const rgb = hexToRgb(hex);
+            document.getElementById('inputRgb').value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+
+            // 3. 转换并同步 HSL
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            document.getElementById('inputHsl').value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+
+            // 4. 转换并同步 CMYK
+            const cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
+            document.getElementById('inputCmyk').value = `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
+
+            // 5. 动态衍生出单色亮度演化梯度阶梯
+            renderScaleContainer(hsl.h, hsl.s);
+        }
+
+        function handlePickerInput(hex) {
+            renderAllColorFormats(hex);
+        }
+
+        function handleTextInput(type, value) {
+            if (type === 'hex' && /^#[0-9A-F]{6}$/i.test(value)) {
+                renderAllColorFormats(value);
+            } else if (type === 'rgb') {
+                const match = value.match(/\b(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\b/g);
+                if (match && match.length === 3) {
+                    const hex = rgbToHex(parseInt(match[0]), parseInt(match[1]), parseInt(match[2]));
+                    renderAllColorFormats(hex);
+                }
+            }
+        }
+
+        // 动态生成亮度演进色阶
+        function renderScaleContainer(h, s) {
+            const container = document.getElementById('scaleContainer');
+            container.innerHTML = '';
+            // 衍生 10 个不同的亮度节点 (从极其柔和的 95% 亮度到深邃的 12% 亮度)
+            const lightValues = [95, 88, 78, 68, 58, 48, 38, 28, 18, 12];
+            
+            lightValues.forEach(l => {
+                const cell = document.createElement('div');
+                cell.className = 'h-16 relative group cursor-pointer transition-transform duration-150 hover:scale-105 hover:z-10';
+                const currentHex = hslToHex(h, s, l);
+                cell.style.backgroundColor = currentHex;
+                cell.title = `HEX: ${currentHex}`;
+                cell.onclick = () => renderAllColorFormats(currentHex);
+                
+                // 气泡提示字
+                const txt = document.createElement('span');
+                txt.className = 'absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold bg-black/40 text-white rounded px-0.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none';
+                txt.innerText = l * 10;
+                
+                cell.appendChild(txt);
+                container.appendChild(cell);
+            });
+        }
+
+        // --- 底层像素转换极其硬核的纯算法数学库 ---
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        function rgbToHsl(r, r_g, b) {
+            r /= 255; r_g /= 255; b /= 255;
+            const max = Math.max(r, r_g, b), min = Math.min(r, r_g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) { h = s = 0; } 
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (r_g - b) / d + (r_g < b ? 6 : 0); break;
+                    case r_g: h = (b - r) / d + 2; break;
+                    case b: h = (r - r_g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function rgbToCmyk(r, g, b) {
+            let c = 1 - (r / 255);
+            let m = 1 - (g / 255);
+            let y = 1 - (b / 255);
+            let k = Math.min(c, Math.min(m, y));
+
+            if (k === 1) { return { c: 0, m: 0, y: 0, k: 100 }; }
+            
+            c = Math.round((c - k) / (1 - k) * 100);
+            m = Math.round((m - k) / (1 - k) * 100);
+            y = Math.round((y - k) / (1 - k) * 100);
+            k = Math.round(k * 100);
+            
+            return { c, m, y, k };
+        }
+
+        function hslToHex(h, s, l) {
+            s /= 100; l /= 100;
+            let c = (1 - Math.abs(2 * l - 1)) * s,
+                x = c * (1 - Math.abs((h / 60) % 2 - 1)),
+                m = l - c / 2, r = 0, g = 0, b = 0;
+
+            if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+            else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+            else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+            else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+            else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+            else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+            
+            r = Math.round((r + m) * 255); g = Math.round((g + m) * 255); b = Math.round((b + m) * 255);
+            return rgbToHex(r, g, b);
+        }
+
+        function copyField(id) {
+            const node = document.getElementById(id);
+            navigator.clipboard.writeText(node.value).then(() => alert('当前色彩数值已安全抓取并写入剪贴板！'));
+        }
+
+        // 初始化首次强制执行渲染
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAllColorFormats('#8b5cf6');
+            if (window.parent && window.parent.integrateToolPage) {
+                window.parent.integrateToolPage('dev-palette');
+            }
+        });
+    </script>
+</body>
+</html>

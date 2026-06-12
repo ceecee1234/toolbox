@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生活、出海与数字套利计算器 - 全能工具箱 V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aurora-bg {
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #6366f1 100%);
+            background-size: 200% 200%;
+            animation: aurora-animation 12s ease infinite;
+        }
+        @keyframes aurora-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        [data-theme="dark"] ::webkit-scrollbar-thumb { background: #334155; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen font-sans text-slate-800 dark:text-slate-200 transition-colors duration-200">
+
+    <header class="aurora-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="返回主页">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        出海数字套利与汇率联动看板
+                    </h1>
+                    <p class="text-white/80 text-sm mt-0.5">实时外汇网关联动 · 多层费率损耗模型 · 跨平台/跨币种套利收益一键精算</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="favBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 backdrop-blur-md border border-white/10">
+                    <i class="fa-regular fa-star" id="favIcon"></i>
+                    <span id="favText">加入收藏</span>
+                </button>
+                <button id="themeBtn" class="bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="切换暗黑模式">
+                    <i class="fa-solid fa-moon text-lg" id="themeIcon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+                <div class="text-2xs font-bold text-slate-400 uppercase tracking-wider">USD / CNY (美元/人民币)</div>
+                <div class="text-xl font-mono font-bold mt-1 text-slate-700 dark:text-slate-200" id="rate-USDCNY">--.--</div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+                <div class="text-2xs font-bold text-slate-400 uppercase tracking-wider">EUR / USD (欧元/美元)</div>
+                <div class="text-xl font-mono font-bold mt-1 text-slate-700 dark:text-slate-200" id="rate-EURUSD">--.--</div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+                <div class="text-2xs font-bold text-slate-400 uppercase tracking-wider">USD / HKD (美元/港币)</div>
+                <div class="text-xl font-mono font-bold mt-1 text-slate-700 dark:text-slate-200" id="rate-USDHKD">--.--</div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+                <div class="text-2xs font-bold text-slate-400 uppercase tracking-wider">USD / EUR (美元/欧元)</div>
+                <div class="text-xl font-mono font-bold mt-1 text-slate-700 dark:text-slate-200" id="rate-USDEUR">--.--</div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+                <div class="text-2xs font-bold text-slate-400 uppercase tracking-wider">USD / JPY (美元/日元)</div>
+                <div class="text-xl font-mono font-bold mt-1 text-slate-700 dark:text-slate-200" id="rate-USDJPY">--.--</div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs flex flex-col justify-center items-start">
+                <span class="text-3xs text-slate-400 flex items-center gap-1"><i class="fa-solid fa-clock"></i> 汇率更新时间:</span>
+                <span id="rateTime" class="text-2xs font-mono font-bold text-emerald-500 mt-0.5">未同步</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6">
+                    <h2 class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-sliders text-emerald-500"></i>第一步：构筑跨境套利交易对
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="block text-2xs font-bold text-slate-400 mb-1.5 uppercase">1. 买入/投入币种</label>
+                            <select id="srcCurrency" onchange="calculateArbitrage()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-emerald-500 font-mono">
+                                <option value="USD" selected>USD - 美元</option>
+                                <option value="CNY">CNY - 人民币</option>
+                                <option value="EUR">EUR - 欧元</option>
+                                <option value="HKD">HKD - 港币</option>
+                                <option value="JPY">JPY - 日元</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-2xs font-bold text-slate-400 mb-1.5 uppercase">2. 中转平台/目标资产</label>
+                            <select id="midCurrency" onchange="calculateArbitrage()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-emerald-500 font-mono">
+                                <option value="USD">USD - 美元资产 (如PayPal/Airtm)</option>
+                                <option value="CNY">CNY - 人民币资产</option>
+                                <option value="EUR">EUR - 欧元资产</option>
+                                <option value="HKD" selected>HKD - 港币资产 (如万里汇/ could港卡)</option>
+                                <option value="JPY">JPY - 日元资产</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-2xs font-bold text-slate-400 mb-1.5 uppercase">3. 最终回国/变现币种</label>
+                            <select id="destCurrency" onchange="calculateArbitrage()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-emerald-500 font-mono">
+                                <option value="USD">USD - 美元</option>
+                                <option value="CNY" selected>CNY - 人民币</option>
+                                <option value="EUR">EUR - 欧元</option>
+                                <option value="HKD">HKD - 港币</option>
+                                <option value="JPY">JPY - 日元</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-2xs font-bold text-slate-400 mb-1.5 uppercase">原始投入本金数量</label>
+                            <div class="relative">
+                                <input type="number" id="principalAmount" value="1000" oninput="calculateArbitrage()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-3 pr-12 py-2 text-xs font-bold font-mono focus:outline-none focus:border-emerald-500">
+                                <span class="absolute right-3 top-2.5 text-2xs font-mono font-bold text-slate-400 curr-src-label">USD</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-2xs font-bold text-slate-400 mb-1.5 uppercase">定制中转溢价/黑市偏差 (%)</label>
+                            <input type="number" id="premiumRate" value="0.0" step="0.1" oninput="calculateArbitrage()" placeholder="如 P2P 溢价，无则填0" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6">
+                    <h2 class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-percent text-blue-500"></i>第二步：构建全流程多级损耗磨损模型
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-2xs font-bold text-slate-400 mb-1.5 uppercase">1级：买入入金手续费 (%)</label>
+                            <input type="number" id="feeStage1" value="0.5" step="0.05" oninput="calculateArbitrage()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-2xs font-bold text-slate-400 mb-1.5 uppercase">2级：中转下发提现费 (%)</label>
+                            <input type="number" id="feeStage2" value="1.0" step="0.05" oninput="calculateArbitrage()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-2xs font-bold text-slate-400 mb-1.5 uppercase">3级：渠道额外固定损耗</label>
+                            <div class="relative">
+                                <input type="number" id="feeFixed" value="2.0" oninput="calculateArbitrage()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-3 pr-12 py-2 text-xs font-bold font-mono focus:outline-none focus:border-blue-500">
+                                <span class="absolute right-3 top-2.5 text-2xs font-mono font-bold text-slate-400 curr-src-label">USD</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-md p-6 flex flex-col justify-between h-full min-h-[420px]">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 mb-6">
+                            <i class="fa-solid fa-chart-pie text-violet-500"></i>第三步：实时套利收益精算沙盘
+                        </h2>
+
+                        <div class="space-y-5">
+                            <div>
+                                <span class="text-3xs font-bold text-slate-400 uppercase block tracking-wider">预计回国变现总额</span>
+                                <div class="text-3xl font-mono font-black text-slate-800 dark:text-white mt-1 flex items-baseline gap-2">
+                                    <span id="resFinalAmount">0.00</span>
+                                    <span class="text-sm font-bold text-slate-400 curr-dest-label">CNY</span>
+                                </div>
+                            </div>
+
+                            <hr class="border-slate-100 dark:border-slate-700/50">
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <span class="text-3xs font-bold text-slate-400 uppercase block">总磨损成本</span>
+                                    <span class="text-sm font-mono font-bold text-rose-500 mt-1 block" id="resTotalFees">0.00</span>
+                                </div>
+                                <div>
+                                    <span class="text-3xs font-bold text-slate-400 uppercase block">净套利利润</span>
+                                    <span class="text-sm font-mono font-bold mt-1 block" id="resNetProfit">0.00</span>
+                                </div>
+                            </div>
+
+                            <hr class="border-slate-100 dark:border-slate-700/50">
+
+                            <div>
+                                <span class="text-3xs font-bold text-slate-400 uppercase block tracking-wider">最终预期净回报率 (ROI)</span>
+                                <div class="flex items-center gap-3 mt-1.5">
+                                    <div class="w-full bg-slate-100 dark:bg-slate-900 h-2 rounded-full overflow-hidden">
+                                        <div id="roiBar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%"></div>
+                                    </div>
+                                    <span id="resROI" class="text-sm font-mono font-extrabold text-emerald-500">0.00%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-slate-50 dark:bg-slate-900/60 rounded-xl p-3 border border-slate-200/50 dark:border-slate-700/40 text-3xs text-slate-400 leading-relaxed flex items-start gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5"></i>
+                        <span>提示：当前资产精算已全面扣除多重汇率转换、百分比扣费及固定手续费摩擦。建议在外贸结汇或 P2P 变现前进行多端对照。</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let exchangeRates = { "USD": 1, "CNY": 7.24, "EUR": 0.92, "HKD": 7.81, "JPY": 156.50 };
+
+        // --- 获取实时汇率网关数据 ---
+        async function fetchLiveRates() {
+            try {
+                const res = await fetch('https://open.er-api.com/v6/latest/USD');
+                if (!res.ok) throw new Error('网关响应异常');
+                const data = await res.json();
+                
+                if (data && data.rates) {
+                    exchangeRates = data.rates;
+                    const updateTime = new Date(data.time_last_update_utc).toLocaleTimeString();
+                    document.getElementById('rateTime').innerText = updateTime;
+                    document.getElementById('rateTime').className = "text-2xs font-mono font-bold text-emerald-500 mt-0.5";
+                    
+                    // 渲染看板数字
+                    if(data.rates.CNY) document.getElementById('rate-USDCNY').innerText = data.rates.CNY.toFixed(4);
+                    if(data.rates.EUR) document.getElementById('rate-USDEUR').innerText = data.rates.EUR.toFixed(4);
+                    if(data.rates.HKD) document.getElementById('rate-USDHKD').innerText = data.rates.HKD.toFixed(4);
+                    if(data.rates.JPY) document.getElementById('rate-USDJPY').innerText = data.rates.JPY.toFixed(4);
+                    if(data.rates.EUR) document.getElementById('rate-EURUSD').innerText = (1 / data.rates.EUR).toFixed(4);
+                    
+                    calculateArbitrage();
+                }
+            } catch (err) {
+                console.error('无法加载实时汇率，启用硬编码保底汇率群:', err);
+                document.getElementById('rateTime').innerText = "保底离线模式";
+                document.getElementById('rateTime').className = "text-2xs font-mono font-bold text-amber-500 mt-0.5";
+                // 离线状态渲染保底汇率数值
+                document.getElementById('rate-USDCNY').innerText = exchangeRates.CNY.toFixed(2);
+                document.getElementById('rate-EURUSD').innerText = (1 / exchangeRates.EUR).toFixed(2);
+                document.getElementById('rate-USDHKD').innerText = exchangeRates.HKD.toFixed(2);
+                document.getElementById('rate-USDEUR').innerText = exchangeRates.EUR.toFixed(2);
+                document.getElementById('rate-USDJPY').innerText = exchangeRates.JPY.toFixed(2);
+                calculateArbitrage();
+            }
+        }
+
+        // --- 核心多级资产损耗套利精算内核 ---
+        function calculateArbitrage() {
+            const src = document.getElementById('srcCurrency').value;
+            const mid = document.getElementById('midCurrency').value;
+            const dest = document.getElementById('destCurrency').value;
+
+            // 联动更新文本标签
+            document.querySelectorAll('.curr-src-label').forEach(el => el.innerText = src);
+            document.querySelectorAll('.curr-dest-label').forEach(el => el.innerText = dest);
+
+            const principal = parseFloat(document.getElementById('principalAmount').value) || 0;
+            const premium = parseFloat(document.getElementById('premiumRate').value) || 0;
+            const fee1 = parseFloat(document.getElementById('feeStage1').value) || 0;
+            const fee2 = parseFloat(document.getElementById('feeStage2').value) || 0;
+            const feeFixed = parseFloat(document.getElementById('feeFixed').value) || 0;
+
+            if (principal <= 0) {
+                resetOutputs();
+                return;
+            }
+
+            // 1. 转换为基础美金进行全流控对齐
+            const rateSrcToUSD = 1 / exchangeRates[src];
+            let amountInUSD = principal * rateSrcToUSD;
+
+            // 2. 扣除一级入金磨损
+            const costStage1 = amountInUSD * (fee1 / 100);
+            amountInUSD -= costStage1;
+
+            // 3. 转入中转平台汇率并结算溢价偏差
+            const rateUSDToMid = exchangeRates[mid];
+            let amountInMid = amountInUSD * rateUSDToMid;
+            amountInMid = amountInMid * (1 + premium / 100);
+
+            // 4. 扣除二级中转提现手续费
+            const costStage2 = amountInMid * (fee2 / 100);
+            amountInMid -= costStage2;
+
+            // 5. 转回最终变现币种并扣除三级固定摩擦损耗
+            const rateMidToDest = exchangeRates[dest] / exchangeRates[mid];
+            let finalAmount = amountInMid * rateMidToDest;
+            finalAmount -= feeFixed;
+
+            if (finalAmount < 0) finalAmount = 0;
+
+            // 6. 计算绝对法币计价的本金价值与其净收益
+            const rateSrcToDest = exchangeRates[dest] / exchangeRates[src];
+            const principalInDestValue = principal * rateSrcToDest;
+            
+            const netProfitInDest = finalAmount - principalInDestValue;
+            const totalFeesInDest = principalInDestValue - finalAmount > 0 ? (principalInDestValue - finalAmount) : 0;
+            const roi = principalInDestValue > 0 ? (netProfitInDest / principalInDestValue) * 100 : 0;
+
+            // 7. 渲染到看板沙盘中
+            document.getElementById('resFinalAmount').innerText = finalAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('resTotalFees').innerText = (totalFeesInDest > 0 ? totalFeesInDest : 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " " + dest;
+            
+            const profitEl = document.getElementById('resNetProfit');
+            if (netProfitInDest >= 0) {
+                profitEl.innerText = "+" + netProfitInDest.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " " + dest;
+                profitEl.className = "text-sm font-mono font-bold text-emerald-500 mt-1 block";
+                document.getElementById('resROI').className = "text-sm font-mono font-extrabold text-emerald-500";
+                document.getElementById('roiBar').className = "bg-emerald-500 h-full transition-all duration-300";
+                document.getElementById('roiBar').style.width = Math.min(Math.max(roi, 0), 100) + "%";
+            } else {
+                profitEl.innerText = netProfitInDest.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " " + dest;
+                profitEl.className = "text-sm font-mono font-bold text-rose-500 mt-1 block";
+                document.getElementById('resROI').className = "text-sm font-mono font-extrabold text-rose-500";
+                document.getElementById('roiBar').className = "bg-rose-500 h-full transition-all duration-300";
+                document.getElementById('roiBar').style.width = "0%";
+            }
+            document.getElementById('resROI').innerText = roi.toFixed(2) + "%";
+        }
+
+        function resetOutputs() {
+            document.getElementById('resFinalAmount').innerText = "0.00";
+            document.getElementById('resTotalFees').innerText = "0.00";
+            document.getElementById('resNetProfit').innerText = "0.00";
+            document.getElementById('resROI').innerText = "0.00%";
+            document.getElementById('roiBar').style.width = "0%";
+        }
+
+        // --- 皮肤与初始化统一加载 ---
+        function initTheme() {
+            const saved = localStorage.getItem('toolbox_theme') || 'dark';
+            document.documentElement.dataset.theme = saved;
+            if(saved === 'dark') document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            document.getElementById('themeIcon').className = saved === 'dark' ? 'fa-solid fa-sun text-lg' : 'fa-solid fa-moon text-lg';
+        }
+        document.getElementById('themeBtn').addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            const target = isDark ? 'light' : 'dark';
+            document.documentElement.dataset.theme = target;
+            if(target === 'dark') document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            localStorage.setItem('toolbox_theme', target);
+            document.getElementById('themeIcon').className = target === 'dark' ? 'fa-solid fa-sun text-lg' : 'fa-solid fa-moon text-lg';
+        });
+
+        const FAV_KEY = 'toolbox_favorites_v2';
+        const TOOL_ID = 'dev-arbitrage';
+        function initFav() {
+            try {
+                const favs = JSON.parse(localStorage.getItem(FAV_KEY)) || [];
+                const favBtn = document.getElementById('favBtn');
+                if (favs.includes(TOOL_ID)) {
+                    favBtn.classList.add('text-amber-400', 'bg-amber-500/10');
+                    document.getElementById('favIcon').className = 'fa-solid fa-star';
+                    document.getElementById('favText').innerText = '已收藏';
+                }
+            } catch(e) {}
+        }
+        document.getElementById('favBtn').addEventListener('click', () => {
+            let favs = [];
+            try { favs = JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch(e){}
+            const favBtn = document.getElementById('favBtn');
+            if (favs.includes(TOOL_ID)) {
+                favs = favs.filter(x => x !== TOOL_ID);
+                favBtn.classList.remove('text-amber-400', 'bg-amber-500/10');
+                document.getElementById('favIcon').className = 'fa-regular fa-star';
+                document.getElementById('favText').innerText = '加入收藏';
+            } else {
+                favs.unshift(TOOL_ID);
+                favBtn.classList.add('text-amber-400', 'bg-amber-500/10');
+                document.getElementById('favIcon').className = 'fa-solid fa-star';
+                document.getElementById('favText').innerText = '已收藏';
+            }
+            localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initFav();
+            fetchLiveRates();
+            if (window.parent && window.parent.integrateToolPage) {
+                window.parent.integrateToolPage('dev-arbitrage');
+            }
+        });
+    </script>
+</body>
+</html>

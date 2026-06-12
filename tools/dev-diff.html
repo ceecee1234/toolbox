@@ -1,961 +1,121 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>代码差异对比 - Dev Toolbox</title>
-<meta name="description" content="在线代码/文本差异对比工具，左右双栏展示，删除行红色高亮，新增行绿色高亮，行号精确对齐。">
-<link rel="icon" href="../favicon.ico">
-<style>
-  :root {
-    --bg: #0f1117;
-    --bg2: #1a1d27;
-    --bg3: #22263a;
-    --border: #2e3347;
-    --text: #e2e8f0;
-    --text2: #94a3b8;
-    --text3: #64748b;
-    --accent: #3b82f6;
-    --accent-hover: #2563eb;
-    --add-bg: #0d2818;
-    --add-border: #1a4731;
-    --add-num-bg: #0a2012;
-    --add-text: #4ade80;
-    --del-bg: #2d0b0b;
-    --del-border: #5c1a1a;
-    --del-num-bg: #200808;
-    --del-text: #f87171;
-    --add-inline: rgba(74,222,128,0.25);
-    --del-inline: rgba(248,113,113,0.3);
-    --equal-bg: transparent;
-    --equal-num-bg: rgba(255,255,255,0.03);
-    --tag-green: #166534;
-    --tag-red: #991b1b;
-    --radius: 12px;
-    --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  }
-  [data-theme="light"] {
-    --bg: #f8fafc;
-    --bg2: #ffffff;
-    --bg3: #f1f5f9;
-    --border: #e2e8f0;
-    --text: #1e293b;
-    --text2: #475569;
-    --text3: #94a3b8;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-    --add-bg: #f0fdf4;
-    --add-border: #bbf7d0;
-    --add-num-bg: #dcfce7;
-    --add-text: #16a34a;
-    --del-bg: #fff1f2;
-    --del-border: #fecdd3;
-    --del-num-bg: #ffe4e6;
-    --del-text: #dc2626;
-    --add-inline: rgba(21,128,61,0.15);
-    --del-inline: rgba(220,38,38,0.15);
-    --equal-bg: transparent;
-    --equal-num-bg: rgba(0,0,0,0.03);
-    --tag-green: #dcfce7;
-    --tag-red: #fee2e2;
-    --shadow: 0 4px 24px rgba(0,0,0,0.08);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    padding-bottom: 60px;
-  }
-  /* Aurora header */
-  .page-header {
-    position: relative;
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    overflow: hidden;
-    padding: 28px 24px 20px;
-  }
-  .page-header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 60% 80% at 20% 50%, rgba(59,130,246,0.12) 0%, transparent 70%),
-                radial-gradient(ellipse 40% 60% at 80% 30%, rgba(99,102,241,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .header-inner {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    position: relative;
-  }
-  .back-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--text2);
-    text-decoration: none;
-    font-size: 13px;
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg3);
-    transition: all .2s;
-    white-space: nowrap;
-  }
-  .back-btn:hover { color: var(--text); border-color: var(--accent); }
-  .header-title { flex: 1; }
-  .header-title h1 { font-size: 20px; font-weight: 700; line-height: 1.3; }
-  .header-title p { font-size: 13px; color: var(--text2); margin-top: 3px; }
-  .theme-btn {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--bg3);
-    color: var(--text2);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    transition: all .2s;
-  }
-  .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .fav-btn {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--bg3);
-    color: var(--text2);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    transition: all .2s;
-  }
-  .fav-btn:hover { border-color: var(--accent); }
-  .fav-btn.active { color: #fbbf24; border-color: #fbbf24; background: rgba(251,191,36,0.1); }
-
-  /* Main layout */
-  .main { max-width: 1400px; margin: 0 auto; padding: 20px 16px; }
-
-  /* Controls bar */
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .controls-left { display: flex; gap: 8px; flex-wrap: wrap; }
-  .controls-right { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg2);
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all .2s;
-    white-space: nowrap;
-  }
-  .btn:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
-  .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: #fff; }
-  .btn-sm { padding: 6px 12px; font-size: 12px; }
-
-  /* View mode tabs */
-  .view-tabs {
-    display: flex;
-    background: var(--bg3);
-    border-radius: 8px;
-    padding: 3px;
-    gap: 2px;
-  }
-  .view-tab {
-    padding: 5px 14px;
-    border-radius: 6px;
-    border: none;
-    background: transparent;
-    color: var(--text2);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all .2s;
-  }
-  .view-tab.active {
-    background: var(--bg2);
-    color: var(--accent);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-  }
-
-  /* Input panels */
-  .input-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-  .panel {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-  }
-  .panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg3);
-    gap: 8px;
-  }
-  .panel-label {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--text2);
-  }
-  .panel-label .dot {
-    display: inline-block;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    margin-right: 6px;
-  }
-  .dot-left { background: var(--del-text); }
-  .dot-right { background: var(--add-text); }
-  .panel-meta { font-size: 11px; color: var(--text3); }
-  textarea {
-    flex: 1;
-    width: 100%;
-    min-height: 200px;
-    background: var(--bg2);
-    color: var(--text);
-    border: none;
-    outline: none;
-    resize: vertical;
-    padding: 12px 14px;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
-    font-size: 13px;
-    line-height: 1.6;
-    tab-size: 2;
-  }
-  textarea::placeholder { color: var(--text3); }
-
-  /* Stats bar */
-  .stats-bar {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 10px 14px;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
-  .stat-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
-  .stat-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-  .badge-add { background: var(--tag-green); color: var(--add-text); }
-  .badge-del { background: var(--tag-red); color: var(--del-text); }
-  .badge-eq  { background: var(--bg3); color: var(--text2); }
-  .stats-empty { font-size: 12px; color: var(--text3); font-style: italic; }
-
-  /* Diff output */
-  .diff-container {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-  }
-  .diff-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg3);
-  }
-  .diff-header-title { font-size: 13px; font-weight: 600; color: var(--text2); }
-  .diff-scroll { overflow-x: auto; max-height: 600px; overflow-y: auto; }
-  table.diff-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
-    font-size: 12.5px;
-    line-height: 1.6;
-  }
-  .diff-table td { white-space: pre; vertical-align: top; }
-  .diff-table .num {
-    width: 44px;
-    min-width: 44px;
-    padding: 0 10px;
-    text-align: right;
-    color: var(--text3);
-    user-select: none;
-    font-size: 11px;
-    border-right: 1px solid var(--border);
-  }
-  .diff-table .sign {
-    width: 22px;
-    min-width: 22px;
-    padding: 0 4px;
-    text-align: center;
-    font-weight: 700;
-    user-select: none;
-  }
-  .diff-table .code { padding: 0 12px; width: 100%; }
-  /* Row types */
-  tr.add td { background: var(--add-bg); }
-  tr.add .num { background: var(--add-num-bg); color: var(--add-text); border-color: var(--add-border); }
-  tr.add .sign { color: var(--add-text); }
-  tr.del td { background: var(--del-bg); }
-  tr.del .num { background: var(--del-num-bg); color: var(--del-text); border-color: var(--del-border); }
-  tr.del .sign { color: var(--del-text); }
-  tr.eq td { background: var(--equal-bg); }
-  tr.eq .num { background: var(--equal-num-bg); }
-  tr.eq .sign { color: var(--text3); }
-  tr.hunk td { background: var(--bg3); color: var(--text3); font-size: 11px; font-style: italic; }
-  /* Inline highlights */
-  .hl-add { background: var(--add-inline); border-radius: 2px; }
-  .hl-del { background: var(--del-inline); border-radius: 2px; }
-
-  /* Split view */
-  table.diff-split {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
-    font-size: 12.5px;
-    line-height: 1.6;
-    table-layout: fixed;
-  }
-  .diff-split td { white-space: pre; vertical-align: top; }
-  .diff-split .num {
-    width: 44px;
-    min-width: 44px;
-    padding: 0 10px;
-    text-align: right;
-    color: var(--text3);
-    user-select: none;
-    font-size: 11px;
-    border-right: 1px solid var(--border);
-  }
-  .diff-split .code { padding: 0 10px; width: 100%; overflow: hidden; }
-  .diff-split .divider { width: 1px; background: var(--border); }
-  .diff-split .left-num, .diff-split .left-code { }
-  .diff-split .right-num, .diff-split .right-code { }
-  tr.split-add .right-num { background: var(--add-num-bg); color: var(--add-text); border-color: var(--add-border); }
-  tr.split-add .right-code { background: var(--add-bg); }
-  tr.split-add .left-num  { background: var(--equal-num-bg); }
-  tr.split-add .left-code  { background: var(--equal-bg); }
-  tr.split-del .left-num  { background: var(--del-num-bg); color: var(--del-text); border-color: var(--del-border); }
-  tr.split-del .left-code  { background: var(--del-bg); }
-  tr.split-del .right-num { background: var(--equal-num-bg); }
-  tr.split-del .right-code { background: var(--equal-bg); }
-  tr.split-chg .left-num  { background: var(--del-num-bg); color: var(--del-text); border-color: var(--del-border); }
-  tr.split-chg .left-code  { background: var(--del-bg); }
-  tr.split-chg .right-num { background: var(--add-num-bg); color: var(--add-text); border-color: var(--add-border); }
-  tr.split-chg .right-code { background: var(--add-bg); }
-  tr.split-eq .left-num, tr.split-eq .right-num { background: var(--equal-num-bg); }
-  tr.split-eq .left-code, tr.split-eq .right-code { background: var(--equal-bg); }
-  tr.split-hunk td { background: var(--bg3); color: var(--text3); font-size: 11px; font-style: italic; }
-
-  /* Empty state */
-  .diff-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    color: var(--text3);
-    gap: 12px;
-  }
-  .diff-empty-icon { font-size: 40px; opacity: .4; }
-  .diff-empty-text { font-size: 14px; }
-
-  /* Copy toast */
-  .toast {
-    position: fixed;
-    bottom: 24px; right: 24px;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 18px;
-    font-size: 13px;
-    color: var(--text);
-    box-shadow: var(--shadow);
-    transform: translateY(80px);
-    opacity: 0;
-    transition: all .3s;
-    z-index: 9999;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-
-  /* Responsive */
-  @media (max-width: 700px) {
-    .input-grid { grid-template-columns: 1fr; }
-    .controls-right { margin-left: 0; width: 100%; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码/文本差异对比生成器 - 全能工具箱 V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aurora-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: aurora-animation 15s ease infinite;
+        }
+        @keyframes aurora-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        /* 强制覆盖滚动条样式，保持全栈现代感 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        [data-theme="dark"] ::webkit-scrollbar-thumb { background: #334155; }
+        
+        /* 适配明暗主题的极端代码高亮色值变量 */
+        :root {
+            --diff-add-bg: rgba(74, 222, 128, 0.15);
+            --diff-add-num-bg: rgba(74, 222, 128, 0.25);
+            --diff-add-text: #16a34a;
+            --diff-del-bg: rgba(248, 113, 113, 0.12);
+            --diff-del-num-bg: rgba(248, 113, 113, 0.22);
+            --diff-del-text: #dc2626;
+            --hl-add-inline: rgba(34, 197, 94, 0.35);
+            --hl-del-inline: rgba(239, 68, 68, 0.35);
+        }
+        [data-theme="dark"] {
+            --diff-add-bg: rgba(16, 185, 129, 0.12);
+            --diff-add-num-bg: rgba(16, 185, 129, 0.2);
+            --diff-add-text: #34d399;
+            --diff-del-bg: rgba(239, 68, 68, 0.12);
+            --diff-del-num-bg: rgba(239, 68, 68, 0.18);
+            --diff-del-text: #f87171;
+            --hl-add-inline: rgba(52, 211, 153, 0.3);
+            --hl-del-inline: rgba(248, 113, 113, 0.3);
+        }
+    </style>
 </head>
-<body>
+<body class="bg-slate-50 dark:bg-slate-900 min-h-screen font-sans text-slate-800 dark:text-slate-200 transition-colors duration-200">
 
-<header class="page-header">
-  <div class="header-inner">
-    <a href="../index.html" class="back-btn">← 返回首页</a>
-    <div class="header-title">
-      <h1>代码差异对比</h1>
-      <p>左右双栏 · 逐行高亮 · 内联字符差异 · 行号对齐</p>
-    </div>
-    <button class="fav-btn" id="favBtn" title="收藏此工具">☆</button>
-    <button class="theme-btn" id="themeBtn" title="切换主题">☀️</button>
-  </div>
-</header>
+    <header class="aurora-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="返回主页">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        代码与文本差异对比板
+                    </h1>
+                    <p class="text-white/80 text-sm mt-0.5">基于精确 Myers LCS 算法，支持双栏分栏、内联字符级像素差异高亮与行号动态对齐</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="favBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 backdrop-blur-md border border-white/10">
+                    <i class="fa-regular fa-star" id="favIcon"></i>
+                    <span id="favText">加入收藏</span>
+                </button>
+                <button id="themeBtn" class="bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="切换暗黑模式">
+                    <i class="fa-solid fa-moon text-lg" id="themeIcon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
 
-<div class="main">
-  <!-- Controls -->
-  <div class="controls">
-    <div class="controls-left">
-      <div class="view-tabs">
-        <button class="view-tab active" data-view="unified">统一视图</button>
-        <button class="view-tab" data-view="split">分栏视图</button>
-      </div>
-      <button class="btn btn-sm" id="optInline">
-        <span id="inlineIcon">✓</span> 内联差异
-      </button>
-      <button class="btn btn-sm" id="optContext">
-        上下文 <span id="contextVal">3</span> 行
-      </button>
-    </div>
-    <div class="controls-right">
-      <button class="btn btn-sm" id="swapBtn">⇄ 交换</button>
-      <button class="btn btn-sm" id="clearBtn">清空</button>
-      <button class="btn btn-primary btn-sm" id="diffBtn">对比</button>
-    </div>
-  </div>
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80 flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="bg-slate-100 dark:bg-slate-900 p-1 rounded-xl flex gap-1 border border-slate-200/60 dark:border-slate-700/50">
+                    <button onclick="switchViewMode('unified')" id="viewUnified" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 bg-white dark:bg-slate-800 text-violet-600 dark:text-violet-400 shadow-xs">
+                        <i class="fa-solid fa-bars-staggered mr-1.5"></i>统一视图
+                    </button>
+                    <button onclick="switchViewMode('split')" id="viewSplit" class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+                        <i class="fa-solid fa-columns mr-1.5"></i>分栏视图
+                    </button>
+                </div>
 
-  <!-- Input panels -->
-  <div class="input-grid">
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-label"><span class="dot dot-left"></span>原始文本 / 旧版本</div>
-        <div class="panel-meta" id="metaLeft">0 行</div>
-      </div>
-      <textarea id="leftInput" placeholder="粘贴原始代码或文本…" spellcheck="false"></textarea>
-    </div>
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-label"><span class="dot dot-right"></span>修改文本 / 新版本</div>
-        <div class="panel-meta" id="metaRight">0 行</div>
-      </div>
-      <textarea id="rightInput" placeholder="粘贴修改后的代码或文本…" spellcheck="false"></textarea>
-    </div>
-  </div>
+                <button id="optInline" onclick="toggleInlineHighlight()" class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all">
+                    <i class="fa-solid fa-circle-check text-emerald-500" id="inlineIcon"></i><span>内联差异高亮</span>
+                </button>
 
-  <!-- Stats bar -->
-  <div class="stats-bar" id="statsBar">
-    <span class="stats-empty" id="statsEmpty">填写两侧内容后点击「对比」按钮，或修改后自动对比</span>
-    <div id="statsItems" style="display:none; display:flex; flex-wrap:wrap; gap:16px; align-items:center;"></div>
-  </div>
+                <button onclick="rotateContextLines()" class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all">
+                    <i class="fa-regular fa-eye text-slate-400"></i>
+                    <span>显示上下文:</span>
+                    <span id="contextVal" class="font-mono font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 px-1.5 py-0.5 rounded">3行</span>
+                </button>
+            </div>
 
-  <!-- Diff output -->
-  <div class="diff-container">
-    <div class="diff-header">
-      <span class="diff-header-title" id="diffTitle">差异结果</span>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-sm" id="copyDiffBtn">复制差异</button>
-      </div>
-    </div>
-    <div class="diff-scroll" id="diffScroll">
-      <div class="diff-empty">
-        <div class="diff-empty-icon">⊕</div>
-        <div class="diff-empty-text">在上方输入两段文本后，差异将显示在这里</div>
-      </div>
-    </div>
-  </div>
-</div>
+            <div class="flex items-center gap-2 max-sm:w-full max-sm:justify-end">
+                <button onclick="swapPanels()" class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 cursor-pointer transition-all"><i class="fa-solid fa-right-left mr-1.5"></i>交换</button>
+                <button onclick="clearAllInputs()" class="bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 cursor-pointer transition-all"><i class="fa-solid fa-trash-can mr-1.5"></i>清空</button>
+                <button onclick="runDiffEngine()" class="bg-violet-600 hover:bg-violet-700 text-white px-5 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-violet-500/10 cursor-pointer transition-all"><i class="fa-solid fa-bolt mr-1.5"></i>执行对比</button>
+            </div>
+        </div>
 
-<div class="toast" id="toast"></div>
-
-<script>
-(function() {
-  'use strict';
-
-  // --- Theme ---
-  const savedTheme = localStorage.getItem('toolbox_theme') || 'dark';
-  document.documentElement.dataset.theme = savedTheme;
-  const themeBtn = document.getElementById('themeBtn');
-  themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-  themeBtn.addEventListener('click', () => {
-    const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = t;
-    localStorage.setItem('toolbox_theme', t);
-    themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
-  });
-
-  // --- Favorites ---
-  const FAV_KEY = 'toolbox_favorites_v2';
-  const TOOL_ID = 'dev-diff';
-  function getFavs() { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch { return []; } }
-  function setFavs(arr) { localStorage.setItem(FAV_KEY, JSON.stringify(arr)); }
-  const favBtn = document.getElementById('favBtn');
-  const favs = getFavs();
-  if (favs.includes(TOOL_ID)) { favBtn.classList.add('active'); favBtn.textContent = '★'; }
-  favBtn.addEventListener('click', () => {
-    const arr = getFavs();
-    if (arr.includes(TOOL_ID)) {
-      setFavs(arr.filter(x => x !== TOOL_ID));
-      favBtn.classList.remove('active');
-      favBtn.textContent = '☆';
-    } else {
-      setFavs([TOOL_ID, ...arr.filter(x => x !== TOOL_ID)]);
-      favBtn.classList.add('active');
-      favBtn.textContent = '★';
-    }
-  });
-
-  // --- State ---
-  let viewMode = 'unified'; // 'unified' | 'split'
-  let inlineHighlight = true;
-  let contextLines = 3;
-  let autoTimer = null;
-
-  // --- LCS Diff ---
-  // Myers-style: compute edit script (array of {type:'eq'|'del'|'ins', text})
-  function diffLines(aLines, bLines) {
-    const m = aLines.length, n = bLines.length;
-    // DP table for LCS
-    const dp = [];
-    for (let i = 0; i <= m; i++) {
-      dp[i] = new Int32Array(n + 1);
-    }
-    for (let i = 1; i <= m; i++) {
-      for (let j = 1; j <= n; j++) {
-        if (aLines[i-1] === bLines[j-1]) {
-          dp[i][j] = dp[i-1][j-1] + 1;
-        } else {
-          dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
-        }
-      }
-    }
-    // Backtrack
-    const ops = [];
-    let i = m, j = n;
-    while (i > 0 || j > 0) {
-      if (i > 0 && j > 0 && aLines[i-1] === bLines[j-1]) {
-        ops.push({ type: 'eq', left: aLines[i-1], right: bLines[j-1] });
-        i--; j--;
-      } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
-        ops.push({ type: 'ins', right: bLines[j-1] });
-        j--;
-      } else {
-        ops.push({ type: 'del', left: aLines[i-1] });
-        i--;
-      }
-    }
-    ops.reverse();
-    return ops;
-  }
-
-  // Char-level diff for inline highlighting
-  function diffChars(a, b) {
-    const m = a.length, n = b.length;
-    if (m === 0 && n === 0) return { a: '', b: '' };
-    if (m === 0) return { a: '', b: `<span class="hl-add">${esc(b)}</span>` };
-    if (n === 0) return { a: `<span class="hl-del">${esc(a)}</span>`, b: '' };
-    // LCS on chars
-    const dp = [];
-    for (let i = 0; i <= m; i++) dp[i] = new Int32Array(n + 1);
-    for (let i = 1; i <= m; i++)
-      for (let j = 1; j <= n; j++)
-        dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1]+1 : Math.max(dp[i-1][j], dp[i][j-1]);
-    // Backtrack
-    const seqA = [], seqB = [];
-    let i = m, j = n;
-    while (i > 0 || j > 0) {
-      if (i > 0 && j > 0 && a[i-1] === b[j-1]) {
-        seqA.push({ eq: true, ch: a[i-1] });
-        seqB.push({ eq: true, ch: b[j-1] });
-        i--; j--;
-      } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
-        seqB.push({ eq: false, ch: b[j-1] });
-        j--;
-      } else {
-        seqA.push({ eq: false, ch: a[i-1] });
-        i--;
-      }
-    }
-    seqA.reverse(); seqB.reverse();
-    const renderSeq = (seq, cls) => {
-      let out = '', inSpan = false;
-      for (const s of seq) {
-        if (!s.eq) {
-          if (!inSpan) { out += `<span class="${cls}">`; inSpan = true; }
-          out += esc(s.ch);
-        } else {
-          if (inSpan) { out += '</span>'; inSpan = false; }
-          out += esc(s.ch);
-        }
-      }
-      if (inSpan) out += '</span>';
-      return out;
-    };
-    return {
-      a: renderSeq(seqA, 'hl-del'),
-      b: renderSeq(seqB, 'hl-add')
-    };
-  }
-
-  function esc(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  // --- Render unified view ---
-  function renderUnified(ops) {
-    const rows = [];
-    let li = 1, ri = 1;
-
-    // Group ops with context
-    // First, collect indices of changed ops
-    const changed = new Set();
-    ops.forEach((op, idx) => { if (op.type !== 'eq') changed.add(idx); });
-    const visible = new Set();
-    changed.forEach(idx => {
-      for (let k = Math.max(0, idx - contextLines); k <= Math.min(ops.length-1, idx + contextLines); k++) {
-        visible.add(k);
-      }
-    });
-
-    // Pre-compute line numbers
-    const linums = []; // [{li, ri}]
-    let tli = 1, tri = 1;
-    ops.forEach(op => {
-      linums.push({ li: op.type !== 'ins' ? tli : null, ri: op.type !== 'del' ? tri : null });
-      if (op.type !== 'ins') tli++;
-      if (op.type !== 'del') tri++;
-    });
-
-    let lastVisible = -1;
-    ops.forEach((op, idx) => {
-      if (!visible.has(idx)) {
-        if (op.type !== 'ins') li++;
-        if (op.type !== 'del') ri++;
-        return;
-      }
-      if (lastVisible !== -1 && idx > lastVisible + 1) {
-        rows.push(`<tr class="hunk"><td class="num" colspan="2">…</td><td class="code" colspan="1">@@ 第 ${li} 行 @@</td></tr>`);
-      }
-      lastVisible = idx;
-      const lnum = op.type !== 'ins' ? li : '';
-      const rnum = op.type !== 'del' ? ri : '';
-      if (op.type !== 'ins') li++;
-      if (op.type !== 'del') ri++;
-
-      let cls, sign, text;
-      if (op.type === 'eq') {
-        cls = 'eq'; sign = '&nbsp;';
-        text = esc(op.left);
-      } else if (op.type === 'del') {
-        cls = 'del'; sign = '-';
-        text = inlineHighlight ? '' : esc(op.left);
-        if (inlineHighlight) {
-          // peek ahead for paired ins
-          const nextOp = ops[idx + 1];
-          if (nextOp && nextOp.type === 'ins') {
-            text = diffChars(op.left, nextOp.right).a;
-          } else {
-            text = esc(op.left);
-          }
-        }
-      } else {
-        cls = 'ins'; sign = '+';
-        text = inlineHighlight ? '' : esc(op.right);
-        if (inlineHighlight) {
-          const prevOp = ops[idx - 1];
-          if (prevOp && prevOp.type === 'del') {
-            text = diffChars(prevOp.left, op.right).b;
-          } else {
-            text = esc(op.right);
-          }
-        }
-      }
-      rows.push(
-        `<tr class="${cls}">` +
-        `<td class="num">${lnum}</td>` +
-        `<td class="num">${rnum}</td>` +
-        `<td class="sign">${sign}</td>` +
-        `<td class="code">${text}</td>` +
-        `</tr>`
-      );
-    });
-
-    if (rows.length === 0) {
-      return '<div class="diff-empty"><div class="diff-empty-icon">✓</div><div class="diff-empty-text">两段文本完全相同，无差异</div></div>';
-    }
-
-    return `<table class="diff-table"><tbody>${rows.join('')}</tbody></table>`;
-  }
-
-  // --- Render split view ---
-  function renderSplit(ops) {
-    // Pair up del/ins for side-by-side
-    const pairs = [];
-    let i = 0;
-    while (i < ops.length) {
-      const op = ops[i];
-      if (op.type === 'del' && i + 1 < ops.length && ops[i+1].type === 'ins') {
-        pairs.push({ type: 'chg', left: op.left, right: ops[i+1].right });
-        i += 2;
-      } else if (op.type === 'del') {
-        pairs.push({ type: 'del', left: op.left, right: null });
-        i++;
-      } else if (op.type === 'ins') {
-        pairs.push({ type: 'add', left: null, right: op.right });
-        i++;
-      } else {
-        pairs.push({ type: 'eq', left: op.left, right: op.right });
-        i++;
-      }
-    }
-
-    const changed = new Set();
-    pairs.forEach((p, idx) => { if (p.type !== 'eq') changed.add(idx); });
-    const visible = new Set();
-    changed.forEach(idx => {
-      for (let k = Math.max(0, idx - contextLines); k <= Math.min(pairs.length-1, idx + contextLines); k++) {
-        visible.add(k);
-      }
-    });
-
-    const rows = [];
-    let li = 1, ri = 1;
-    let lastVisible = -1;
-
-    pairs.forEach((p, idx) => {
-      if (!visible.has(idx)) {
-        if (p.type !== 'add') li++;
-        if (p.type !== 'del') ri++;
-        return;
-      }
-      if (lastVisible !== -1 && idx > lastVisible + 1) {
-        rows.push(`<tr class="split-hunk"><td colspan="4">@@ 第 ${li} 行 @@</td></tr>`);
-      }
-      lastVisible = idx;
-
-      let cls, lnum = '', rnum = '', lt = '', rt = '';
-      if (p.type === 'eq') {
-        cls = 'split-eq'; lnum = li; rnum = ri; li++; ri++;
-        lt = rt = esc(p.left);
-      } else if (p.type === 'chg') {
-        cls = 'split-chg'; lnum = li; rnum = ri; li++; ri++;
-        if (inlineHighlight) {
-          const r = diffChars(p.left, p.right);
-          lt = r.a; rt = r.b;
-        } else {
-          lt = esc(p.left); rt = esc(p.right);
-        }
-      } else if (p.type === 'del') {
-        cls = 'split-del'; lnum = li; rnum = ''; li++;
-        lt = esc(p.left); rt = '';
-      } else {
-        cls = 'split-add'; lnum = ''; rnum = ri; ri++;
-        lt = ''; rt = esc(p.right);
-      }
-
-      rows.push(
-        `<tr class="${cls}">` +
-        `<td class="num left-num">${lnum}</td>` +
-        `<td class="code left-code">${lt}</td>` +
-        `<td class="divider"></td>` +
-        `<td class="num right-num">${rnum}</td>` +
-        `<td class="code right-code">${rt}</td>` +
-        `</tr>`
-      );
-    });
-
-    if (rows.length === 0) {
-      return '<div class="diff-empty"><div class="diff-empty-icon">✓</div><div class="diff-empty-text">两段文本完全相同，无差异</div></div>';
-    }
-
-    return `<table class="diff-split"><tbody>${rows.join('')}</tbody></table>`;
-  }
-
-  // --- Main diff logic ---
-  function runDiff() {
-    const left = document.getElementById('leftInput').value;
-    const right = document.getElementById('rightInput').value;
-
-    if (!left.trim() && !right.trim()) {
-      document.getElementById('diffScroll').innerHTML =
-        '<div class="diff-empty"><div class="diff-empty-icon">⊕</div><div class="diff-empty-text">在上方输入两段文本后，差异将显示在这里</div></div>';
-      showStats(null);
-      return;
-    }
-
-    const aLines = left.split('\n');
-    const bLines = right.split('\n');
-    const ops = diffLines(aLines, bLines);
-
-    let adds = 0, dels = 0, eqs = 0;
-    ops.forEach(op => {
-      if (op.type === 'ins') adds++;
-      else if (op.type === 'del') dels++;
-      else eqs++;
-    });
-
-    showStats({ adds, dels, eqs, total: ops.length });
-
-    const html = viewMode === 'unified' ? renderUnified(ops) : renderSplit(ops);
-    document.getElementById('diffScroll').innerHTML = html;
-    document.getElementById('diffTitle').textContent =
-      `差异结果 · ${adds} 行新增 · ${dels} 行删除`;
-  }
-
-  function showStats(s) {
-    const empty = document.getElementById('statsEmpty');
-    const items = document.getElementById('statsItems');
-    if (!s) {
-      empty.style.display = '';
-      items.style.display = 'none';
-      return;
-    }
-    empty.style.display = 'none';
-    items.style.display = 'flex';
-    items.innerHTML =
-      `<span class="stat-item"><span class="stat-badge badge-add">+${s.adds}</span> 新增行</span>` +
-      `<span class="stat-item"><span class="stat-badge badge-del">-${s.dels}</span> 删除行</span>` +
-      `<span class="stat-item"><span class="stat-badge badge-eq">${s.eqs}</span> 未变行</span>` +
-      `<span class="stat-item" style="color:var(--text3)">相似度 ${s.total > 0 ? Math.round(s.eqs / s.total * 100) : 100}%</span>`;
-  }
-
-  // --- Line meta update ---
-  function updateMeta() {
-    const lv = document.getElementById('leftInput').value;
-    const rv = document.getElementById('rightInput').value;
-    const lLines = lv ? lv.split('\n').length : 0;
-    const rLines = rv ? rv.split('\n').length : 0;
-    document.getElementById('metaLeft').textContent = `${lLines} 行`;
-    document.getElementById('metaRight').textContent = `${rLines} 行`;
-  }
-
-  // Auto-diff on input
-  function scheduleAuto() {
-    clearTimeout(autoTimer);
-    autoTimer = setTimeout(runDiff, 600);
-    updateMeta();
-  }
-
-  document.getElementById('leftInput').addEventListener('input', scheduleAuto);
-  document.getElementById('rightInput').addEventListener('input', scheduleAuto);
-  document.getElementById('diffBtn').addEventListener('click', runDiff);
-
-  // --- Scroll sync for input textareas ---
-  const leftInputEl = document.getElementById('leftInput');
-  const rightInputEl = document.getElementById('rightInput');
-  let syncScroll = true;
-  function syncScrollHandler(source, target) {
-    return function() {
-      if (!syncScroll) return;
-      syncScroll = false;
-      target.scrollTop = source.scrollTop;
-      target.scrollLeft = source.scrollLeft;
-      setTimeout(() => { syncScroll = true; }, 10);
-    };
-  }
-  leftInputEl.addEventListener('scroll', syncScrollHandler(leftInputEl, rightInputEl));
-  rightInputEl.addEventListener('scroll', syncScrollHandler(rightInputEl, leftInputEl));
-
-  // View mode
-  document.querySelectorAll('.view-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.view-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      viewMode = btn.dataset.view;
-      runDiff();
-    });
-  });
-
-  // Inline toggle
-  document.getElementById('optInline').addEventListener('click', () => {
-    inlineHighlight = !inlineHighlight;
-    document.getElementById('inlineIcon').textContent = inlineHighlight ? '✓' : '○';
-    runDiff();
-  });
-
-  // Context lines toggle
-  const ctxValues = [0, 1, 3, 5, 10];
-  let ctxIdx = 2;
-  document.getElementById('optContext').addEventListener('click', () => {
-    ctxIdx = (ctxIdx + 1) % ctxValues.length;
-    contextLines = ctxValues[ctxIdx];
-    document.getElementById('contextVal').textContent = contextLines === 0 ? '全部' : String(contextLines);
-    runDiff();
-  });
-
-  // Swap
-  document.getElementById('swapBtn').addEventListener('click', () => {
-    const l = document.getElementById('leftInput');
-    const r = document.getElementById('rightInput');
-    [l.value, r.value] = [r.value, l.value];
-    updateMeta();
-    runDiff();
-  });
-
-  // Clear
-  document.getElementById('clearBtn').addEventListener('click', () => {
-    document.getElementById('leftInput').value = '';
-    document.getElementById('rightInput').value = '';
-    document.getElementById('diffScroll').innerHTML =
-      '<div class="diff-empty"><div class="diff-empty-icon">⊕</div><div class="diff-empty-text">在上方输入两段文本后，差异将显示在这里</div></div>';
-    showStats(null);
-    updateMeta();
-  });
-
-  // Copy diff
-  document.getElementById('copyDiffBtn').addEventListener('click', () => {
-    const left = document.getElementById('leftInput').value.split('\n');
-    const right = document.getElementById('rightInput').value.split('\n');
-    const ops = diffLines(left, right);
-    const lines = ops.map(op => {
-      if (op.type === 'eq') return '  ' + op.left;
-      if (op.type === 'del') return '- ' + op.left;
-      return '+ ' + op.right;
-    });
-    navigator.clipboard.writeText(lines.join('\n')).then(() => toast('已复制差异文本'));
-  });
-
-  // Toast
-  function toast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2200);
-  }
-
-  updateMeta();
-})();
-</script>
-</body>
-</html>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 overflow-hidden shadow-xs flex flex-col">
+                <div class="bg-slate-50/80 dark:bg-slate-900/50 px-4 py-2.5 border-bottom border-slate-200/60 dark:border-slate-700/60 flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-500 flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>原始文本 / 变更前 (Old)</span>
+                    <span id="metaLeft" class="text-2xs font-mono text-slate-400">0 行</span>
+                </div>
+                <textarea id="leftInput" oninput="scheduleAutoDiff()" placeholder="在此粘贴变更前的原始代码或文本段落..." spellcheck="false" class="w-full min-h-56 p-4 bg-transparent border-0 outline-none font-mono text-xs leading-relaxed text-slate-700 dark:text-slate-300 resize-y"></textarea>
+            </div>
+            
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 overflow-hidden shadow-xs flex flex-col">
+                <div class="bg-slate-50/80 dark:bg-slate-900/50 px-4 py-2.5 border-bottom border-slate-200/60 dark:border-slate-700/60 flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-500 flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>修改文本 / 变更后 (New)</span>
+                    <span id="metaRight" class="text-2xs font-mono text-slate-400">0 行</span>
+                </div>
+                <textarea id="rightInput" oninput="scheduleAutoDiff()" placeholder="在此
