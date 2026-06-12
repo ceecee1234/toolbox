@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万能字数计数器与排版优化器 - 全能工具箱 V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aurora-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: aurora-animation 15s ease infinite;
+        }
+        @keyframes aurora-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <header class="aurora-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="返回主页">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        万能字数统计与排版优化
+                    </h1>
+                    <p class="text-white/80 text-sm mt-0.5">提供多维度的字符矩阵拆解统计，内置一键清洗空格与自媒体中英文排版优化格式化</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="favBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 backdrop-blur-md border border-white/10">
+                    <i class="fa-regular fa-star" id="favIcon"></i>
+                    <span id="favText">加入收藏</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="lg:col-span-2 flex flex-col justify-between bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6">
+                <div class="w-full">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-align-left text-violet-500"></i> 请在此处输入或粘贴待处理的文本内容
+                        </label>
+                        <button onclick="clearAll()" class="text-xs text-slate-400 hover:text-slate-600"><i class="fa-solid fa-trash-can mr-1"></i>一键清空</button>
+                    </div>
+                    <textarea id="textInput" oninput="calculateStats()" class="w-full h-80 p-4 rounded-xl border border-slate-200 font-sans text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all outline-none resize-none" placeholder="输入任何推文、广告词、开发文案或文章，系统将实时进行多维计数分析..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100">
+                    <button onclick="cleanSpaces()" class="py-2 px-3 bg-slate-50 hover:bg-violet-50 hover:text-violet-600 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-scissors"></i>去除所有空格
+                    </button>
+                    <button onclick="cleanLineBreaks()" class="py-2 px-3 bg-slate-50 hover:bg-violet-50 hover:text-violet-600 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-turn-down"></i>合并空行换行
+                    </button>
+                    <button onclick="optimizeSpacing()" class="py-2 px-3 bg-violet-50 hover:bg-violet-100 text-violet-600 border border-violet-100 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm" title="在中文字符与英文字母/数字间自动补齐标准空格">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>中英排版美化
+                    </button>
+                    <button onclick="copyResult()" class="py-2 px-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-copy"></i>一键复制文本
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-chart-pie text-pink-500"></i> 多维字符特征分析雷达
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <div class="bg-violet-50/50 border border-violet-100/60 rounded-xl p-3 text-center">
+                            <div class="text-2xs font-semibold text-slate-400 uppercase tracking-wider">总字符数 (计空格)</div>
+                            <div id="statTotalWithSpace" class="text-2xl font-mono font-bold text-violet-600 mt-0.5">0</div>
+                        </div>
+                        <div class="bg-pink-50/50 border border-pink-100/60 rounded-xl p-3 text-center">
+                            <div class="text-2xs font-semibold text-slate-400 uppercase tracking-wider">净字符数 (不计空格)</div>
+                            <div id="statTotalNoSpace" class="text-2xl font-mono font-bold text-pink-500 mt-0.5">0</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 text-xs text-slate-600 font-medium">
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-100">
+                            <span class="text-slate-500"><i class="fa-solid fa-language text-slate-400 mr-2 w-4 text-center"></i>中文字符数:</span>
+                            <span id="statChinese" class="font-mono text-slate-800 font-bold bg-slate-100 px-2 py-0.5 rounded">0</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-100">
+                            <span class="text-slate-500"><i class="fa-solid fa-font text-slate-400 mr-2 w-4 text-center"></i>英文字母数:</span>
+                            <span id="statEnglish" class="font-mono text-slate-800 font-bold bg-slate-100 px-2 py-0.5 rounded">0</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-100">
+                            <span class="text-slate-500"><i class="fa-solid fa-hashtag text-slate-400 mr-2 w-4 text-center"></i>阿拉伯数字:</span>
+                            <span id="statDigits" class="font-mono text-slate-800 font-bold bg-slate-100 px-2 py-0.5 rounded">0</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-100">
+                            <span class="text-slate-500"><i class="fa-solid fa-quote-right text-slate-400 mr-2 w-4 text-center"></i>标点及特殊符号:</span>
+                            <span id="statPunctuation" class="font-mono text-slate-800 font-bold bg-slate-100 px-2 py-0.5 rounded">0</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-100">
+                            <span class="text-slate-500"><i class="fa-solid fa-paragraph text-slate-400 mr-2 w-4 text-center"></i>总段落数:</span>
+                            <span id="statParagraphs" class="font-mono text-slate-800 font-bold bg-slate-100 px-2 py-0.5 rounded">0</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5">
+                            <span class="text-slate-500"><i class="fa-solid fa-lines-leaning text-slate-400 mr-2 w-4 text-center"></i>总行数:</span>
+                            <span id="statLines" class="font-mono text-slate-800 font-bold bg-slate-100 px-2 py-0.5 rounded">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-100 text-2xs text-slate-400 flex items-center justify-between">
+                    <span>估算阅读耗时: <strong id="readTime" class="font-mono text-slate-600 font-bold">0</strong> 分钟</span>
+                    <span>估算朗读耗时: <strong id="speakTime" class="font-mono text-slate-600 font-bold">0</strong> 分钟</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function calculateStats() {
+            const text = document.getElementById('textInput').value;
+
+            // 1. 基础全量总长度
+            document.getElementById('statTotalWithSpace').innerText = text.length;
+            
+            // 2. 去除各种空格字符后的总长度
+            const noSpaceText = text.replace(/\s/g, '');
+            document.getElementById('statTotalNoSpace').innerText = noSpaceText.length;
+
+            // 3. 细分特征正则提取分析
+            const chineseMatch = text.match(/[\u4e00-\u9fa5]/g);
+            const englishMatch = text.match(/[a-zA-Z]/g);
+            const digitMatch = text.match(/[0-9]/g);
+            
+            const chineseLen = chineseMatch ? chineseMatch.length : 0;
+            const englishLen = englishMatch ? englishMatch.length : 0;
+            const digitLen = digitMatch ? digitMatch.length : 0;
+            
+            // 标点符号 = 总体不含空白长度 - 中文长度 - 英文长度 - 数字长度
+            let punctLen = noSpaceText.length - chineseLen - englishLen - digitLen;
+            if(punctLen < 0) punctLen = 0;
+
+            document.getElementById('statChinese').innerText = chineseLen;
+            document.getElementById('statEnglish').innerText = englishLen;
+            document.getElementById('statDigits').innerText = digitLen;
+            document.getElementById('statPunctuation').innerText = punctLen;
+
+            // 4. 行数与有效段落数测算
+            const lines = text ? text.split('\n') : [];
+            document.getElementById('statLines').innerText = lines.length;
+
+            const paragraphs = text ? text.split('\n').filter(p => p.trim() !== '') : [];
+            document.getElementById('statParagraphs').innerText = paragraphs.length;
+
+            // 5. 耗时预估（按常人标准平均阅读速度 400字/min，朗读 200字/min 估算）
+            const wordCount = noSpaceText.length;
+            document.getElementById('readTime').innerText = Math.ceil(wordCount / 400) || 0;
+            document.getElementById('speakTime').innerText = Math.ceil(wordCount / 200) || 0;
+        }
+
+        // 功能函数一：一键除空
+        function cleanSpaces() {
+            const input = document.getElementById('textInput');
+            input.value = input.value.replace(/[ \t\r]/g, '');
+            calculateStats();
+        }
+
+        // 功能函数二：合并多余空行
+        function cleanLineBreaks() {
+            const input = document.getElementById('textInput');
+            input.value = input.value.replace(/\n\s*\n/g, '\n');
+            calculateStats();
+        }
+
+        // 功能函数三：自媒体排版美化黑科技（中英文混排自动加空格）
+        function optimizeSpacing() {
+            let val = document.getElementById('textInput').value;
+            if(!val) return;
+
+            // 经典中英文边界正则空间注入算法
+            val = val.replace(/([\u4e00-\u9fa5])([a-zA-Z0-9])/g, '$1 $2');
+            val = val.replace(/([a-zA-Z0-9])([\u4e00-\u9fa5])/g, '$1 $2');
+
+            document.getElementById('textInput').value = val;
+            calculateStats();
+        }
+
+        function copyResult() {
+            const text = document.getElementById('textInput').value;
+            if(!text) return alert('当前没有可供复制的文本串！');
+            navigator.clipboard.writeText(text).then(() => alert('处理完成的文本已安全复制到你的剪贴板！'));
+        }
+
+        function clearAll() {
+            document.getElementById('textInput').value = '';
+            calculateStats();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.parent && window.parent.integrateToolPage) {
+                window.parent.integrateToolPage('text-counter');
+            }
+        });
+    </script>
+</body>
+</html>

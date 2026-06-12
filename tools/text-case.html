@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全能文本大小写与命名风格转换器 - 全能工具箱 V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aurora-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: aurora-animation 15s ease infinite;
+        }
+        @keyframes aurora-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <header class="aurora-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="返回主页">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        文本风格与大小写转换
+                    </h1>
+                    <p class="text-white/80 text-sm mt-0.5">支持英文字符全系列大小写、自媒体标题首字母、全角半角及开发专用命名风格极速转换</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="favBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 backdrop-blur-md border border-white/10">
+                    <i class="fa-regular fa-star" id="favIcon"></i>
+                    <span id="favText">加入收藏</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
+                <div>
+                    <label class="text-sm font-semibold text-slate-700 mb-2 block flex items-center gap-2">
+                        <i class="fa-solid fa-keyboard text-violet-500"></i> 请输入或粘贴你的原始英文/英汉文本
+                    </label>
+                    <textarea id="caseInput" class="w-full h-80 p-4 rounded-xl border border-slate-200 font-mono text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all outline-none resize-none" placeholder="例如输入: hello world 或 hello_world..."></textarea>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 flex justify-end">
+                    <button onclick="document.getElementById('caseInput').value=''" class="text-xs text-slate-400 hover:text-slate-600"><i class="fa-solid fa-trash-can mr-1"></i>清空内容</button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-sliders text-pink-500"></i> 一键转换动作矩阵
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-2.5 mb-6">
+                        <button onclick="convertStyle('upper')" class="py-2 px-3 bg-slate-50 hover:bg-violet-50 hover:border-violet-200 border border-slate-150 rounded-xl text-xs font-semibold text-slate-700 text-left transition-all flex items-center justify-between"><span>全大写 (UPPERCASE)</span><i class="fa-solid fa-chevron-right text-slate-300"></i></button>
+                        <button onclick="convertStyle('lower')" class="py-2 px-3 bg-slate-50 hover:bg-violet-50 hover:border-violet-200 border border-slate-150 rounded-xl text-xs font-semibold text-slate-700 text-left transition-all flex items-center justify-between"><span>全小写 (lowercase)</span><i class="fa-solid fa-chevron-right text-slate-300"></i></button>
+                        <button onclick="convertStyle('title')" class="py-2 px-3 bg-slate-50 hover:bg-violet-50 hover:border-violet-200 border border-slate-150 rounded-xl text-xs font-semibold text-slate-700 text-left transition-all flex items-center justify-between" title="每个英文单词的首字母大写"><span>标题风格 (Title Case)</span><i class="fa-solid fa-chevron-right text-slate-300"></i></button>
+                        <button onclick="convertStyle('sentence')" class="py-2 px-3 bg-slate-50 hover:bg-violet-50 hover:border-violet-200 border border-slate-150 rounded-xl text-xs font-semibold text-slate-700 text-left transition-all flex items-center justify-between" title="每句句首的首字母大写"><span>句首大写 (Sentence)</span><i class="fa-solid fa-chevron-right text-slate-300"></i></button>
+                        <button onclick="convertStyle('camel')" class="py-2 px-3 bg-slate-50 hover:bg-pink-50 hover:border-pink-200 border border-slate-150 rounded-xl text-xs font-semibold text-slate-700 text-left transition-all flex items-center justify-between"><span>小驼峰 (camelCase)</span><i class="fa-solid fa-chevron-right text-slate-300"></i></button>
+                        <button onclick="convertStyle('pascal')" class="py-2 px-3 bg-slate-50 hover:bg-pink-50 hover:border-pink-200 border border-slate-150 rounded-xl text-xs font-semibold text-slate-700 text-left transition-all flex items-center justify-between"><span>大驼峰 (PascalCase)</span><i class="fa-solid fa-chevron-right text-slate-300"></i></button>
+                        <button onclick="convertStyle('snake')" class="py-2 px-3 bg-slate-50 hover:bg-pink-50 hover:border-pink-200 border border-slate-150 rounded-xl text-xs font-semibold text-slate-700 text-left transition-all flex items-center justify-between"><span>蛇形命名 (snake_case)</span><i class="fa-solid fa-chevron-right text-slate-300"></i></button>
+                        <button onclick="convertStyle('kebab')" class="py-2 px-3 bg-slate-50 hover:bg-pink-50 hover:border-pink-200 border border-slate-150 rounded-xl text-xs font-semibold text-slate-700 text-left transition-all flex items-center justify-between"><span>短横线 (kebab-case)</span><i class="fa-solid fa-chevron-right text-slate-300"></i></button>
+                        <button onclick="convertStyle('toFull')" class="col-span-2 py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-150 rounded-xl text-xs font-semibold text-slate-700 text-center transition-all">半角字符 ➡️ 全角字符 (由 123 变为 １２３)</button>
+                        <button onclick="convertStyle('toHalf')" class="col-span-2 py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-150 rounded-xl text-xs font-semibold text-slate-700 text-center transition-all">全角字符 ➡️ 半角字符 (清除排版乱码异常)</button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-150">
+                    <div class="flex justify-between items-center mb-1.5 text-2xs font-bold text-slate-400 uppercase tracking-wider">
+                        <span>最新一步转换结果</span>
+                        <button onclick="copyOutput()" class="text-violet-600 hover:text-violet-800 font-sans font-semibold"><i class="fa-solid fa-copy mr-1"></i>一键复制结果</button>
+                    </div>
+                    <div id="caseOutput" class="w-full min-h-[90px] font-mono text-sm text-slate-800 break-all select-all whitespace-pre-wrap">等待执行上方转换动作...</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function convertStyle(type) {
+            const input = document.getElementById('caseInput').value;
+            const outputBox = document.getElementById('caseOutput');
+            
+            if(!input.trim()) {
+                return alert('请先在左侧输入区内粘贴或填写原始文本！');
+            }
+
+            let res = '';
+
+            switch(type) {
+                case 'upper':
+                    res = input.toUpperCase();
+                    break;
+                case 'lower':
+                    res = input.toLowerCase();
+                    break;
+                case 'title':
+                    res = input.toLowerCase().replace(/\b[a-z]/g, letter => letter.toUpperCase());
+                    break;
+                case 'sentence':
+                    // 句首大写：寻找每段开头或标点点号、问号、感叹号后面的第一个字母大写
+                    res = input.toLowerCase().replace(/(^\s*|[.!?]\s+)([a-z])/g, m => m.toUpperCase());
+                    break;
+                case 'camel':
+                case 'pascal':
+                case 'snake':
+                case 'kebab':
+                    // 开发通用切分洗词引擎算法
+                    let words = input.replace(/[-_]/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase().split(/\s+/).filter(w => w.length > 0);
+                    if(type === 'camel') {
+                        res = words.map((w, i) => i === 0 ? w : w.charAt(0).toUpperCase() + w.slice(1)).join('');
+                    } else if(type === 'pascal') {
+                        res = words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
+                    } else if(type === 'snake') {
+                        res = words.join('_');
+                    } else if(type === 'kebab') {
+                        res = words.join('-');
+                    }
+                    break;
+                case 'toFull':
+                    // 半角转全角
+                    res = "";
+                    for (let i = 0; i < input.length; i++) {
+                        let c = input.charCodeAt(i);
+                        if (c === 32) { res += String.fromCharCode(12288); }
+                        else if (c < 127) { res += String.fromCharCode(c + 65248); }
+                        else { res += input.charAt(i); }
+                    }
+                    break;
+                case 'toHalf':
+                    // 全角转半角
+                    res = "";
+                    for (let i = 0; i < input.length; i++) {
+                        let c = input.charCodeAt(i);
+                        if (c === 12288) { res += String.fromCharCode(32); }
+                        else if (c > 65280 && c < 65375) { res += String.fromCharCode(c - 65248); }
+                        else { res += input.charAt(i); }
+                    }
+                    break;
+            }
+
+            outputBox.innerText = res;
+            outputBox.classList.remove('text-slate-400');
+        }
+
+        function copyOutput() {
+            const outNode = document.getElementById('caseOutput');
+            const txt = outNode.innerText;
+            if(!txt || txt.includes('等待执行上方转换动作...')) return alert('当前结果区尚无有效转换数据！');
+            
+            navigator.clipboard.writeText(txt).then(() => alert('目标格式文本已完美复制至剪贴板！'));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.parent && window.parent.integrateToolPage) {
+                window.parent.integrateToolPage('text-case');
+            }
+        });
+    </script>
+</body>
+</html>
