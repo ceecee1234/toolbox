@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可视化极光渐变代码生成器 - 全能工具箱 V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .aurora-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: aurora-animation 15s ease infinite;
+        }
+        @keyframes aurora-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        /* 动态背景动画 */
+        @keyframes dynamic-preview {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .animate-preview {
+            background-size: 200% 200% !important;
+            animation: dynamic-preview 8s ease infinite !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <header class="aurora-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl transition-all duration-200 flex items-center justify-center backdrop-blur-md border border-white/10" title="返回主页">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        极光渐变生成器
+                    </h1>
+                    <p class="text-white/80 text-sm mt-0.5">像素级可视化色彩配比，一键导出 CSS、Tailwind 4.0 复合代码与动态流光特效</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="favBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 backdrop-blur-md border border-white/10">
+                    <i class="fa-regular fa-star" id="favIcon"></i>
+                    <span id="favText">加入收藏</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <div class="lg:col-span-7 space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4">
+                    <div id="gradientPreview" class="w-full h-64 rounded-xl shadow-inner transition-all duration-300 relative overflow-hidden" style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);">
+                        <div class="absolute bottom-3 right-3 bg-black/20 text-white/60 text-2xs px-2 py-1 rounded backdrop-blur-sm select-none font-mono">LIVE PREVIEW</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 space-y-5">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-violet-500"></i> 色彩节点与几何形态调校
+                    </h3>
+
+                    <div>
+                        <div class="flex justify-between items-center text-xs font-semibold text-slate-600 mb-2">
+                            <span>渐变旋转角度 (Angle)</span>
+                            <span id="angleVal" class="font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">135°</span>
+                        </div>
+                        <input type="range" id="angleInput" min="0" max="360" value="135" oninput="updateGradient()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-violet-600">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-100 pt-4">
+                        <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                            <label class="text-2xs font-bold text-slate-400 block mb-1.5 uppercase tracking-wider">节点一 (Start)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="color1" value="#3b82f6" oninput="updateGradient()" class="w-8 h-8 rounded-lg cursor-pointer border-0 bg-transparent">
+                                <input type="text" id="colorHex1" value="#3b82f6" oninput="syncColorInput(1)" class="w-full bg-white border border-slate-200 rounded-md text-xs font-mono px-2 py-1 text-slate-700 uppercase">
+                            </div>
+                        </div>
+                        <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                            <label class="text-2xs font-bold text-slate-400 block mb-1.5 uppercase tracking-wider">节点二 (Middle)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="color2" value="#8b5cf6" oninput="updateGradient()" class="w-8 h-8 rounded-lg cursor-pointer border-0 bg-transparent">
+                                <input type="text" id="colorHex2" value="#8b5cf6" oninput="syncColorInput(2)" class="w-full bg-white border border-slate-200 rounded-md text-xs font-mono px-2 py-1 text-slate-700 uppercase">
+                            </div>
+                        </div>
+                        <div class="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                            <label class="text-2xs font-bold text-slate-400 block mb-1.5 uppercase tracking-wider">节点三 (End)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="color3" value="#ec4899" oninput="updateGradient()" class="w-8 h-8 rounded-lg cursor-pointer border-0 bg-transparent">
+                                <input type="text" id="colorHex3" value="#ec4899" oninput="syncColorInput(3)" class="w-full bg-white border border-slate-200 rounded-md text-xs font-mono px-2 py-1 text-slate-700 uppercase">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between border-t border-slate-100 pt-4">
+                        <div class="text-xs text-slate-600 font-medium flex flex-col">
+                            <span>流光动效预览 (Live Animation)</span>
+                            <span class="text-2xs text-slate-400 font-normal">让色彩在画布上如极光般缓缓流动</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer select-none">
+                            <input type="checkbox" id="animateToggle" onchange="updateGradient()" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 space-y-4">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-code text-pink-500"></i> 生成的代码资产
+                    </h3>
+
+                    <div>
+                        <div class="flex justify-between items-center text-2xs font-bold text-slate-400 mb-1 tracking-wider uppercase">
+                            <span>Standard CSS</span>
+                            <button onclick="copyCode('cssCode')" class="text-violet-600 hover:text-violet-800"><i class="fa-solid fa-copy mr-1"></i>复制</button>
+                        </div>
+                        <div id="cssCode" class="w-full bg-slate-900 text-pink-400 p-3 rounded-xl font-mono text-2xs break-all border border-slate-800">background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);</div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center text-2xs font-bold text-slate-400 mb-1 tracking-wider uppercase">
+                            <span>Tailwind CSS</span>
+                            <button onclick="copyCode('twCode')" class="text-violet-600 hover:text-violet-800"><i class="fa-solid fa-copy mr-1"></i>复制</button>
+                        </div>
+                        <div id="twCode" class="w-full bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-2xs break-all border border-slate-800">bg-gradient-to-br from-[#3b82f6] via-[#8b5cf6] to-[#ec4899]</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-palette text-amber-500"></i> 设计师经典极光灵感推荐
+                    </h3>
+                    <div class="space-y-2">
+                        <button onclick="applyPreset('#3b82f6', '#8b5cf6', '#ec4899')" class="w-full p-2 hover:bg-slate-50 border border-slate-150 rounded-xl flex items-center justify-between transition-all group text-left">
+                            <span class="text-xs font-semibold text-slate-600">霓虹极光 (默认经典)</span>
+                            <div class="flex gap-1"><span class="w-4 h-4 rounded-full bg-[#3b82f6]"></span><span class="w-4 h-4 rounded-full bg-[#8b5cf6]"></span><span class="w-4 h-4 rounded-full bg-[#ec4899]"></span></div>
+                        </button>
+                        <button onclick="applyPreset('#10b981', '#06b6d4', '#3b82f6')" class="w-full p-2 hover:bg-slate-50 border border-slate-150 rounded-xl flex items-center justify-between transition-all group text-left">
+                            <span class="text-xs font-semibold text-slate-600">深海森林 (科技感)</span>
+                            <div class="flex gap-1"><span class="w-4 h-4 rounded-full bg-[#10b981]"></span><span class="w-4 h-4 rounded-full bg-[#06b6d4]"></span><span class="w-4 h-4 rounded-full bg-[#3b82f6]"></span></div>
+                        </button>
+                        <button onclick="applyPreset('#ff007a', '#7928ca', '#ff4500')" class="w-full p-2 hover:bg-slate-50 border border-slate-150 rounded-xl flex items-center justify-between transition-all group text-left">
+                            <span class="text-xs font-semibold text-slate-600">赛博朋克 (强冲击)</span>
+                            <div class="flex gap-1"><span class="w-4 h-4 rounded-full bg-[#ff007a]"></span><span class="w-4 h-4 rounded-full bg-[#7928ca]"></span><span class="w-4 h-4 rounded-full bg-[#ff4500]"></span></div>
+                        </button>
+                        <button onclick="applyPreset('#ff9a9e', '#fecfef', '#a1c4fd')" class="w-full p-2 hover:bg-slate-50 border border-slate-150 rounded-xl flex items-center justify-between transition-all group text-left">
+                            <span class="text-xs font-semibold text-slate-600">莫奈花园 (温柔浪漫)</span>
+                            <div class="flex gap-1"><span class="w-4 h-4 rounded-full bg-[#ff9a9e]"></span><span class="w-4 h-4 rounded-full bg-[#fecfef]"></span><span class="w-4 h-4 rounded-full bg-[#a1c4fd]"></span></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function updateGradient() {
+            const angle = document.getElementById('angleInput').value;
+            const c1 = document.getElementById('color1').value;
+            const c2 = document.getElementById('color2').value;
+            const c3 = document.getElementById('color3').value;
+            const isAnimated = document.getElementById('animateToggle').checked;
+
+            // 同步文本框
+            document.getElementById('colorHex1').value = c1;
+            document.getElementById('colorHex2').value = c2;
+            document.getElementById('colorHex3').value = c3;
+            document.getElementById('angleVal').innerText = angle + '°';
+
+            // 1. 生成 CSS 标准代码与方向词逻辑
+            const cssStyle = `linear-gradient(${angle}deg, ${c1} 0%, ${c2} 50%, ${c3} 100%)`;
+            const previewCanvas = document.getElementById('gradientPreview');
+            
+            previewCanvas.style.background = cssStyle;
+
+            // 动效切换控制
+            if(isAnimated) {
+                previewCanvas.classList.add('animate-preview');
+            } else {
+                previewCanvas.classList.remove('animate-preview');
+            }
+
+            document.getElementById('cssCode').innerText = `background: ${cssStyle};`;
+
+            // 2. 映射折算极其硬核的 Tailwind 4.0 动态万能类名
+            // 根据角度折算大概的 Tailwind 朝向类
+            let twDirection = 'to-br';
+            if (angle >= 337 || angle < 22) twDirection = 'to-t';
+            else if (angle >= 22 && angle < 67) twDirection = 'to-tr';
+            else if (angle >= 67 && angle < 112) twDirection = 'to-r';
+            else if (angle >= 112 && angle < 157) twDirection = 'to-br';
+            else if (angle >= 157 && angle < 202) twDirection = 'to-b';
+            else if (angle >= 202 && angle < 247) twDirection = 'to-bl';
+            else if (angle >= 247 && angle < 292) twDirection = 'to-l';
+            else if (angle >= 292 && angle < 337) twDirection = 'to-tl';
+
+            const twCode = `bg-gradient-${twDirection} from-[${c1}] via-[${c2}] to-[${c3}]${isAnimated ? ' animate-pulse' : ''}`;
+            document.getElementById('twCode').innerText = twCode;
+        }
+
+        // 文本框手动改颜色同步给取色盘
+        function syncColorInput(index) {
+            const hexInput = document.getElementById(`colorHex${index}`).value;
+            if(/^#[0-9A-F]{6}$/i.test(hexInput)) {
+                document.getElementById(`color${index}`).value = hexInput;
+                updateGradient();
+            }
+        }
+
+        // 套用预设模板
+        function applyPreset(c1, c2, c3) {
+            document.getElementById('color1').value = c1;
+            document.getElementById('color2').value = c2;
+            document.getElementById('color3').value = c3;
+            updateGradient();
+        }
+
+        function copyCode(id) {
+            const txt = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(txt).then(() => alert('极光渐变代码资产已成功复制到剪贴板！'));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.parent && window.parent.integrateToolPage) {
+                window.parent.integrateToolPage('css-gradient');
+            }
+        });
+    </script>
+</body>
+</html>
